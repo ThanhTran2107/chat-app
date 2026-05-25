@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
-import { User } from "../models/User.js";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
+import { User } from "../models/User.js";
 import { Session } from "../models/Session.js";
 
 const ACCESS_TOKEN_TTL = "30m";
@@ -35,7 +35,7 @@ export const register = async (req, res) => {
   }
 };
 
-export const login = async (req, res) => {
+export const logIn = async (req, res) => {
   try {
     const { username, password } = req.body;
 
@@ -75,6 +75,23 @@ export const login = async (req, res) => {
     });
 
     return res.status(200).json({ accessToken });
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const logOut = async (req, res) => {
+  try {
+    const token = req.cookies?.refreshToken;
+
+    if (token) {
+      await Session.deleteOne({ refreshToken: token });
+
+      req.clearCookie("refreshToken");
+    }
+
+    return res.sendStatus(204);
   } catch (e) {
     console.error(e);
     return res.status(500).json({ message: "Internal server error" });
