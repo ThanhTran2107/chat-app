@@ -32,4 +32,20 @@ export const registerSchema = z
     path: ["confirmPassword"],
   });
 
+export const loginSchema = z.object({
+  username: z
+    .string()
+    .min(
+      USERNAME_MIN_LENGTH,
+      `Username must be at least ${USERNAME_MIN_LENGTH} characters`,
+    ),
+  password: z
+    .string()
+    .min(
+      PASSWORD_MIN_LENGTH,
+      `Password must be at least ${PASSWORD_MIN_LENGTH} characters`,
+    ),
+});
+
 export type RegisterFormValues = z.infer<typeof registerSchema>;
+export type LoginFormValues = z.infer<typeof loginSchema>;
