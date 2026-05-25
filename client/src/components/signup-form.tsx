@@ -10,6 +10,9 @@ import {
   FieldSeparator,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { registerSchema, type RegisterFormValues } from "@/utils/constants";
 
 export function SignupForm({
   className,
@@ -18,11 +21,24 @@ export function SignupForm({
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
+  });
+
   return (
     <div className={cn("flex flex-col gap-1", className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="px-4 py-10 md:px-5 md:py-2.5">
+          <form
+            className="px-4 py-10 md:px-5 md:py-2.5"
+            onSubmit={handleSubmit((data) => {
+              console.log(data);
+            })}
+          >
             <FieldGroup className="gap-5">
               {/* Header */}
               <div className="flex flex-col text-center">
@@ -50,8 +66,14 @@ export function SignupForm({
                     type="text"
                     placeholder="John"
                     className="h-7"
-                    required
+                    {...register("firstName")}
                   />
+
+                  {errors.firstName && (
+                    <p className="text-[0.6rem] text-destructive">
+                      {errors.firstName.message}
+                    </p>
+                  )}
                 </Field>
                 <Field>
                   <FieldLabel htmlFor="last-name" className="text-xs">
@@ -62,8 +84,14 @@ export function SignupForm({
                     type="text"
                     placeholder="Doe"
                     className="h-7"
-                    required
+                    {...register("lastName")}
                   />
+
+                  {errors.lastName && (
+                    <p className="text-[0.6rem] text-destructive">
+                      {errors.lastName.message}
+                    </p>
+                  )}
                 </Field>
               </div>
 
@@ -77,8 +105,14 @@ export function SignupForm({
                   type="text"
                   placeholder="johndoe"
                   className="h-7"
-                  required
+                  {...register("username")}
                 />
+
+                {errors.username && (
+                  <p className="text-[0.6rem] text-destructive">
+                    {errors.username.message}
+                  </p>
+                )}
               </Field>
 
               {/* Email */}
@@ -91,8 +125,14 @@ export function SignupForm({
                   type="email"
                   placeholder="user@example.com"
                   className="h-7"
-                  required
+                  {...register("email")}
                 />
+
+                {errors.email && (
+                  <p className="text-[0.6rem] text-destructive">
+                    {errors.email.message}
+                  </p>
+                )}
               </Field>
 
               {/* Password row */}
@@ -106,7 +146,7 @@ export function SignupForm({
                       id="password"
                       type={showPassword ? "text" : "password"}
                       className="h-7 pr-7"
-                      required
+                      {...register("password")}
                     />
                     <button
                       type="button"
@@ -121,6 +161,12 @@ export function SignupForm({
                       )}
                     </button>
                   </div>
+
+                  {errors.password && (
+                    <p className="text-[0.6rem] text-destructive">
+                      {errors.password.message}
+                    </p>
+                  )}
                 </Field>
                 <Field>
                   <FieldLabel htmlFor="confirm-password" className="text-xs">
@@ -131,7 +177,7 @@ export function SignupForm({
                       id="confirm-password"
                       type={showConfirmPassword ? "text" : "password"}
                       className="h-7 pr-7"
-                      required
+                      {...register("confirmPassword")}
                     />
                     <button
                       type="button"
@@ -146,6 +192,12 @@ export function SignupForm({
                       )}
                     </button>
                   </div>
+
+                  {errors.confirmPassword && (
+                    <p className="text-[0.6rem] text-destructive">
+                      {errors.confirmPassword.message}
+                    </p>
+                  )}
                 </Field>
               </div>
               {/* Submit */}
@@ -153,6 +205,7 @@ export function SignupForm({
                 type="submit"
                 className="w-full cursor-pointer hover:bg-primary/80"
                 size="sm"
+                disabled={isSubmitting}
               >
                 Create Account
               </Button>
