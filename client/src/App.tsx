@@ -1,8 +1,10 @@
-import { BrowserRouter, Routes, Route } from "react-router";
-import { LoginPage } from "./pages/login.page";
-import { RegisterPage } from "./pages/register.page";
-import { ChatPage } from "./pages/chat.page";
-import { Toaster } from "sonner";
+import { Toaster } from 'sonner';
+
+import { BrowserRouter, Route, Routes } from 'react-router';
+
+import { ChatPage } from './pages/chat.page';
+import { LoginPage } from './pages/login.page';
+import { RegisterPage } from './pages/register.page';
 
 function App() {
   return (
