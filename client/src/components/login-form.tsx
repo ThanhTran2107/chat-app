@@ -4,6 +4,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
+import { Checkbox } from '@/components/antd/checkbox.component';
 import { SocialButtons } from '@/components/social-buttons';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -77,9 +78,15 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
 
               {/* Password row */}
               <Field>
-                <FieldLabel htmlFor="password" className="text-xs">
-                  Password
-                </FieldLabel>
+                <div className="flex items-center justify-between gap-3">
+                  <FieldLabel htmlFor="password" className="text-xs">
+                    Password
+                  </FieldLabel>
+
+                  <button type="button" className="text-[0.7rem] font-medium text-sky-600 italic hover:underline">
+                    Forgot?
+                  </button>
+                </div>
                 <div className="relative">
                   <Input
                     id="password"
@@ -98,6 +105,10 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                 </div>
 
                 {errors.password && <p className="text-destructive text-[0.6rem]">{errors.password.message}</p>}
+
+                <div className="flex items-center gap-2 text-xs">
+                  <Checkbox>Remember me</Checkbox>
+                </div>
               </Field>
 
               {/* Submit */}
