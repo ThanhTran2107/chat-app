@@ -13,9 +13,16 @@ import { Input } from '@/components/ui/input';
 import { type LoginFormValues, ROUTES, loginSchema } from '@/utils/constants';
 
 import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/stores/useAuthStore';
+import { getApiErrorMessage } from '@/lib/axios';
+import { toast } from 'sonner';
+import { useNavigate } from 'react-router';
 
 export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) {
   const [showPassword, setShowPassword] = useState(false);
+
+  const { login } = useAuthStore();
+  const navigate = useNavigate();
 
   const {
     register,
@@ -25,16 +32,23 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
     resolver: zodResolver(loginSchema),
   });
 
+  const handleLogin = async (data: LoginFormValues) => {
+    try {
+      const { username, password } = data;
+
+      await login(username, password);
+      toast.success('Login successful!');
+      navigate(ROUTES.CHAT);
+    } catch (e) {
+      toast.error(getApiErrorMessage(e, 'Login failed. Please try again.'));
+    }
+  };
+
   return (
     <div className={cn('flex flex-col gap-1', className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form
-            className="px-4 py-10 md:px-5 md:py-2.5"
-            onSubmit={handleSubmit(data => {
-              console.log(data);
-            })}
-          >
+          <form className="px-4 py-10 md:px-5 md:py-2.5" onSubmit={handleSubmit(handleLogin)}>
             <FieldGroup className="gap-5">
               {/* Header */}
               <div className="flex flex-col text-center">

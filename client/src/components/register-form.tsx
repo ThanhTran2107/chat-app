@@ -33,7 +33,7 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<'div'
     resolver: zodResolver(registerSchema),
   });
 
-  const onSubmit = async (data: RegisterFormValues) => {
+  const handleRegister = async (data: RegisterFormValues) => {
     try {
       const { username, password, email, firstName, lastName } = data;
 
@@ -50,7 +50,7 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<'div'
     <div className={cn('flex flex-col gap-1', className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="px-4 py-10 md:px-5 md:py-2.5" onSubmit={handleSubmit(onSubmit)}>
+          <form className="px-4 py-10 md:px-5 md:py-2.5" onSubmit={handleSubmit(handleRegister)}>
             <FieldGroup className="gap-5">
               {/* Header */}
               <div className="flex flex-col text-center">
