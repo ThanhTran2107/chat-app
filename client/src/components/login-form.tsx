@@ -22,7 +22,7 @@ import { useNavigate } from 'react-router';
 export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) {
   const [showPassword, setShowPassword] = useState(false);
 
-  const { login } = useAuthStore();
+  const { logIn } = useAuthStore();
   const navigate = useNavigate();
 
   const {
@@ -37,7 +37,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
     try {
       const { username, password } = data;
 
-      await login(username, password);
+      await logIn(username, password);
       toast.success('Login successful!');
       navigate(ROUTES.CHAT);
     } catch (e) {
