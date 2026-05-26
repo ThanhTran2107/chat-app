@@ -1,8 +1,11 @@
+import { useAuthStore } from '@/stores/use-auth-store';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router';
 
 import { Checkbox } from '@/components/antd/checkbox.component';
 import { SocialButtons } from '@/components/social-buttons';
@@ -13,11 +16,8 @@ import { Input } from '@/components/ui/input';
 
 import { type LoginFormValues, ROUTES, loginSchema } from '@/utils/constants';
 
-import { cn } from '@/lib/utils';
-import { useAuthStore } from '@/stores/useAuthStore';
 import { getApiErrorMessage } from '@/lib/axios';
-import { toast } from 'sonner';
-import { useNavigate } from 'react-router';
+import { cn } from '@/lib/utils';
 
 export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) {
   const [showPassword, setShowPassword] = useState(false);

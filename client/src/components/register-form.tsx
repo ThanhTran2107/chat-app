@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/stores/useAuthStore';
+import { useAuthStore } from '@/stores/use-auth-store';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';

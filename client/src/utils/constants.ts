@@ -11,7 +11,7 @@ export const API_ENDPOINTS = Object.freeze({
 export const ROUTES = Object.freeze({
   LOGIN: '/login',
   REGISTER: '/register',
-  CHAT: '/chat',
+  CHAT: '/',
 });
 
 export const registerSchema = z

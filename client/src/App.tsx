@@ -5,6 +5,7 @@ import { BrowserRouter, Route, Routes } from 'react-router';
 import { ChatPage } from './pages/chat.page';
 import { LoginPage } from './pages/login.page';
 import { RegisterPage } from './pages/register.page';
+import { ProtectedRoute } from './routes/protected-route';
 import { ROUTES } from './utils/constants';
 
 function App() {
@@ -15,7 +16,9 @@ function App() {
         <Routes>
           <Route path={ROUTES.LOGIN} element={<LoginPage />} />
           <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
-          <Route path={ROUTES.CHAT} element={<ChatPage />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path={ROUTES.CHAT} element={<ChatPage />} />
+          </Route>
         </Routes>
       </BrowserRouter>
     </>

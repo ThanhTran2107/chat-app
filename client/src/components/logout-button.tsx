@@ -1,8 +1,11 @@
-import { ROUTES } from '@/utils/constants';
-import { getApiErrorMessage } from '@/lib/axios';
+import { useAuthStore } from '@/stores/use-auth-store';
 import { toast } from 'sonner';
+
 import { useNavigate } from 'react-router';
-import { useAuthStore } from '@/stores/useAuthStore';
+
+import { ROUTES } from '@/utils/constants';
+
+import { getApiErrorMessage } from '@/lib/axios';
 
 export const LogoutButton = () => {
   const { logOut } = useAuthStore();
