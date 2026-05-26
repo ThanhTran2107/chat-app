@@ -1,8 +1,11 @@
+import { useAuthStore } from '@/stores/useAuthStore';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router';
 
 import { SocialButtons } from '@/components/social-buttons';
 import { Button } from '@/components/ui/button';
@@ -10,32 +13,44 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Field, FieldGroup, FieldLabel, FieldSeparator } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 
-import { type RegisterFormValues, registerSchema } from '@/utils/constants';
+import { ROUTES, type RegisterFormValues, registerSchema } from '@/utils/constants';
 
+import { getApiErrorMessage } from '@/lib/axios';
 import { cn } from '@/lib/utils';
 
 export function RegisterForm({ className, ...props }: React.ComponentProps<'div'>) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  const { register } = useAuthStore();
+  const navigate = useNavigate();
+
   const {
-    register,
+    register: formRegister,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
   });
 
+  const onSubmit = async (data: RegisterFormValues) => {
+    try {
+      const { username, password, email, firstName, lastName } = data;
+
+      await register(username, password, email, lastName, firstName);
+
+      toast.success('Registration successful! Please log in.');
+      navigate(ROUTES.LOGIN);
+    } catch (e) {
+      toast.error(getApiErrorMessage(e, 'Registration failed. Please try again.'));
+    }
+  };
+
   return (
     <div className={cn('flex flex-col gap-1', className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form
-            className="px-4 py-10 md:px-5 md:py-2.5"
-            onSubmit={handleSubmit(data => {
-              console.log(data);
-            })}
-          >
+          <form className="px-4 py-10 md:px-5 md:py-2.5" onSubmit={handleSubmit(onSubmit)}>
             <FieldGroup className="gap-5">
               {/* Header */}
               <div className="flex flex-col text-center">
@@ -55,7 +70,7 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<'div'
                     type="text"
                     placeholder="John"
                     className="h-7 text-[0.7rem] placeholder:text-[0.7rem] md:text-[0.7rem]"
-                    {...register('firstName')}
+                    {...formRegister('firstName')}
                   />
 
                   {errors.firstName && <p className="text-destructive text-[0.6rem]">{errors.firstName.message}</p>}
@@ -70,7 +85,7 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<'div'
                     type="text"
                     placeholder="Doe"
                     className="h-7 text-[0.7rem] placeholder:text-[0.7rem] md:text-[0.7rem]"
-                    {...register('lastName')}
+                    {...formRegister('lastName')}
                   />
 
                   {errors.lastName && <p className="text-destructive text-[0.6rem]">{errors.lastName.message}</p>}
@@ -87,7 +102,7 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<'div'
                   type="text"
                   placeholder="johndoe"
                   className="h-7 text-[0.7rem] placeholder:text-[0.7rem] md:text-[0.7rem]"
-                  {...register('username')}
+                  {...formRegister('username')}
                 />
 
                 {errors.username && <p className="text-destructive text-[0.6rem]">{errors.username.message}</p>}
@@ -103,7 +118,7 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<'div'
                   type="email"
                   placeholder="user@example.com"
                   className="h-7 text-[0.7rem] placeholder:text-[0.7rem] md:text-[0.7rem]"
-                  {...register('email')}
+                  {...formRegister('email')}
                 />
 
                 {errors.email && <p className="text-destructive text-[0.6rem]">{errors.email.message}</p>}
@@ -120,7 +135,7 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<'div'
                       id="password"
                       type={showPassword ? 'text' : 'password'}
                       className="h-7 pr-7 text-[0.7rem] placeholder:text-[0.7rem] md:text-[0.7rem]"
-                      {...register('password')}
+                      {...formRegister('password')}
                     />
                     <button
                       type="button"
@@ -144,7 +159,7 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<'div'
                       id="confirm-password"
                       type={showConfirmPassword ? 'text' : 'password'}
                       className="h-7 pr-7 text-[0.7rem] placeholder:text-[0.7rem] md:text-[0.7rem]"
-                      {...register('confirmPassword')}
+                      {...formRegister('confirmPassword')}
                     />
                     <button
                       type="button"
@@ -183,7 +198,7 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<'div'
               {/* Sign in link */}
               <p className="text-muted-foreground text-center text-[0.7rem] italic">
                 Already have an account?{' '}
-                <a href="/login" className="cursor-pointer font-medium underline underline-offset-4">
+                <a href={ROUTES.LOGIN} className="cursor-pointer font-medium underline underline-offset-4">
                   Login
                 </a>
               </p>

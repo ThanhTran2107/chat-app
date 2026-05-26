@@ -10,7 +10,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Field, FieldGroup, FieldLabel, FieldSeparator } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 
-import { type LoginFormValues, loginSchema } from '@/utils/constants';
+import { type LoginFormValues, ROUTES, loginSchema } from '@/utils/constants';
 
 import { cn } from '@/lib/utils';
 
@@ -107,7 +107,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
               {/* Register link */}
               <p className="text-muted-foreground text-center text-[0.7rem] italic">
                 Do not have any accounts?{' '}
-                <a href="/register" className="cursor-pointer font-medium underline underline-offset-4">
+                <a href={ROUTES.REGISTER} className="cursor-pointer font-medium underline underline-offset-4">
                   Register
                 </a>
               </p>

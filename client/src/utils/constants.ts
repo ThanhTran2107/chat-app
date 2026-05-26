@@ -3,6 +3,17 @@ import { z } from 'zod';
 export const USERNAME_MIN_LENGTH = 3;
 export const PASSWORD_MIN_LENGTH = 6;
 
+export const API_ENDPOINTS = Object.freeze({
+  BASE: '/chat-app',
+  AUTH_REGISTER: 'auth/register',
+});
+
+export const ROUTES = Object.freeze({
+  LOGIN: '/login',
+  REGISTER: '/register',
+  CHAT: '/chat',
+});
+
 export const registerSchema = z
   .object({
     firstName: z.string().min(1, 'First name is required'),
