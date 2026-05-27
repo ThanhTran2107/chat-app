@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/stores/use-auth-store';
 import axios, { isAxiosError } from 'axios';
 
 import { API_ENDPOINTS } from '@/utils/constants';
@@ -8,6 +9,14 @@ export const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+});
+
+api.interceptors.request.use(config => {
+  const { accessToken } = useAuthStore.getState();
+
+  if (accessToken) config.headers['Authorization'] = `Bearer ${accessToken}`;
+
+  return config;
 });
 
 export function getApiErrorMessage(error: unknown, fallback = 'Something went wrong') {

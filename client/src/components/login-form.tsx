@@ -39,7 +39,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
 
       await logIn(username, password);
       toast.success('Login successful!');
-      navigate(ROUTES.CHAT);
+      navigate(ROUTES.CHAT, { replace: true });
     } catch (e) {
       toast.error(getApiErrorMessage(e, 'Login failed. Please try again.'));
     }

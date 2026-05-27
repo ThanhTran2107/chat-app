@@ -16,7 +16,7 @@ export const LogoutButton = () => {
       await logOut();
 
       toast.success('Logout successful!');
-      navigate(ROUTES.LOGIN);
+      navigate(ROUTES.LOGIN, { replace: true });
     } catch (e) {
       console.error(e);
       toast.error(getApiErrorMessage(e, 'Logout failed. Please try again.'));
