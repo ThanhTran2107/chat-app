@@ -2,6 +2,7 @@ import { useAuthStore } from '@/stores/use-auth-store';
 import axios, { isAxiosError } from 'axios';
 
 import { API_ENDPOINTS } from '@/utils/constants';
+import { ROUTES } from '@/utils/constants';
 
 // Create an Axios instance with default configuration for API calls
 export const api = axios.create({
@@ -32,8 +33,15 @@ api.interceptors.response.use(
       originalRequest.url.includes(API_ENDPOINTS.AUTH_LOGIN) ||
       originalRequest.url.includes(API_ENDPOINTS.AUTH_REFRESH) ||
       originalRequest.url.includes(API_ENDPOINTS.AUTH_REGISTER)
-    )
+    ) {
+      // If refresh token endpoint returns 401, force redirect to login
+      if (originalRequest.url.includes(API_ENDPOINTS.AUTH_REFRESH) && error.response?.status === 401) {
+        useAuthStore.getState().clearState();
+        window.location.replace(ROUTES.LOGIN);
+      }
+
       return Promise.reject(error);
+    }
 
     originalRequest._retryCount = originalRequest._retryCount || 0; // Initialize retry count for the original request
 
