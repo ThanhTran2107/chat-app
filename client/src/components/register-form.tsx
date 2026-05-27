@@ -33,6 +33,7 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<'div'
     resolver: zodResolver(registerSchema),
   });
 
+  // Handle form submission for user registration
   const handleRegister = async (data: RegisterFormValues) => {
     try {
       const { username, password, email, firstName, lastName } = data;

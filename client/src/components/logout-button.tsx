@@ -11,6 +11,7 @@ export const LogoutButton = () => {
   const { logOut } = useAuthStore();
   const navigate = useNavigate();
 
+  // Handle the logout process when the button is clicked
   const handleLogOut = async () => {
     try {
       await logOut();

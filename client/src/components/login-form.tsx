@@ -33,6 +33,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
     resolver: zodResolver(loginSchema),
   });
 
+  // Handle form submission for user login
   const handleLogin = async (data: LoginFormValues) => {
     try {
       const { username, password } = data;
