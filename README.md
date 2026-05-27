@@ -1,6 +1,6 @@
 # Chat App
 
-A full-stack real-time chat application built with **React + TypeScript** on the frontend and **Node.js + Express** on the backend, using **MongoDB** as the database.
+A full-stack chat application using **React 19 + TypeScript** (frontend) and **Node.js + Express 5** (backend), with **MongoDB** as the database. The project includes user authentication, session management, API protection, basic register/login UI, and is ready for real-time chat extension.
 
 ---
 
@@ -27,34 +27,33 @@ Chat App is a web-based messaging platform where users can register, log in, and
 
 ---
 
-## Tech Stack
+## Tech Stack & Libraries
 
 ### Frontend (`client/`)
 
-| Technology            | Purpose                    |
-| --------------------- | -------------------------- |
-| React 19 + TypeScript | UI framework               |
-| Vite                  | Build tool & dev server    |
-| Tailwind CSS v4       | Styling                    |
-| shadcn/ui + base-ui   | Component library          |
-| React Router v7       | Client-side routing        |
-| React Hook Form + Zod | Form handling & validation |
-| Zustand               | Global state management    |
-| Axios                 | HTTP client                |
-| Sonner                | Toast notifications        |
-| Lucide React          | Icons                      |
+- **React 19**, **TypeScript**
+- **Vite** (dev server & build)
+- **Tailwind CSS v4** (styling)
+- **shadcn/ui**, **base-ui**, **Ant Design** (UI components)
+- **React Router v7** (routing)
+- **React Hook Form**, **Zod** (form & validation)
+- **Zustand** (state management)
+- **Axios** (HTTP client)
+- **Sonner** (toast notifications)
+- **Lucide React** (icons)
+- **Prettier, ESLint, Husky, lint-staged** (format/lint)
+- **@fontsource-variable/geist**, **class-variance-authority**, **clsx**, **tailwind-merge**, **tailwindcss-animate**, **tw-animate-css**
 
 ### Backend (`server/`)
 
-| Technology           | Purpose                         |
-| -------------------- | ------------------------------- |
-| Node.js + Express 5  | HTTP server & routing           |
-| MongoDB + Mongoose   | Database & ODM                  |
-| bcrypt               | Password hashing                |
-| JSON Web Token (JWT) | Access token authentication     |
-| cookie-parser        | HTTP cookie handling            |
-| dotenv               | Environment variable management |
-| nodemon              | Development auto-restart        |
+- **Node.js + Express 5**
+- **MongoDB + Mongoose**
+- **bcrypt** (hash password)
+- **jsonwebtoken** (JWT)
+- **cookie-parser**
+- **dotenv**
+- **cors**
+- **nodemon** (dev auto-restart)
 
 ---
 
@@ -62,84 +61,77 @@ Chat App is a web-based messaging platform where users can register, log in, and
 
 ```
 chat-app/
-├── client/                     # Frontend (React + TypeScript)
-│   ├── public/                 # Static assets (logo.svg, images)
+├── client/
+│   ├── public/
 │   ├── src/
 │   │   ├── assets/
 │   │   ├── components/
-│   │   │   ├── ui/             # Reusable UI primitives (Button, Input, Card, etc.)
-│   │   │   └── signup-form.tsx # Registration form component
-│   │   ├── lib/
-│   │   │   └── utils.ts        # Utility helpers (cn, etc.)
-│   │   ├── pages/
-│   │   │   ├── chat.page.tsx   # Main chat page (in progress)
-│   │   │   ├── login.page.tsx  # Login page (in progress)
-│   │   │   └── register.page.tsx # Registration page
-│   │   ├── App.tsx             # Root app with routing
-│   │   ├── main.tsx            # Entry point
-│   │   └── index.css           # Global styles & Tailwind imports
-│   ├── package.json
-│   └── vite.config.ts
+│   │   │   ├── login-form.tsx, register-form.tsx, logout-button.tsx, social-buttons.tsx
+│   │   │   ├── antd/ (checkbox, spin)
+│   │   │   └── ui/ (button, card, field, input, label, separator, ...)
+│   │   ├── lib/ (axios.ts, utils.ts)
+│   │   ├── pages/ (chat.page.tsx, login.page.tsx, register.page.tsx)
+│   │   ├── routes/ (protected-route.tsx, redirect-if-authenticated.tsx)
+│   │   ├── stores/ (use-auth-store.ts)
+│   │   ├── types/ (store.ts, user.ts)
+│   │   └── utils/ (constants.ts, services/auth.service.ts)
+│   ├── package.json, tsconfig.json, vite.config.ts, eslint.config.js, ...
 │
-└── server/                     # Backend (Node.js + Express)
-    ├── src/
-    │   ├── controllers/
-    │   │   ├── authController.js   # register, logIn, logOut
-    │   │   └── userController.js   # authMe (get current user)
-    │   ├── libs/
-    │   │   └── db.js               # MongoDB connection
-    │   ├── middlewares/
-    │   │   └── authMiddleware.js   # JWT access token guard
-    │   ├── models/
-    │   │   ├── User.js             # User schema
-    │   │   └── Session.js          # Refresh token session schema
-    │   ├── routes/
-    │   │   ├── authRoute.js        # /chat-app/auth/*
-    │   │   └── userRoute.js        # /chat-app/user/*
-    │   └── server.js               # App entry point
-    └── package.json
+└── server/
+  ├── src/
+  │   ├── controllers/ (authController.js, userController.js)
+  │   ├── libs/ (db.js)
+  │   ├── middlewares/ (authMiddleware.js)
+  │   ├── models/ (User.js, Session.js)
+  │   ├── routes/ (authRoute.js, userRoute.js)
+  │   └── server.js
+  └── package.json
 ```
 
 ---
 
 ## Current Features
 
-### Authentication
+### Backend
 
-- **Register** — Create a new account with first name, last name, username, email, and password
-- **Login** — Authenticate with username and password; returns a short-lived JWT access token (30 min) and sets an HTTP-only refresh token cookie (14 days)
-- **Logout** — Invalidates the refresh token session in the database
-- **Protected routes** — All `/chat-app/user/*` endpoints require a valid `Authorization: Bearer <token>` header
+- **Register**: Create a new account (username, email, password, full name)
+- **Login**: Authenticate, return access token (JWT) and refresh token (cookie)
+- **Logout**: Delete refresh token session
+- **Protected routes**: `/chat-app/user/*` requires a valid JWT
+- **Get current user info**: `/chat-app/user/me` (protected)
+- **Refresh token**: Issue new access token via refresh token (cookie)
 
-### Frontend Pages
+### Frontend
 
-- **Register page** — Fully designed signup form with: name fields, username, email, password visibility toggle, social login buttons (Google, Meta), branded logo
-- **Login page** — Placeholder (in progress)
-- **Chat page** — Placeholder (in progress)
+- **Register page**: Full form, validation, social login button (Google, Meta - UI)
+- **Login page**: Login form, checkbox, social login button (UI)
+- **Chat page**: Display user info, logout button (no real chat yet)
+- **Auth state management**: Zustand, store user and token
+- **Toast notifications**: Sonner
+- **Route protection**: Redirect if not logged in/already logged in
 
 ### User Model
 
-Each user stores: `username`, `hashedPassword`, `email`, `displayName`, `avatarUrl`, `avatarId`, `bio`, `phoneNumber`
+Each user includes: `username`, `hashedPassword`, `email`, `displayName`, `avatarUrl`, `avatarId`, `bio`, `phoneNumber`
 
 ---
 
 ## Planned Features
 
-- [ ] Login page UI & form validation
-- [ ] JWT refresh token flow (auto-renew access token using cookie)
-- [ ] Chat page UI — conversation list, message thread, message input
-- [ ] Real-time messaging via **WebSocket / Socket.IO**
-- [ ] One-on-one private messaging
-- [ ] Group chats / channels
-- [ ] Online presence indicator (online / offline / away)
-- [ ] Message read receipts
+- [ ] Complete login page UI & validation
+- [ ] JWT refresh token flow (auto-renew access token via cookie)
+- [ ] Chat page UI: conversation list, chat box, message input
+- [ ] Real-time chat (WebSocket/Socket.IO)
+- [ ] One-on-one and group messaging
+- [ ] Online/offline/away status
+- [ ] Read receipts
 - [ ] File & image attachments
-- [ ] User profile page (edit avatar, bio, display name)
-- [ ] Search users
+- [ ] User profile page (avatar, bio, display name)
+- [ ] User search
 - [ ] Notifications
 - [ ] OAuth login (Google, Meta)
-- [ ] Dark / light mode toggle
-- [ ] Deployment configuration (Docker, CI/CD)
+- [ ] Dark/light mode
+- [ ] Docker, CI/CD
 
 ---
 
@@ -230,15 +222,13 @@ VITE_API_BASE_URL=http://localhost:3000
 
 ---
 
-## Setup & Installation
+## Setup & Run (Installation Guide)
 
-### Prerequisites
+### Requirements
 
-Make sure you have the following installed on your machine:
-
-- [Node.js](https://nodejs.org/) v18 or higher
-- [npm](https://www.npmjs.com/) v9 or higher
-- A [MongoDB](https://www.mongodb.com/atlas) database (Atlas free tier is sufficient)
+- Node.js >= 18
+- npm >= 9
+- MongoDB (Atlas/local)
 
 ### 1. Clone the repository
 
@@ -247,81 +237,63 @@ git clone <repository-url>
 cd chat-app
 ```
 
-### 2. Install server dependencies
+### 2. Install backend dependencies
 
 ```bash
 cd server
 npm install
+cp .env.example .env
+# Edit .env with your MongoDB info and ACCESS_TOKEN_SECRET
 ```
 
-### 3. Configure server environment variables
-
-```bash
-# Still inside /server
-cp .env.example .env   # or create .env manually
-```
-
-Edit `server/.env` and fill in your values:
-
-```env
-PORT=3000
-MONGODB_CONNECTIONSTRING=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/chat-app
-ACCESS_TOKEN_SECRET=replace_this_with_a_long_random_string
-```
-
-> **Tip:** Generate a strong secret with:
->
-> ```bash
-> node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
-> ```
-
-### 4. Install client dependencies
+### 3. Install frontend dependencies
 
 ```bash
 cd ../client
 npm install
 ```
 
----
+### 4. Run the project
 
-## Running the Project
+Open 2 terminals:
 
-Open **two separate terminals**.
-
-### Terminal 1 — Start the backend
+**Terminal 1: Backend**
 
 ```bash
 cd server
 npm run dev
+# Server runs at http://localhost:3000
 ```
 
-Server starts at `http://localhost:3000`
-
-### Terminal 2 — Start the frontend
+**Terminal 2: Frontend**
 
 ```bash
 cd client
 npm run dev
+# Frontend runs at http://localhost:5173
 ```
-
-Frontend starts at `http://localhost:5173` (or the port Vite assigns)
 
 ---
 
-## Available Scripts
+## Notes
+
+- To register, you must fill in all required fields (username, email, password, full name)
+- Successful login will store the access token (JWT) and refresh token (cookie)
+- All `/chat-app/user/*` routes require the header: `Authorization: Bearer <accessToken>`
+- Chat functionality is not implemented yet, only UI and authentication are available
+
+---
+
+## Scripts
 
 ### Server
 
-| Command       | Description                                         |
-| ------------- | --------------------------------------------------- |
-| `npm run dev` | Start server with nodemon (auto-restart on changes) |
-| `npm start`   | Start server without nodemon (production)           |
+- `npm run dev`: Run server with nodemon (dev, auto-restart)
+- `npm start`: Run server in production
 
 ### Client
 
-| Command           | Description                          |
-| ----------------- | ------------------------------------ |
-| `npm run dev`     | Start Vite dev server                |
-| `npm run build`   | Type-check and build for production  |
-| `npm run preview` | Preview the production build locally |
-| `npm run lint`    | Run ESLint                           |
+- `npm run dev`: Run Vite dev server
+- `npm run build`: Build for production
+- `npm run preview`: Preview production build
+- `npm run lint`: Run ESLint
