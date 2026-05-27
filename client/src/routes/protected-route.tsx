@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useAuthStore } from '@/stores/use-auth-store';
+import { Spin } from '@/components/antd/spin.component';
 
 import { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router';
@@ -21,8 +22,13 @@ export const ProtectedRoute = () => {
     })();
   }, []);
 
-  // While loading or starting, show a loading message. If there's no access token after the checks, redirect to the login page. Otherwise, render the child routes (protected content).
-  if (loading || starting) return <div className="flex h-screen items-center justify-center">Loading the page...</div>;
+  // While loading or starting, show a loading spinner. If there's no access token after the checks, redirect to the login page. Otherwise, render the child routes (protected content).
+  if (loading || starting)
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Spin description="Loading the page..." size="large" />
+      </div>
+    );
 
   // If there's no access token, redirect to the login page
   if (!accessToken) return <Navigate to={ROUTES.LOGIN} replace />;

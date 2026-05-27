@@ -19,7 +19,7 @@ export const authService = {
   },
 
   // Log out the current user
-  logOut: async () => await api.post(API_ENDPOINTS.AUTH_LOGOUT, { withCredentials: true }),
+  logOut: async () => await api.post(API_ENDPOINTS.AUTH_LOGOUT, undefined, { withCredentials: true }),
 
   // Fetch the current user's information
   fetchMe: async () => {
@@ -30,7 +30,7 @@ export const authService = {
 
   // Refresh the access token using the refresh token stored in cookies
   refreshToken: async () => {
-    const res = await api.post(API_ENDPOINTS.AUTH_REFRESH, { withCredentials: true });
+    const res = await api.post(API_ENDPOINTS.AUTH_REFRESH, undefined, { withCredentials: true });
 
     return res.data.accessToken;
   },
