@@ -6,6 +6,7 @@ import { userRoute } from "./routes/userRoute.js";
 import cookieParser from "cookie-parser";
 import { protectedRoute } from "./middlewares/authMiddleware.js";
 import cors from "cors";
+import { friendRoute } from "./routes/friendRoute.js";
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.use("/chat-app/auth", authRoute);
 // Private route
 app.use(protectedRoute);
 app.use("/chat-app/user", userRoute);
+app.use("/chat-app/friend", friendRoute);
 
 connectDB().then(() => {
   app.listen(PORT, () => {
