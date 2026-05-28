@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import { protectedRoute } from "./middlewares/authMiddleware.js";
 import cors from "cors";
 import { friendRoute } from "./routes/friendRoute.js";
+import { messageRoute } from "./routes/messageRoute.js";
 
 dotenv.config();
 
@@ -30,6 +31,7 @@ app.use("/chat-app/auth", authRoute);
 app.use(protectedRoute);
 app.use("/chat-app/user", userRoute);
 app.use("/chat-app/friend", friendRoute);
+app.use("/chat-app/message", messageRoute);
 
 connectDB().then(() => {
   app.listen(PORT, () => {

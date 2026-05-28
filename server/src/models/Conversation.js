@@ -57,12 +57,10 @@ const conversationSchema = new mongoose.Schema(
       enum: ["direct", "group"],
       required: true,
     },
-    participants: [
-      {
-        type: [participantSchema],
-        required: true,
-      },
-    ],
+    participants: {
+      type: [participantSchema],
+      required: true,
+    },
     group: {
       type: [groupSchema],
     },
@@ -76,10 +74,10 @@ const conversationSchema = new mongoose.Schema(
       },
     ],
     lastMessage: {
-      type: [lastMessageSchema],
+      type: lastMessageSchema,
       default: null,
     },
-    unreadCount: {
+    unreadCounts: {
       type: Map,
       of: Number,
       default: {},
