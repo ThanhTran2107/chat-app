@@ -9,6 +9,8 @@ import cors from "cors";
 import { friendRoute } from "./routes/friendRoute.js";
 import { messageRoute } from "./routes/messageRoute.js";
 import { conversationRoute } from "./routes/conversationRoute.js";
+import SwaggerUI from "swagger-ui-express";
+import fs from "fs";
 
 dotenv.config();
 
@@ -24,6 +26,13 @@ app.use(
     credentials: true,
   }),
 );
+
+// Swagger setup
+const swaggerDocument = JSON.parse(
+  fs.readFileSync("./src/swagger.json", "utf-8"),
+);
+
+app.use("/api-docs", SwaggerUI.serve, SwaggerUI.setup(swaggerDocument));
 
 // Public route
 app.use("/chat-app/auth", authRoute);

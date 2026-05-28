@@ -1,6 +1,6 @@
-# Chat App
+﻿# Chat App
 
-A full-stack chat application using **React 19 + TypeScript** (frontend) and **Node.js + Express 5** (backend), with **MongoDB** as the database. The project includes user authentication, session management, API protection, basic register/login UI, and is ready for real-time chat extension.
+A full-stack chat application using **React 19 + TypeScript** (frontend) and **Node.js + Express 5** (backend), with **MongoDB** as the database. The project includes user authentication, session management, friend / conversation APIs, Swagger docs, and foundational direct/group messaging endpoints.
 
 ---
 
@@ -20,7 +20,7 @@ A full-stack chat application using **React 19 + TypeScript** (frontend) and **N
 
 ## Overview
 
-Chat App is a web-based messaging platform where users can register, log in, and chat in real time. The project is split into two separate workspaces:
+Chat App is a web-based messaging platform where users can register, log in, manage friends, and use conversation/message APIs. The project is split into two separate workspaces:
 
 - **`client/`** — React SPA (Single Page Application)
 - **`server/`** — REST API server
@@ -53,6 +53,7 @@ Chat App is a web-based messaging platform where users can register, log in, and
 - **cookie-parser**
 - **dotenv**
 - **cors**
+- **swagger-ui-express**
 - **nodemon** (dev auto-restart)
 
 ---
@@ -79,11 +80,13 @@ chat-app/
 │
 └── server/
   ├── src/
-  │   ├── controllers/ (authController.js, userController.js)
+  │   ├── controllers/ (authController.js, userController.js, friendController.js, messageController.js, conversationController.js)
   │   ├── libs/ (db.js)
-  │   ├── middlewares/ (authMiddleware.js)
-  │   ├── models/ (User.js, Session.js)
-  │   ├── routes/ (authRoute.js, userRoute.js)
+  │   ├── middlewares/ (authMiddleware.js, friendMiddleware.js)
+  │   ├── models/ (User.js, Session.js, Friend.js, FriendRequest.js, Conversation.js, Message.js)
+  │   ├── routes/ (authRoute.js, userRoute.js, friendRoute.js, messageRoute.js, conversationRoute.js)
+  │   ├── utils/ (messageHelper.js)
+  │   ├── swagger.json
   │   └── server.js
   └── package.json
 ```
@@ -94,21 +97,35 @@ chat-app/
 
 ### Backend
 
-- **Register**: Create a new account (username, email, password, full name)
-- **Login**: Authenticate, return access token (JWT) and refresh token (cookie)
-- **Logout**: Delete refresh token session
-- **Protected routes**: `/chat-app/user/*` requires a valid JWT
-- **Get current user info**: `/chat-app/user/me` (protected)
-- **Refresh token**: Issue new access token via refresh token (cookie)
+- **User auth**: register, login, logout, refresh token
+- **JWT protection**: all private APIs require `Authorization: Bearer <accessToken>`
+- **Session-based refresh**: refresh token stored in cookie and validated with `Session` model
+- **User profile**: `/chat-app/user/me`
+- **Friend system**:
+  - send friend requests
+  - accept friend requests
+  - decline friend requests
+  - list friends
+  - list sent / received requests
+- **Conversations**:
+  - create direct conversations
+  - create group conversations
+  - list user conversations
+  - paginate conversation messages
+- **Messaging API**:
+  - send direct messages
+  - send group messages
+  - update conversation metadata and unread counts
+- **Swagger docs**: backend API documentation served at `/api-docs`
 
 ### Frontend
 
-- **Register page**: Full form, validation, social login button (Google, Meta - UI)
-- **Login page**: Login form, checkbox, social login button (UI)
-- **Chat page**: Display user info, logout button (no real chat yet)
-- **Auth state management**: Zustand, store user and token
-- **Toast notifications**: Sonner
-- **Route protection**: Redirect if not logged in/already logged in
+- **Register page**: form validation and social login UI controls
+- **Login page**: auth form with UI state and token storage
+- **Chat page**: user info and logout support
+- **Auth state management**: Zustand for auth data
+- **Route protection**: redirects based on login state
+- **Toasts**: Sonner notifications for success/error states
 
 ### User Model
 
@@ -118,20 +135,16 @@ Each user includes: `username`, `hashedPassword`, `email`, `displayName`, `avata
 
 ## Planned Features
 
-- [ ] Complete login page UI & validation
-- [ ] JWT refresh token flow (auto-renew access token via cookie)
-- [ ] Chat page UI: conversation list, chat box, message input
-- [ ] Real-time chat (WebSocket/Socket.IO)
-- [ ] One-on-one and group messaging
-- [ ] Online/offline/away status
-- [ ] Read receipts
-- [ ] File & image attachments
-- [ ] User profile page (avatar, bio, display name)
-- [ ] User search
+- [ ] Complete chat UI and integrate message list with backend
+- [ ] Real-time chat with WebSocket / Socket.IO
+- [ ] Online/offline presence status
+- [ ] Read receipts and typing indicators
+- [ ] File and image attachments
+- [ ] Search users and view profiles
 - [ ] Notifications
 - [ ] OAuth login (Google, Meta)
-- [ ] Dark/light mode
-- [ ] Docker, CI/CD
+- [ ] Theme toggle (dark/light)
+- [ ] Docker and CI/CD
 
 ---
 
@@ -143,6 +156,14 @@ Each user includes: `username`, `hashedPassword`, `email`, `displayName`, `avata
 http://localhost:3000
 ```
 
+### Swagger UI
+
+Open API docs at:
+
+```
+http://localhost:3000/api-docs
+```
+
 ### Auth Routes — `/chat-app/auth`
 
 | Method | Endpoint                  | Auth | Description                          |
@@ -150,6 +171,7 @@ http://localhost:3000
 | POST   | `/chat-app/auth/register` | None | Register a new user                  |
 | POST   | `/chat-app/auth/login`    | None | Log in, returns access token         |
 | POST   | `/chat-app/auth/logout`   | None | Log out, clears refresh token cookie |
+| POST   | `/chat-app/auth/refresh`  | None | Refresh access token from cookie     |
 
 #### POST `/chat-app/auth/register`
 
@@ -184,7 +206,7 @@ Response:
 
 ### User Routes — `/chat-app/user` _(Protected)_
 
-All requests must include header:
+Requires header:
 
 ```
 Authorization: Bearer <accessToken>
@@ -193,6 +215,31 @@ Authorization: Bearer <accessToken>
 | Method | Endpoint            | Description                                    |
 | ------ | ------------------- | ---------------------------------------------- |
 | GET    | `/chat-app/user/me` | Get the currently authenticated user's profile |
+
+### Friend Routes — `/chat-app/friend` _(Protected)_
+
+| Method | Endpoint                                      | Description                             |
+| ------ | --------------------------------------------- | --------------------------------------- |
+| POST   | `/chat-app/friend/request`                     | Send a friend request                   |
+| POST   | `/chat-app/friend/request/:requestId/accept`   | Accept a friend request                 |
+| POST   | `/chat-app/friend/request/:requestId/decline`  | Decline a friend request                |
+| GET    | `/chat-app/friend/get-all`                     | Get friend list                         |
+| GET    | `/chat-app/friend/requests`                    | List sent and received friend requests  |
+
+### Message Routes — `/chat-app/message` _(Protected)_
+
+| Method | Endpoint                    | Description                        |
+| ------ | --------------------------- | ---------------------------------- |
+| POST   | `/chat-app/message/direct`  | Send a direct one-on-one message   |
+| POST   | `/chat-app/message/group`   | Send a group conversation message  |
+
+### Conversation Routes — `/chat-app/conversation` _(Protected)_
+
+| Method | Endpoint                                      | Description                                 |
+| ------ | --------------------------------------------- | ------------------------------------------- |
+| POST   | `/chat-app/conversation`                       | Create a direct or group conversation       |
+| GET    | `/chat-app/conversation`                       | Get conversations for the current user      |
+| GET    | `/chat-app/conversation/:conversationId/messages` | Get messages for a conversation           |
 
 ---
 
@@ -206,6 +253,7 @@ Create a file `server/.env` with the following variables:
 PORT=3000
 MONGODB_CONNECTIONSTRING=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/<dbname>
 ACCESS_TOKEN_SECRET=your_super_secret_key_here
+CLIENT_URL=http://localhost:5173
 ```
 
 | Variable                   | Description                                        |
@@ -213,8 +261,9 @@ ACCESS_TOKEN_SECRET=your_super_secret_key_here
 | `PORT`                     | Port the server listens on (default: `3000`)       |
 | `MONGODB_CONNECTIONSTRING` | MongoDB connection string (Atlas or local)         |
 | `ACCESS_TOKEN_SECRET`      | Secret key used to sign & verify JWT access tokens |
+| `CLIENT_URL`               | Frontend origin allowed by CORS                   |
 
-### Client (`client/.env`) _(optional, for future use)_
+### Client (`client/.env`) _(optional)_
 
 ```env
 VITE_API_BASE_URL=http://localhost:3000
@@ -222,7 +271,7 @@ VITE_API_BASE_URL=http://localhost:3000
 
 ---
 
-## Setup & Run (Installation Guide)
+## Setup & Installation
 
 ### Requirements
 
@@ -242,9 +291,9 @@ cd chat-app
 ```bash
 cd server
 npm install
-cp .env.example .env
-# Edit .env with your MongoDB info and ACCESS_TOKEN_SECRET
 ```
+
+Create `.env` from your environment settings.
 
 ### 3. Install frontend dependencies
 
@@ -277,23 +326,22 @@ npm run dev
 
 ## Notes
 
-- To register, you must fill in all required fields (username, email, password, full name)
-- Successful login will store the access token (JWT) and refresh token (cookie)
-- All `/chat-app/user/*` routes require the header: `Authorization: Bearer <accessToken>`
-- Chat functionality is not implemented yet, only UI and authentication are available
+- Backend routes are mounted under `/chat-app`
+- Swagger docs are available at `/api-docs`
+- JWT access token must be sent in `Authorization: Bearer <accessToken>`
+- Refresh token is stored in a secure cookie and used by `/chat-app/auth/refresh`
+- Messaging APIs support direct and group message creation via server endpoints
 
 ---
 
-## Scripts
+## Server Scripts
 
-### Server
+- `npm run dev`: Run backend with nodemon in development
+- `npm start`: Run backend in production
 
-- `npm run dev`: Run server with nodemon (dev, auto-restart)
-- `npm start`: Run server in production
-
-### Client
+## Client Scripts
 
 - `npm run dev`: Run Vite dev server
-- `npm run build`: Build for production
+- `npm run build`: Build production assets
 - `npm run preview`: Preview production build
 - `npm run lint`: Run ESLint
