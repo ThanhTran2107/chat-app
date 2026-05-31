@@ -12,6 +12,10 @@ export const API_ENDPOINTS = Object.freeze({
   AUTH_LOGOUT: 'auth/logout',
   AUTH_REFRESH: 'auth/refresh',
   USER_ME: 'user/me',
+  CONVERSATION: '/conversation',
+  CONVERSATION_MESSAGES: '/conversation/{id}/messages',
+  DIRECT_MESSAGE: '/message/direct',
+  GROUP_MESSAGE: '/message/group',
 });
 
 export const ROUTES = Object.freeze({

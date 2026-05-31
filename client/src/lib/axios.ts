@@ -59,7 +59,7 @@ api.interceptors.response.use(
 
         return api(originalRequest);
       } catch (e) {
-        console.error(e);
+        console.error('Token refresh error:', e);
         useAuthStore.getState().clearState();
 
         return Promise.reject(e);

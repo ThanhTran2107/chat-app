@@ -44,8 +44,6 @@ app.use("/chat-app/friend", friendRoute);
 app.use("/chat-app/message", messageRoute);
 app.use("/chat-app/conversation", conversationRoute);
 
-connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-  });
-});
+connectDB().then(() =>
+  app.listen(PORT, () => console.log(`Server is running on port ${PORT}`)),
+);

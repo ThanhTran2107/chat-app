@@ -60,7 +60,7 @@ export const createConversation = async (req, res) => {
 
     return res.status(201).json({ conversation });
   } catch (e) {
-    console.error(e);
+    console.error('Create conversation error:', e);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -102,7 +102,7 @@ export const getConversations = async (req, res) => {
 
     return res.status(200).json({ conversations: formatted });
   } catch (e) {
-    console.error(e);
+    console.error('Get conversations error:', e);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -133,7 +133,7 @@ export const getMessages = async (req, res) => {
 
     return res.status(200).json({ messages, nextCursor });
   } catch (e) {
-    console.error(e);
+    console.error('Get messages error:', e);
     return res.status(500).json({ message: "Internal server error" });
   }
 };

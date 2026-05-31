@@ -44,7 +44,7 @@ export const sendFriendRequest = async (req, res) => {
       .status(200)
       .json({ message: "Friend request sent successfully", request });
   } catch (e) {
-    console.error(e);
+    console.error('Send friend request error:', e);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -82,7 +82,7 @@ export const acceptFriendRequest = async (req, res) => {
       },
     });
   } catch (e) {
-    console.error(e);
+    console.error('Accept friend request error:', e);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -106,7 +106,7 @@ export const declineFriendRequest = async (req, res) => {
       .status(204)
       .json({ message: "Friend request declined successfully" });
   } catch (e) {
-    console.error(e);
+    console.error('Decline friend request error:', e);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -130,7 +130,7 @@ export const getAllFriends = async (req, res) => {
 
     return res.status(200).json({ friends });
   } catch (e) {
-    console.error(e);
+    console.error('Get all friends error:', e);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -148,7 +148,7 @@ export const getFriendRequests = async (req, res) => {
 
     return res.status(200).json({ sent, received });
   } catch (e) {
-    console.error(e);
+    console.error('Get friend requests error:', e);
     return res.status(500).json({ message: "Internal server error" });
   }
 };

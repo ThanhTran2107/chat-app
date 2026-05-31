@@ -1,96 +1,113 @@
+import { useChatStore } from '@/stores/use-chat-store';
 import type { AuthState } from '@/types/store';
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 // Zustand library for state management
 
 import { authService } from '@/utils/services/auth.service';
 
 // Zustand store for managing authentication state and actions
-export const useAuthStore = create<AuthState>((set, get) => ({
-  // Initial state values for authentication
-  accessToken: null,
-  user: null,
-  loading: false,
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set, get) => ({
+      // Initial state values for authentication
+      accessToken: null,
+      user: null,
+      loading: false,
 
-  clearState: () => set({ accessToken: null, user: null, loading: false }), // Reset the authentication state to its initial values
-  setAccessToken: token => set({ accessToken: token }), // Update the access token in the state
+      clearState: () => {
+        set({ accessToken: null, user: null, loading: false });
+        localStorage.removeItem('auth-storage');
+        localStorage.removeItem('chat-storage');
+        useChatStore.getState().reset();
+      }, // Reset the authentication state to its initial values
+      setAccessToken: token => set({ accessToken: token }), // Update the access token in the state
 
-  // Register a new user
-  register: async (username, password, email, lastName, firstName) => {
-    try {
-      set({ loading: true });
+      // Register a new user
+      register: async (username, password, email, lastName, firstName) => {
+        try {
+          set({ loading: true });
 
-      await authService.register(username, password, email, lastName, firstName);
-    } catch (e) {
-      console.error(e);
-      throw e;
-    } finally {
-      set({ loading: false });
-    }
-  },
+          await authService.register(username, password, email, lastName, firstName);
+        } catch (e) {
+          console.error('Registration error:', e);
+          throw e;
+        } finally {
+          set({ loading: false });
+        }
+      },
 
-  // Log in an existing user and return the access token
-  logIn: async (username, password) => {
-    try {
-      set({ loading: true });
+      // Log in an existing user and return the access token
+      logIn: async (username, password) => {
+        try {
+          set({ loading: true });
 
-      const { accessToken } = await authService.logIn(username, password);
-      get().setAccessToken(accessToken);
+          localStorage.removeItem('auth-storage');
+          localStorage.removeItem('chat-storage');
+          useChatStore.getState().reset();
 
-      await get().fetchMe();
-    } catch (e) {
-      console.error(e);
-      throw e;
-    } finally {
-      set({ loading: false });
-    }
-  },
+          const { accessToken } = await authService.logIn(username, password);
+          get().setAccessToken(accessToken);
 
-  // Clear the authentication state and log out the user
-  logOut: async () => {
-    try {
-      get().clearState();
-      await authService.logOut();
-    } catch (e) {
-      console.error(e);
-      throw e;
-    }
-  },
+          await get().fetchMe();
+          await useChatStore.getState().fetchConversations();
+        } catch (e) {
+          console.error('Login error:', e);
+          throw e;
+        } finally {
+          set({ loading: false });
+        }
+      },
 
-  // Fetch the current user's information
-  fetchMe: async () => {
-    try {
-      set({ loading: true });
+      // Clear the authentication state and log out the user
+      logOut: async () => {
+        try {
+          get().clearState();
+          await authService.logOut();
+        } catch (e) {
+          console.error('Logout error:', e);
+          throw e;
+        }
+      },
 
-      const user = await authService.fetchMe();
-      set({ user });
-    } catch (e) {
-      console.error(e);
-      set({ user: null, accessToken: null });
+      // Fetch the current user's information
+      fetchMe: async () => {
+        try {
+          set({ loading: true });
 
-      throw e;
-    } finally {
-      set({ loading: false });
-    }
-  },
+          const user = await authService.fetchMe();
+          set({ user });
+        } catch (e) {
+          console.error('Fetch user error:', e);
+          set({ user: null, accessToken: null });
 
-  // Refresh the access token using the refresh token stored in cookies
-  refreshToken: async () => {
-    try {
-      set({ loading: true });
-      const { user, fetchMe, setAccessToken } = get();
-      const accessToken = await authService.refreshToken();
+          throw e;
+        } finally {
+          set({ loading: false });
+        }
+      },
 
-      setAccessToken(accessToken);
+      // Refresh the access token using the refresh token stored in cookies
+      refreshToken: async () => {
+        try {
+          set({ loading: true });
+          const { user, fetchMe, setAccessToken } = get();
+          const accessToken = await authService.refreshToken();
 
-      if (!user) await fetchMe();
-    } catch (e) {
-      console.error(e);
-      get().clearState();
+          setAccessToken(accessToken);
 
-      throw e;
-    } finally {
-      set({ loading: false });
-    }
-  },
-}));
+          if (!user) await fetchMe();
+        } catch (e) {
+          console.error('Refresh token error:', e);
+          get().clearState();
+
+          throw e;
+        } finally {
+          set({ loading: false });
+        }
+      },
+    }),
+    { name: 'auth-storage', partialize: state => ({ user: state.user }) },
+  ),
+);

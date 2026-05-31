@@ -8,13 +8,14 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
 import { Checkbox } from '@/components/antd/checkbox.component';
-import { SocialButtons } from '@/components/social-buttons';
+import { SocialButtons } from '@/components/social-buttons.component';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Field, FieldGroup, FieldLabel, FieldSeparator } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 
 import { type LoginFormValues, ROUTES, loginSchema } from '@/utils/constants';
+import { useThemeStore } from '@/stores/use-theme-store';
 
 import { getApiErrorMessage } from '@/lib/axios';
 import { cn } from '@/lib/utils';
@@ -24,6 +25,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
 
   const { logIn } = useAuthStore();
   const navigate = useNavigate();
+  const { isDark } = useThemeStore();
 
   const {
     register,
@@ -107,8 +109,13 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
 
                 {errors.password && <p className="text-destructive text-[0.6rem]">{errors.password.message}</p>}
 
-                <div className="flex items-center gap-2 text-xs">
-                  <Checkbox>Remember me</Checkbox>
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    className={isDark ? 'text-white/80!' : 'text-black/80!'}
+                    style={{ color: isDark ? '#ffffff' : '#000000' }}
+                  >
+                    <span className="text-xs leading-snug font-medium">Remember me</span>
+                  </Checkbox>
                 </div>
               </Field>
 
