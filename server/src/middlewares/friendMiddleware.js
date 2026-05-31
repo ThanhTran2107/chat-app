@@ -42,7 +42,7 @@ export const checkFriendship = async (req, res, next) => {
 
     next();
   } catch (e) {
-    console.error(e);
+    console.error("Check friendship error:", e);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -69,7 +69,7 @@ export const checkGroupMemberShip = async (req, res, next) => {
     req.conversation = conversation;
     next();
   } catch (e) {
-    console.error(e);
+    console.error("Check group membership error:", e);
     return res.status(500).json({ message: "Internal server error" });
   }
 };

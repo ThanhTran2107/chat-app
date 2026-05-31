@@ -3,7 +3,7 @@ import { type VariantProps } from 'class-variance-authority';
 
 import { cn } from '@/lib/utils';
 
-import { buttonVariants } from './button-variants';
+import { buttonVariants } from './variants/button-variants';
 
 function Button({
   className,

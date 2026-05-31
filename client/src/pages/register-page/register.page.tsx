@@ -1,6 +1,6 @@
 import { RedirectIfAuthenticated } from '@/routes/redirect-if-authenticated';
 
-import { RegisterForm } from '@/components/register-form';
+import { RegisterForm } from '@/pages/register-page/components/register-form.component';
 
 export const RegisterPage = () => {
   return (

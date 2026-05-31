@@ -33,7 +33,7 @@ export const register = async (req, res) => {
 
     return res.sendStatus(204);
   } catch (e) {
-    console.error(e);
+    console.error('Registration error:', e);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -87,7 +87,7 @@ export const logIn = async (req, res) => {
     // trả refresh token về trong response
     return res.status(200).json({ accessToken });
   } catch (e) {
-    console.error(e);
+    console.error('Login error:', e);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -107,7 +107,7 @@ export const logOut = async (req, res) => {
 
     return res.sendStatus(204);
   } catch (e) {
-    console.error(e);
+    console.error('Logout error:', e);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -136,7 +136,7 @@ export const refreshToken = async (req, res) => {
 
     return res.status(200).json({ accessToken });
   } catch (e) {
-    console.error(e);
+    console.error('Refresh token error:', e);
     return res.status(500).json({ message: "Internal server error" });
   }
 };

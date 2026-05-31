@@ -39,7 +39,7 @@ export const sendDirectMessage = async (req, res) => {
 
     return res.status(201).json({ message });
   } catch (e) {
-    console.error(e);
+    console.error('Send direct message error:', e);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -65,7 +65,7 @@ export const sendGroupMessage = async (req, res) => {
 
     return res.status(201).json({ message });
   } catch (e) {
-    console.error(e);
+    console.error('Send group message error:', e);
     return res.status(500).json({ message: "Internal server error" });
   }
 };

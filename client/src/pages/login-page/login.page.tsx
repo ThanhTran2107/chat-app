@@ -1,6 +1,6 @@
 import { RedirectIfAuthenticated } from '@/routes/redirect-if-authenticated';
 
-import { LoginForm } from '@/components/login-form';
+import { LoginForm } from '@/pages/login-page/components/login-form.component';
 
 export const LoginPage = () => {
   return (

@@ -4,8 +4,9 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router';
 
 import { ROUTES } from '@/utils/constants';
-
+import { Button } from '@/components/ui/button';
 import { getApiErrorMessage } from '@/lib/axios';
+import { LogOut } from 'lucide-react';
 
 export const LogoutButton = () => {
   const { logOut } = useAuthStore();
@@ -19,14 +20,14 @@ export const LogoutButton = () => {
       toast.success('Logout successful!');
       navigate(ROUTES.LOGIN, { replace: true });
     } catch (e) {
-      console.error(e);
+      console.error('Logout error:', e);
       toast.error(getApiErrorMessage(e, 'Logout failed. Please try again.'));
     }
   };
 
   return (
-    <button className="rounded bg-red-500 px-4 py-2 text-white" onClick={handleLogOut}>
-      Logout
-    </button>
+    <Button className="flex w-full cursor-pointer justify-start" variant="completeGhost" onClick={handleLogOut}>
+      <LogOut className="text-destructive -ml-2" /> Log out
+    </Button>
   );
 };
