@@ -1,6 +1,7 @@
 import type { Conversation } from './chat.ts';
 import type { Message } from './chat.ts';
 import type { User } from './user.ts';
+import type { Socket } from 'socket.io-client';
 
 // Types for the authentication state managed by Zustand
 export interface AuthState {
@@ -38,4 +39,11 @@ export interface ChatState {
   fetchMessages: (conversationId: string) => Promise<void>; // Function to fetch messages for a specific conversation, with optional pagination cursor
   sendDirectMessage: (recipientId: string, content: string, imgUrl?: string) => Promise<void>; // Function to send a direct message
   sendGroupMessage: (conversationId: string, content: string, imgUrl?: string) => Promise<void>; // Function to send a group message
+}
+
+export interface SocketState {
+  socket: Socket | null;
+  onlineUsers: string[];
+  connectSocket: () => void;
+  disconnectSocket: () => void;
 }

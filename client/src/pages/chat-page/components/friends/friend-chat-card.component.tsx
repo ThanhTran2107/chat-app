@@ -8,10 +8,12 @@ import { ChatCard } from '../chat-card.component';
 import { StatusBadge } from '../status-badge.component';
 import { UnreadCountBadge } from '../unread-count-badge.component';
 import { UserAvatar } from './user-avatar.component';
+import { useSocketStore } from '@/stores/use-socket-store';
 
 export const FriendChatCard = ({ convo }: { convo: Conversation }) => {
   const { user } = useAuthStore();
   const { activeConversationId, setActiveConversation, messages, fetchMessages } = useChatStore();
+  const { onlineUsers } = useSocketStore();
 
   if (!user) return null;
 
@@ -39,7 +41,7 @@ export const FriendChatCard = ({ convo }: { convo: Conversation }) => {
         <>
           <UserAvatar type="sidebar" name={otherUser.displayName ?? ''} avatarUrl={otherUser.avatarUrl ?? undefined} />
           {/* todo: socket io */}
-          <StatusBadge status="offline" />
+          <StatusBadge status={onlineUsers.includes(otherUser?._id ?? '') ? 'online' : 'offline'} />
           {unreadCount > 0 && <UnreadCountBadge unreadCount={unreadCount} />}
         </>
       }

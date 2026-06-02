@@ -8,10 +8,12 @@ import { GroupChatAvatar } from '../groups/group-chat-avatar.component';
 import { Separator } from '@/components/ui/separator';
 import isEmpty from 'lodash-es/isEmpty';
 import filter from 'lodash-es/filter';
+import { useSocketStore } from '@/stores/use-socket-store';
 
 export const ChatWindowHeader = ({ chat }: { chat?: Conversation }) => {
   const { conversations, activeConversationId } = useChatStore();
   const { user } = useAuthStore();
+  const { onlineUsers } = useSocketStore();
 
   let otherUser;
 
@@ -55,7 +57,7 @@ export const ChatWindowHeader = ({ chat }: { chat?: Conversation }) => {
                   avatarUrl={otherUser?.avatarUrl || undefined}
                 />
                 {/* Online status indicator for direct chats */}
-                <StatusBadge status="offline" />
+                <StatusBadge status={onlineUsers.includes(otherUser?._id ?? '') ? 'online' : 'offline'} />
               </>
             ) : (
               <GroupChatAvatar participants={chat.participants} type="sidebar" />

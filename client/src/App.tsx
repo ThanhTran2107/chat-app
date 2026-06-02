@@ -10,13 +10,23 @@ import { RegisterPage } from './pages/register-page/register.page';
 import { ProtectedRoute } from './routes/protected-route';
 import { useThemeStore } from './stores/use-theme-store';
 import { ROUTES } from './utils/constants';
+import { useAuthStore } from './stores/use-auth-store';
+import { useSocketStore } from './stores/use-socket-store';
 
 function App() {
   const { isDark, setTheme } = useThemeStore();
+  const { accessToken } = useAuthStore();
+  const { connectSocket, disconnectSocket } = useSocketStore();
 
   useEffect(() => {
     setTheme(isDark);
   }, [isDark]);
+
+  useEffect(() => {
+    if (accessToken) connectSocket();
+
+    return () => disconnectSocket();
+  }, [accessToken]);
 
   return (
     <>

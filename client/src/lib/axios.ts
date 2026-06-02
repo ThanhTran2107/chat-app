@@ -6,7 +6,7 @@ import { ROUTES } from '@/utils/constants';
 
 // Create an Axios instance with default configuration for API calls
 export const api = axios.create({
-  baseURL: API_ENDPOINTS.BASE, // Base URL for the API, defined in constants
+  baseURL: import.meta.env.VITE_API_URL, // Base URL for the API, defined in constants
   withCredentials: true, // Include cookies in requests for authentication
   headers: {
     'Content-Type': 'application/json',

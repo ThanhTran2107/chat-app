@@ -11,10 +11,10 @@ import { messageRoute } from "./routes/messageRoute.js";
 import { conversationRoute } from "./routes/conversationRoute.js";
 import SwaggerUI from "swagger-ui-express";
 import fs from "fs";
+import { app, httpServer } from "./socket/index.js";
 
 dotenv.config();
 
-const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middlewares
@@ -45,5 +45,7 @@ app.use("/chat-app/message", messageRoute);
 app.use("/chat-app/conversation", conversationRoute);
 
 connectDB().then(() =>
-  app.listen(PORT, () => console.log(`Server is running on port ${PORT}`)),
+  httpServer.listen(PORT, () =>
+    console.log(`Server is running on port ${PORT}`),
+  ),
 );
