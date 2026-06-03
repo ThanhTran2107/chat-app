@@ -40,7 +40,8 @@ export interface ChatState {
   sendDirectMessage: (recipientId: string, content: string, imgUrl?: string) => Promise<void>; // Function to send a direct message
   sendGroupMessage: (conversationId: string, content: string, imgUrl?: string) => Promise<void>; // Function to send a group message
   addMessage: (message: Message) => Promise<void>; // Function to add a new message to the state, used for real-time updates
-  updateConversation: (conversation: Conversation) => void; // Function to update a conversation in the state, used for real-time updates
+  updateConversation: (conversation: Partial<Conversation>) => void; // Function to update a conversation in the state, used for real-time updates
+  markAsSeen: () => Promise<void>; // Function to mark a conversation as seen
 }
 
 export interface SocketState {

@@ -65,6 +65,8 @@ api.interceptors.response.use(
         return Promise.reject(e);
       }
     }
+
+    return Promise.reject(error);
   },
 );
 

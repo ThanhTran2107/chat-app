@@ -25,16 +25,18 @@ export const MessageItem = ({ message, index, messages, selectedConvo, lastMessa
   );
 
   return (
-    <div className={cn('message-bounce flex overflow-hidden', message.isOwn ? 'justify-end' : 'justify-start')}>
-      {/*avatar*/}
+    <div className={cn('message-bounce flex items-start gap-2', message.isOwn ? 'justify-end' : 'justify-start')}>
+      {/*avatar spacer*/}
       {!message.isOwn && (
-        <div>
-          {isGroupBreak && (
+        <div className="shrink-0 flex items-start">
+          {isGroupBreak ? (
             <UserAvatar
               type="chat"
               name={participant?.displayName ?? 'Moji'}
               avatarUrl={participant?.avatarUrl ?? undefined}
             />
+          ) : (
+            <div className="size-8" />
           )}
         </div>
       )}

@@ -45,4 +45,10 @@ export const ChatService = {
 
     return res.data.message;
   },
+
+  async markAsSeen(conversationId: string) {
+    const res = await api.patch(`${API_ENDPOINTS.CONVERSATION}/${conversationId}/seen`);
+
+    return res.data;
+  }
 };

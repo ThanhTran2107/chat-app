@@ -1,4 +1,5 @@
 import { useChatStore } from '@/stores/use-chat-store';
+import { useSocketStore } from '@/stores/use-socket-store';
 import type { AuthState } from '@/types/store';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
@@ -17,9 +18,12 @@ export const useAuthStore = create<AuthState>()(
       loading: false,
 
       clearState: () => {
+        useSocketStore.getState().disconnectSocket();
         set({ accessToken: null, user: null, loading: false });
+
         localStorage.removeItem('auth-storage');
         localStorage.removeItem('chat-storage');
+        localStorage.removeItem('auth-session');
         useChatStore.getState().reset();
       }, // Reset the authentication state to its initial values
       setAccessToken: token => set({ accessToken: token }), // Update the access token in the state
@@ -49,6 +53,7 @@ export const useAuthStore = create<AuthState>()(
 
           const { accessToken } = await authService.logIn(username, password);
           get().setAccessToken(accessToken);
+          localStorage.setItem('auth-session', '1');
 
           await get().fetchMe();
           await useChatStore.getState().fetchConversations();
@@ -95,14 +100,23 @@ export const useAuthStore = create<AuthState>()(
           const { user, fetchMe, setAccessToken } = get();
           const accessToken = await authService.refreshToken();
 
+          if (!accessToken) {
+            get().clearState();
+
+            return null;
+          }
+
+          localStorage.setItem('auth-session', '1');
           setAccessToken(accessToken);
 
           if (!user) await fetchMe();
+          
+          return accessToken;
         } catch (e) {
-          console.error('Refresh token error:', e);
+          console.warn('Refresh token failed:', e);
           get().clearState();
 
-          throw e;
+          return null;
         } finally {
           set({ loading: false });
         }

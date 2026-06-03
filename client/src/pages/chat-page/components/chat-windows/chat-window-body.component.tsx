@@ -7,9 +7,11 @@ import { isEmpty, map } from 'lodash-es';
 export const ChatWindowBody = () => {
   const bodyRef = useRef<HTMLDivElement | null>(null);
   const { activeConversationId, messages: allMessages, conversations } = useChatStore();
+  
+  const selectedConvo = conversations.find(conversation => conversation._id === activeConversationId);
+  const lastMessageStatus = !isEmpty(selectedConvo?.seenBy ?? []) ? 'seen' : 'delivered';
 
   const messages = activeConversationId ? (allMessages[activeConversationId]?.items ?? []) : [];
-  const selectedConvo = conversations.find(conversation => conversation._id === activeConversationId);
 
   useEffect(() => {
     if (!bodyRef.current) return;
@@ -40,7 +42,7 @@ export const ChatWindowBody = () => {
               index={index}
               messages={messages}
               selectedConvo={selectedConvo}
-              lastMessageStatus="delivered"
+              lastMessageStatus={lastMessageStatus}
             />
           </div>
         ))}

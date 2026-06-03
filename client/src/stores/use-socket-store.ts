@@ -26,9 +26,10 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     // online users
     socket.on('online-users', userIds => set({ onlineUsers: userIds }));
     // new message
-    socket.on('new-message', ({message, conversation, unreadCounts}) => {
-      if(!message || !conversation) return;
-      
+    socket.on('new-message', ({ message, conversation, unreadCounts }) => {
+      if (!message || !conversation) return;
+      if (!conversation.lastMessage) return;
+
       useChatStore.getState().addMessage(message);
 
       const lastMessage = {
@@ -36,9 +37,9 @@ export const useSocketStore = create<SocketState>((set, get) => ({
         content: conversation.lastMessage.content,
         createdAt: conversation.lastMessage.createdAt,
         sender: {
-          _id: conversation.lastMessage.sender._id,
-          displayName: '',
-          avatarUrl: '',
+          _id: conversation.lastMessage.sender?._id ?? conversation.lastMessage.senderId,
+          displayName: conversation.lastMessage.sender?.displayName ?? '',
+          avatarUrl: conversation.lastMessage.sender?.avatarUrl ?? '',
         },
       };
 
@@ -48,11 +49,22 @@ export const useSocketStore = create<SocketState>((set, get) => ({
         unreadCounts,
       };
 
-      if (useChatStore.getState().activeConversationId === message.conversationId) {
-        // seen marked
-      }
+      if (useChatStore.getState().activeConversationId === message.conversationId) useChatStore.getState().markAsSeen();
 
       useChatStore.getState().updateConversation(updatedConversation);
+    });
+
+    // read message
+    socket.on('read-message', ({ conversation, lastMessage }) => {
+      const updated = {
+        _id: conversation._id,
+        lastMessage,
+        lastMessageAt: conversation.lastMessageAt,
+        unreadCounts: conversation.unreadCounts,
+        seenBy: conversation.seenBy,
+      };
+
+      useChatStore.getState().updateConversation(updated);
     });
   },
   disconnectSocket: () => {

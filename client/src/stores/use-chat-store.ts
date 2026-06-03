@@ -6,6 +6,8 @@ import { ChatService } from '@/utils/services/chat.service';
 import { useAuthStore } from './use-auth-store';
 import isEmpty from 'lodash-es/isEmpty';
 import map from 'lodash-es/map';
+import find from 'lodash-es/find';
+import some from 'lodash-es/some';
 
 export const useChatStore = create<ChatState>()(
   persist(
@@ -121,15 +123,15 @@ export const useChatStore = create<ChatState>()(
           }
 
           set(state => {
-            if (prevItems.some(m => m._id === message._id)) return state;
+            if (some(prevItems, m => m._id === message._id)) return state;
 
             return {
               messages: {
                 ...state.messages,
                 [convoId]: {
                   items: [...prevItems, message],
-                  hasMore: state.messages[convoId].hasMore,
-                  nextCursor: state.messages[convoId].nextCursor ?? undefined,
+                  hasMore: state.messages[convoId]?.hasMore ?? true,
+                  nextCursor: state.messages[convoId]?.nextCursor,
                 },
               },
             };
@@ -145,6 +147,34 @@ export const useChatStore = create<ChatState>()(
             convo._id === conversation._id ? { ...convo, ...conversation } : convo,
           ),
         }));
+      },
+
+      markAsSeen: async () => {
+        try {
+          const { user } = useAuthStore.getState();
+          const { activeConversationId, conversations } = get();
+
+          if (!activeConversationId || !user) return;
+
+          const convo = find(conversations, convo => convo._id === activeConversationId);
+
+          if (!convo) return;
+
+          if ((convo.unreadCounts?.[user._id] ?? 0) === 0) return;
+
+          await ChatService.markAsSeen(activeConversationId);
+
+          set(state => ({
+            conversations: map(state.conversations, convo =>
+              convo._id === activeConversationId && convo.lastMessage
+                ? { ...convo, unreadCounts: { ...convo.unreadCounts, [user._id]: 0 } }
+                : convo,
+            ),
+          }));
+        } catch (e) {
+          console.error('Mark as seen error:', e);
+          throw e;
+        }
       },
     }),
     { name: 'chat-storage', partialize: state => ({ conversations: state.conversations }) },

@@ -8,17 +8,22 @@ import { Spin } from '@/components/antd/spin.component';
 
 import { ROUTES } from '@/utils/constants';
 
+let protectedRouteInitPromise: Promise<void> | null = null;
+
 export const ProtectedRoute = () => {
+  const [starting, setStarting] = useState(true);
+
   // Get the authentication state and actions from the auth store
   const { accessToken, loading, refreshToken, fetchMe } = useAuthStore();
-  const [starting, setStarting] = useState(true);
 
   useEffect(() => {
     let mounted = true;
 
     const initializeAuth = async () => {
       try {
-        if (!accessToken) await refreshToken();
+        const hasSession = localStorage.getItem('auth-session') === '1';
+
+        if (!accessToken && hasSession) await refreshToken();
 
         const authState = useAuthStore.getState();
         const currentAccessToken = authState.accessToken;
@@ -29,13 +34,19 @@ export const ProtectedRoute = () => {
         if (currentAccessToken && !chatState.convoLoading && !chatState.conversations?.length)
           await chatState.fetchConversations();
       } catch (e) {
-        console.error('ProtectedRoute initialization error:', e);
+        console.warn('ProtectedRoute initialization warning:', e);
       } finally {
         if (mounted) setStarting(false);
       }
     };
 
-    initializeAuth();
+    if (!protectedRouteInitPromise) {
+      protectedRouteInitPromise = initializeAuth();
+    } else {
+      protectedRouteInitPromise.finally(() => {
+        if (mounted) setStarting(false);
+      });
+    }
 
     return () => {
       mounted = false;

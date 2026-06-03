@@ -1,3 +1,4 @@
+import { isAxiosError } from 'axios';
 import { API_ENDPOINTS } from '@/utils/constants';
 
 import { api } from '@/lib/axios';
@@ -30,8 +31,16 @@ export const authService = {
 
   // Refresh the access token using the refresh token stored in cookies
   refreshToken: async () => {
-    const res = await api.post(API_ENDPOINTS.AUTH_REFRESH, undefined, { withCredentials: true });
+    try {
+      const res = await api.post(API_ENDPOINTS.AUTH_REFRESH, undefined, { withCredentials: true });
 
-    return res.data.accessToken;
+      return res.data.accessToken;
+    } catch (error) {
+      if (isAxiosError(error) && [401, 403].includes(error.response?.status ?? 0)) {
+        return null;
+      }
+
+      throw error;
+    }
   },
 };

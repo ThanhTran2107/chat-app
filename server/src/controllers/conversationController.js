@@ -1,5 +1,6 @@
 import { Conversation } from "../models/Conversation.js";
 import { Message } from "../models/Message.js";
+import { io } from "../socket/index.js";
 
 export const createConversation = async (req, res) => {
   try {
@@ -151,5 +152,66 @@ export const getUserConversationsForSocketIo = async (userId) => {
   } catch (e) {
     console.error("Get user conversations for Socket.IO error:", e);
     return [];
+  }
+};
+
+export const markAsSeen = async (req, res) => {
+  try {
+    const { conversationId } = req.params;
+    const userId = req.user._id.toString();
+
+    const conversation = await Conversation.findById(conversationId).lean();
+
+    if (!conversation)
+      return res.status(404).json({ message: "Conversation not found" });
+
+    const last = conversation.lastMessage;
+
+    if (!last)
+      return res
+        .status(200)
+        .json({ message: "No messages in this conversation" });
+
+    if (last.senderId.toString() === userId)
+      return res
+        .status(200)
+        .json({ message: "Sender no need to mark as seen" });
+
+    const updated = await Conversation.findByIdAndUpdate(
+      conversationId,
+      {
+        $addToSet: { seenBy: userId },
+        $set: { [`unreadCounts.${userId}`]: 0 },
+      },
+      {
+        returnDocument: "after",
+      },
+    );
+
+    if (!updated)
+      return res
+        .status(404)
+        .json({ message: "Conversation not found after update" });
+
+    io.to(conversationId).emit("read-message", {
+      conversation: updated,
+      lastMessage: {
+        _id: updated.lastMessage?._id,
+        content: updated.lastMessage?.content,
+        createdAt: updated.lastMessage?.createdAt,
+        sender: {
+          _id: updated.lastMessage?.senderId,
+        },
+      },
+    });
+
+    return res.status(200).json({
+      message: "Marked as seen",
+      seenBy: updated?.seenBy || [],
+      myUnreadCount: updated?.unreadCounts?.[userId] || 0,
+    });
+  } catch (e) {
+    console.error("Mark as seen error:", e);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
