@@ -103,6 +103,49 @@ export const useChatStore = create<ChatState>()(
           throw e;
         }
       },
+      addMessage: async message => {
+        try {
+          const { user } = useAuthStore.getState();
+          const { fetchMessages } = get();
+
+          message.isOwn = message.senderId === user?._id;
+
+          const convoId = message.conversationId;
+
+          let prevItems = get().messages[convoId]?.items ?? [];
+
+          if (isEmpty(prevItems)) {
+            await fetchMessages(message.conversationId);
+
+            prevItems = get().messages[convoId]?.items ?? [];
+          }
+
+          set(state => {
+            if (prevItems.some(m => m._id === message._id)) return state;
+
+            return {
+              messages: {
+                ...state.messages,
+                [convoId]: {
+                  items: [...prevItems, message],
+                  hasMore: state.messages[convoId].hasMore,
+                  nextCursor: state.messages[convoId].nextCursor ?? undefined,
+                },
+              },
+            };
+          });
+        } catch (e) {
+          console.error('Add message error:', e);
+          throw e;
+        }
+      },
+      updateConversation: conversation => {
+        set(state => ({
+          conversations: map(state.conversations, convo =>
+            convo._id === conversation._id ? { ...convo, ...conversation } : convo,
+          ),
+        }));
+      },
     }),
     { name: 'chat-storage', partialize: state => ({ conversations: state.conversations }) },
   ),

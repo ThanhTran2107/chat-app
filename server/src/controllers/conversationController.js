@@ -60,7 +60,7 @@ export const createConversation = async (req, res) => {
 
     return res.status(201).json({ conversation });
   } catch (e) {
-    console.error('Create conversation error:', e);
+    console.error("Create conversation error:", e);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -102,7 +102,7 @@ export const getConversations = async (req, res) => {
 
     return res.status(200).json({ conversations: formatted });
   } catch (e) {
-    console.error('Get conversations error:', e);
+    console.error("Get conversations error:", e);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -133,7 +133,23 @@ export const getMessages = async (req, res) => {
 
     return res.status(200).json({ messages, nextCursor });
   } catch (e) {
-    console.error('Get messages error:', e);
+    console.error("Get messages error:", e);
     return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getUserConversationsForSocketIo = async (userId) => {
+  try {
+    const conversations = await Conversation.find(
+      {
+        "participants.userId": userId,
+      },
+      { _id: 1 },
+    );
+
+    return conversations.map((c) => c._id.toString());
+  } catch (e) {
+    console.error("Get user conversations for Socket.IO error:", e);
+    return [];
   }
 };

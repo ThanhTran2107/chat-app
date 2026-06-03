@@ -39,6 +39,8 @@ export interface ChatState {
   fetchMessages: (conversationId: string) => Promise<void>; // Function to fetch messages for a specific conversation, with optional pagination cursor
   sendDirectMessage: (recipientId: string, content: string, imgUrl?: string) => Promise<void>; // Function to send a direct message
   sendGroupMessage: (conversationId: string, content: string, imgUrl?: string) => Promise<void>; // Function to send a group message
+  addMessage: (message: Message) => Promise<void>; // Function to add a new message to the state, used for real-time updates
+  updateConversation: (conversation: Conversation) => void; // Function to update a conversation in the state, used for real-time updates
 }
 
 export interface SocketState {

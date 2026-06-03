@@ -1,6 +1,8 @@
 import { Conversation } from "../models/Conversation.js";
 import { Message } from "../models/Message.js";
 import { updateConversationAfterCreateMessage } from "../utils/messageHelper.js";
+import { emitNewMessage } from "../utils/messageHelper.js";
+import { io } from "../socket/index.js";
 
 export const sendDirectMessage = async (req, res) => {
   try {
@@ -37,9 +39,11 @@ export const sendDirectMessage = async (req, res) => {
 
     await conversation.save();
 
+    emitNewMessage({ io, conversation, message });
+
     return res.status(201).json({ message });
   } catch (e) {
-    console.error('Send direct message error:', e);
+    console.error("Send direct message error:", e);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -63,9 +67,11 @@ export const sendGroupMessage = async (req, res) => {
 
     await conversation.save();
 
+    emitNewMessage({ io, conversation, message });
+
     return res.status(201).json({ message });
   } catch (e) {
-    console.error('Send group message error:', e);
+    console.error("Send group message error:", e);
     return res.status(500).json({ message: "Internal server error" });
   }
 };

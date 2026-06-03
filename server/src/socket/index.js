@@ -2,6 +2,7 @@ import { Server } from "socket.io";
 import http from "http";
 import express from "express";
 import { socketMiddleware } from "../middlewares/socketMiddleware.js";
+import { getUserConversationsForSocketIo } from "../controllers/conversationController.js";
 
 export const app = express();
 
@@ -18,7 +19,7 @@ io.use(socketMiddleware);
 
 const onlineUsers = new Map(); // {userId: socketId }
 
-io.on("connection", (socket) => {
+io.on("connection", async (socket) => {
   const user = socket.user;
 
   console.log(`${user.displayName} online with socket ID: ${socket.id}`);
@@ -26,6 +27,9 @@ io.on("connection", (socket) => {
   onlineUsers.set(user._id, socket.id);
 
   io.emit("online-users", Array.from(onlineUsers.keys()));
+
+  const conversationIds = await getUserConversationsForSocketIo(user._id);
+  conversationIds.forEach((conversationId) => socket.join(conversationId));
 
   socket.on("disconnect", () => {
     onlineUsers.delete(user._id);

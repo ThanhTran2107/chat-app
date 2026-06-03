@@ -4,7 +4,7 @@ export const authMe = async (req, res) => {
 
     return res.status(200).json({ user });
   } catch (e) {
-    console.error('Auth me error:', e);
+    console.error("Auth me error:", e);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
