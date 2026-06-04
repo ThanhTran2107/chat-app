@@ -1,10 +1,11 @@
 import { useChatStore } from '@/stores/use-chat-store';
 import { ChatWelcomeScreen } from '../components/chat-windows/chat-welcome-screen.component';
-import { ChatWindowSkeleton } from '../components/chat-windows/chat-window-skeleton.component';
+// import { ChatWindowSkeleton } from '../components/chat-windows/chat-window-skeleton.component';
 import { SidebarInset } from '@/components/ui/sidebar';
 import { ChatWindowHeader } from '../components/chat-windows/chat-window-header.component';
 import { ChatWindowBody } from '../components/chat-windows/chat-window-body.component';
 import { MessageInput } from '../components/messages/message-input.component';
+import { Spin } from '@/components/antd/spin.component';
 import { useEffect } from 'react';
 
 export const ChatWindowLayout = () => {
@@ -28,7 +29,7 @@ export const ChatWindowLayout = () => {
 
   if (!selectedConvo) return <ChatWelcomeScreen />;
 
-  if (loading) return <ChatWindowSkeleton />;
+  if (loading) return <Spin />;
 
   return (
     <SidebarInset className="flex h-full min-h-0 flex-1 flex-col overflow-hidden rounded-sm shadow-md">

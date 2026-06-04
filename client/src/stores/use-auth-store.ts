@@ -20,11 +20,11 @@ export const useAuthStore = create<AuthState>()(
       clearState: () => {
         useSocketStore.getState().disconnectSocket();
         set({ accessToken: null, user: null, loading: false });
-
+        useChatStore.getState().reset();
+        sessionStorage.clear();
         localStorage.removeItem('auth-storage');
         localStorage.removeItem('chat-storage');
         localStorage.removeItem('auth-session');
-        useChatStore.getState().reset();
       }, // Reset the authentication state to its initial values
       setAccessToken: token => set({ accessToken: token }), // Update the access token in the state
 
@@ -45,11 +45,8 @@ export const useAuthStore = create<AuthState>()(
       // Log in an existing user and return the access token
       logIn: async (username, password) => {
         try {
+          get().clearState();
           set({ loading: true });
-
-          localStorage.removeItem('auth-storage');
-          localStorage.removeItem('chat-storage');
-          useChatStore.getState().reset();
 
           const { accessToken } = await authService.logIn(username, password);
           get().setAccessToken(accessToken);
@@ -110,7 +107,7 @@ export const useAuthStore = create<AuthState>()(
           setAccessToken(accessToken);
 
           if (!user) await fetchMe();
-          
+
           return accessToken;
         } catch (e) {
           console.warn('Refresh token failed:', e);
