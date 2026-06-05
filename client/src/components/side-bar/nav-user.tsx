@@ -16,67 +16,75 @@ import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui
 import { useSidebar } from '@/components/ui/contexts/sidebar-context';
 import { type User } from '@/types/user.ts';
 import { LogoutButton } from '../logout-button.component';
+import { useState } from 'react';
+import { FriendRequestDialog } from './dialogs/friend-request-dialog.component';
 
 export function NavUser({ user }: { user: User }) {
   const { isMobile } = useSidebar();
+  const [friendRequestOpen, setFriendRequestOpen] = useState(false);
+
   return (
-    <SidebarMenu>
-      <SidebarMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTrigger render={<SidebarMenuButton size="lg" className="aria-expanded:bg-muted" />}>
-            <Avatar>
-              <AvatarImage src={user.avatarUrl} alt={user.displayName} />
-              <AvatarFallback>{user.displayName.charAt(0)}</AvatarFallback>
-            </Avatar>
-            <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-medium">{user.displayName}</span>
-              <span className="truncate text-xs">{user.email}</span>
-            </div>
-            <ChevronsUpDownIcon className="ml-auto size-4" />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            className="min-w-56 rounded-lg"
-            side={isMobile ? 'bottom' : 'right'}
-            align="end"
-            sideOffset={4}
-          >
-            <DropdownMenuGroup>
-              <DropdownMenuLabel className="p-0 font-normal">
-                <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                  <Avatar>
-                    <AvatarImage src={user.avatarUrl} alt={user.displayName} />
-                    <AvatarFallback>{user.displayName.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">{user.displayName}</span>
-                    <span className="truncate text-xs">{user.email}</span>
+    <>
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <DropdownMenu>
+            <DropdownMenuTrigger render={<SidebarMenuButton size="lg" className="aria-expanded:bg-muted" />}>
+              <Avatar>
+                <AvatarImage src={user.avatarUrl} alt={user.displayName} />
+                <AvatarFallback>{user.displayName.charAt(0)}</AvatarFallback>
+              </Avatar>
+              <div className="grid flex-1 text-left text-sm leading-tight">
+                <span className="truncate font-medium">{user.displayName}</span>
+                <span className="truncate text-xs">{user.email}</span>
+              </div>
+              <ChevronsUpDownIcon className="ml-auto size-4" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              className="min-w-56 rounded-lg"
+              side={isMobile ? 'bottom' : 'right'}
+              align="end"
+              sideOffset={4}
+            >
+              <DropdownMenuGroup>
+                <DropdownMenuLabel className="p-0 font-normal">
+                  <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                    <Avatar>
+                      <AvatarImage src={user.avatarUrl} alt={user.displayName} />
+                      <AvatarFallback>{user.displayName.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <div className="grid flex-1 text-left text-sm leading-tight">
+                      <span className="truncate font-medium">{user.displayName}</span>
+                      <span className="truncate text-xs">{user.email}</span>
+                    </div>
                   </div>
-                </div>
-              </DropdownMenuLabel>
-            </DropdownMenuGroup>
+                </DropdownMenuLabel>
+              </DropdownMenuGroup>
 
-            <DropdownMenuSeparator />
+              <DropdownMenuSeparator />
 
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <UserIcon className="text-muted-foreground dark:group-focus:text-accent-foreground!" />
-                Account
+              <DropdownMenuGroup>
+                <DropdownMenuItem>
+                  <UserIcon className="text-muted-foreground dark:group-focus:text-accent-foreground!" />
+                  Account
+                </DropdownMenuItem>
+
+                <DropdownMenuItem onClick={() => setFriendRequestOpen(true)} className="cursor-pointer">
+                  <Bell className="text-muted-foreground dark:group-focus:text-accent-foreground!" />
+                  Notifications
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+
+              <DropdownMenuSeparator />
+
+              <DropdownMenuItem className="cursor-pointer" variant="destructive">
+                <LogoutButton />
               </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </SidebarMenuItem>
+      </SidebarMenu>
 
-              <DropdownMenuItem>
-                <Bell className="text-muted-foreground dark:group-focus:text-accent-foreground!" />
-                Notifications
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-
-            <DropdownMenuSeparator />
-
-            <DropdownMenuItem className="cursor-pointer" variant="destructive">
-              <LogoutButton />
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </SidebarMenuItem>
-    </SidebarMenu>
+      <FriendRequestDialog open={friendRequestOpen} setOpen={setFriendRequestOpen} />
+    </>
   );
 }

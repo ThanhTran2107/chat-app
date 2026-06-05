@@ -1,6 +1,6 @@
 import type { Conversation } from './chat.ts';
 import type { Message } from './chat.ts';
-import type { User } from './user.ts';
+import type { FriendRequest, User } from './user.ts';
 import type { Socket } from 'socket.io-client';
 
 // Types for the authentication state managed by Zustand
@@ -49,4 +49,15 @@ export interface SocketState {
   onlineUsers: string[];
   connectSocket: () => void;
   disconnectSocket: () => void;
+}
+
+export interface FriendState {
+  loading: boolean; // Indicates if friend-related operations are in progress
+  receivedList: FriendRequest[]; // List of received friend requests
+  sentList: FriendRequest[]; // List of sent friend requests
+  searchByUsername: (username: string) => Promise<User | null>; // Function to search for a user by username, returns a User object or null if not found
+  sendFriendRequest: (to: string, message?: string) => Promise<string>; // Function to send a friend request, returns a success message
+  getAllFriendRequests: () => Promise<void>; // Function to fetch all friend requests (both sent and received)
+  acceptRequest: (requestId: string) => Promise<void>; // Function to accept a friend request by its ID
+  declineRequest: (requestId: string) => Promise<void>; // Function to decline a friend request by its ID
 }

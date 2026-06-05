@@ -1,6 +1,5 @@
 'use client';
 
-// import { AddFriendModel } from '../chat/add-friend-model';
 import { useThemeStore } from '@/stores/use-theme-store';
 import { Moon, Sun } from 'lucide-react';
 
@@ -26,6 +25,7 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { useAuthStore } from '@/stores/use-auth-store';
 import { NavUser } from './nav-user.tsx';
+import { AddFriendModel } from '@/pages/chat-page/components/add-friend-model.component.tsx';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { isDark, toggleTheme } = useThemeStore();
@@ -79,7 +79,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarGroup>
           <SidebarGroupLabel className="uppercase">Friends</SidebarGroupLabel>
           <SidebarGroupAction title="Add friend" className="cursor-pointer">
-            {/* <AddFriendModel /> */}
+            <AddFriendModel />
           </SidebarGroupAction>
 
           <SidebarGroupContent>
