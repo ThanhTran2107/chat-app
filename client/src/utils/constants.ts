@@ -6,14 +6,30 @@ export const USERNAME_MIN_LENGTH = 3;
 export const PASSWORD_MIN_LENGTH = 6;
 
 export const API_ENDPOINTS = Object.freeze({
+  // Base path for all API endpoints
   BASE: '/chat-app',
+
+  // Authentication endpoints
   AUTH_REGISTER: 'auth/register',
   AUTH_LOGIN: 'auth/login',
   AUTH_LOGOUT: 'auth/logout',
   AUTH_REFRESH: 'auth/refresh',
+
+  // User-related endpoints
   USER_ME: 'user/me',
+
+  // Friend-related endpoints
+  FRIEND_REQUEST: 'friend/request',
+  FRIEND_REQUEST_ACCEPT: (requestId: string) => `friend/request/${requestId}/accept`,
+  FRIEND_REQUEST_DECLINE: (requestId: string) => `friend/request/${requestId}/decline`,
+  FRIEND_REQUESTS: 'friend/requests',
+  FRIEND_LIST: 'friend/get-all',
+
+  // Conversation and messaging endpoints
   CONVERSATION: '/conversation',
   CONVERSATION_MESSAGES: '/conversation/{id}/messages',
+
+  // Message endpoints
   DIRECT_MESSAGE: '/message/direct',
   GROUP_MESSAGE: '/message/group',
 });

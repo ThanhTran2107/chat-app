@@ -24,7 +24,7 @@ export const SendFriendRequestForm = ({
 }: SendFriendRequestFormProps) => {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      <div>
+      <div className="space-y-4">
         <span className="success-message">
           Great news! We found <span className="font-semibold">@{searchedUsername}</span>
         </span>
@@ -40,7 +40,8 @@ export const SendFriendRequestForm = ({
             render={({ field }) => (
               <TextArea
                 id="message"
-                rows={3}
+                rows={5}
+                maxLength={200}
                 placeholder="Hi there! Would you like to connect?"
                 className="glass border-border/50 focus:border-primary/50 transition-smooth resize-none"
                 {...field}

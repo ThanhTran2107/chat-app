@@ -18,7 +18,7 @@ import { useSidebar } from '@/components/ui/contexts/sidebar-context';
 import { type User } from '@/types/user.ts';
 import { LogoutButton } from '../logout-button.component';
 import { useEffect, useState } from 'react';
-import { FriendRequestDialog } from './dialogs/friend-request-dialog.component';
+import { FriendRequestDialog } from '../../pages/chat-page/components/friends/dialogs/friend-request-dialog.component';
 import { useFriendStore } from '@/stores/use-friend-store';
 
 export function NavUser({ user }: { user: User }) {
@@ -72,7 +72,7 @@ export function NavUser({ user }: { user: User }) {
                       <AvatarImage src={user.avatarUrl} alt={user.displayName} />
                       <AvatarFallback>{user.displayName.charAt(0)}</AvatarFallback>
                     </Avatar>
-                    
+
                     <div className="grid flex-1 gap-0.5 text-left text-sm leading-tight">
                       <span className="truncate font-medium">
                         {user.displayName} (<span className="truncate text-xs">@{user.username}</span>)

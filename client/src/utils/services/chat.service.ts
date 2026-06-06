@@ -51,4 +51,9 @@ export const ChatService = {
 
     return res.data;
   },
+
+  async createConversation(type: 'direct' | 'group', memberIds: string[], name: string) {
+    const res = await api.post(API_ENDPOINTS.CONVERSATION, { type, name, memberIds });
+    return res.data.conversation;
+  },
 };

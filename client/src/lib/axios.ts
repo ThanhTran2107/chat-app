@@ -3,6 +3,7 @@ import axios, { isAxiosError } from 'axios';
 
 import { API_ENDPOINTS } from '@/utils/constants';
 import { ROUTES } from '@/utils/constants';
+import { authService } from '@/utils/services/auth.service';
 
 // Create an Axios instance with default configuration for API calls
 export const api = axios.create({
@@ -32,13 +33,36 @@ api.interceptors.response.use(
     if (
       originalRequest.url.includes(API_ENDPOINTS.AUTH_LOGIN) ||
       originalRequest.url.includes(API_ENDPOINTS.AUTH_REFRESH) ||
-      originalRequest.url.includes(API_ENDPOINTS.AUTH_REGISTER)
+      originalRequest.url.includes(API_ENDPOINTS.AUTH_REGISTER) ||
+      originalRequest.url.includes(API_ENDPOINTS.AUTH_LOGOUT)
     ) {
       // If refresh token endpoint returns 401, force redirect to login
       if (originalRequest.url.includes(API_ENDPOINTS.AUTH_REFRESH) && error.response?.status === 401) {
         useAuthStore.getState().clearState();
         window.location.replace(ROUTES.LOGIN);
       }
+
+      return Promise.reject(error);
+    }
+
+    const responseMessage = (error.response?.data as { message?: string } | undefined)?.message ?? '';
+
+    const isAuthError =
+      error.response?.status === 401 ||
+      responseMessage.toLowerCase().includes('jwt expired') ||
+      responseMessage.toLowerCase().includes('token expired') ||
+      responseMessage.toLowerCase().includes('invalid token');
+
+    if (isAuthError) {
+      useAuthStore.getState().clearState();
+
+      try {
+        await authService.logOut();
+      } catch (logoutError) {
+        console.warn('Logout request failed after token expiry:', logoutError);
+      }
+
+      window.location.replace(ROUTES.LOGIN);
 
       return Promise.reject(error);
     }

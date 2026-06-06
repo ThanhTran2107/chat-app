@@ -7,6 +7,7 @@ export const useFriendStore = create<FriendState>((set, get) => ({
   loading: false,
   receivedList: [],
   sentList: [],
+  friends: [],
   searchByUsername: async username => {
     try {
       set({ loading: true });
@@ -88,6 +89,21 @@ export const useFriendStore = create<FriendState>((set, get) => ({
       await get().getAllFriendRequests();
     } catch (e) {
       console.error('Error declining friend request:', e);
+      throw e;
+    } finally {
+      set({ loading: false });
+    }
+  },
+  getFriendList: async () => {
+  try {
+      set({ loading: true });
+
+      const friends = await FriendService.getFriendList();
+
+      set({ friends: friends });
+    } catch (e) {
+      console.error('Error fetching friend list:', e);
+      set({ friends: [] });
       throw e;
     } finally {
       set({ loading: false });

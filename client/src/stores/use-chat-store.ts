@@ -8,6 +8,7 @@ import isEmpty from 'lodash-es/isEmpty';
 import map from 'lodash-es/map';
 import find from 'lodash-es/find';
 import some from 'lodash-es/some';
+import { useSocketStore } from './use-socket-store';
 
 export const useChatStore = create<ChatState>()(
   persist(
@@ -173,6 +174,30 @@ export const useChatStore = create<ChatState>()(
           }));
         } catch (e) {
           console.error('Mark as seen error:', e);
+          throw e;
+        }
+      },
+
+      addConvo: convo => {
+        set(state => {
+          const exists = some(state.conversations, c => c._id.toString() === convo._id.toString());
+
+          return {
+            conversations: exists ? state.conversations : [convo, ...state.conversations],
+            activeConversationId: convo._id,
+          };
+        });
+      },
+
+      createConversation: async (type, memberIds, name) => {
+        try {
+          const conversation = await ChatService.createConversation(type, memberIds, name);
+
+          get().addConvo(conversation);
+
+          useSocketStore.getState().socket?.emit('join-conversation', conversation._id);
+        } catch (e) {
+          console.error('Create conversation error:', e);
           throw e;
         }
       },

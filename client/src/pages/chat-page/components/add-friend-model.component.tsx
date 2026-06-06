@@ -5,8 +5,8 @@ import { useState } from 'react';
 import { useFriendStore } from '@/stores/use-friend-store';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { SearchForm } from '@/components/side-bar/forms/search-form.component';
-import { SendFriendRequestForm } from '@/components/side-bar/forms/send-friend-request-form.component';
+import { SearchForm } from '@/pages/chat-page/components/friends/forms/search-form.component';
+import { SendFriendRequestForm } from '@/pages/chat-page/components/friends/forms/send-friend-request-form.component';
 import { getApiErrorMessage } from '@/lib/axios';
 
 export interface IFormValues {

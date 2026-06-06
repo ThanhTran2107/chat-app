@@ -12,7 +12,7 @@ export const GroupChatList = () => {
   const groupConversations = filter(conversations, convo => convo.type === 'group');
 
   return (
-    <div className="flex-1 space-y-2 overflow-y-auto px-2">
+    <div className="flex-1 p-2 space-y-3 overflow-y-auto px-2">
       {map(groupConversations, convo => (
         <GroupChatCard key={convo._id} convo={convo} />
       ))}

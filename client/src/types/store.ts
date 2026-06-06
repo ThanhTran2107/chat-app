@@ -42,6 +42,8 @@ export interface ChatState {
   addMessage: (message: Message) => Promise<void>; // Function to add a new message to the state, used for real-time updates
   updateConversation: (conversation: Partial<Conversation>) => void; // Function to update a conversation in the state, used for real-time updates
   markAsSeen: () => Promise<void>; // Function to mark a conversation as seen
+  addConvo: (convo: Conversation) => void; // Function to add a new conversation to the state
+  createConversation: (type: 'direct' | 'group', memberIds: string[], name: string) => Promise<void>; // Function to create a new conversation
 }
 
 export interface SocketState {
@@ -55,9 +57,11 @@ export interface FriendState {
   loading: boolean; // Indicates if friend-related operations are in progress
   receivedList: FriendRequest[]; // List of received friend requests
   sentList: FriendRequest[]; // List of sent friend requests
+  friends: User[]; // List of friends
   searchByUsername: (username: string) => Promise<User | null>; // Function to search for a user by username, returns a User object or null if not found
   sendFriendRequest: (to: string, message?: string) => Promise<string>; // Function to send a friend request, returns a success message
   getAllFriendRequests: () => Promise<void>; // Function to fetch all friend requests (both sent and received)
   acceptRequest: (requestId: string) => Promise<void>; // Function to accept a friend request by its ID
   declineRequest: (requestId: string) => Promise<void>; // Function to decline a friend request by its ID
+  getFriendList: () => Promise<void>; // Function to fetch the list of friends
 }
