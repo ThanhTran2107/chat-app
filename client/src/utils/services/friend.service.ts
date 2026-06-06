@@ -7,7 +7,7 @@ export const FriendService = {
   },
   async sendFriendRequest(to: string, message?: string) {
     const response = await api.post('/friend/request', { to, message });
-    return response.data.message;
+    return response.data;
   },
   async getAllFriendRequests() {
     try {

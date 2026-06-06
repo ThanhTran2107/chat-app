@@ -9,7 +9,7 @@ interface FetchMessageProps {
   cursor?: string;
 }
 
-const pageLimit = 20;
+const pageLimit = 50;
 
 export const ChatService = {
   async fetchConversations(): Promise<ConversationResponse> {
@@ -50,5 +50,5 @@ export const ChatService = {
     const res = await api.patch(`${API_ENDPOINTS.CONVERSATION}/${conversationId}/seen`);
 
     return res.data;
-  }
+  },
 };

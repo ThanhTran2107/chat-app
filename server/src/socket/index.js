@@ -15,16 +15,17 @@ export const io = new Server(httpServer, {
   },
 });
 
-io.use(socketMiddleware);
+export const onlineUsers = new Map(); // {userId: socketId }
 
-const onlineUsers = new Map(); // {userId: socketId }
+io.use(socketMiddleware);
 
 io.on("connection", async (socket) => {
   const user = socket.user;
 
   console.log(`${user.displayName} online with socket ID: ${socket.id}`);
 
-  onlineUsers.set(user._id, socket.id);
+  const userId = user._id.toString();
+  onlineUsers.set(userId, socket.id);
 
   io.emit("online-users", Array.from(onlineUsers.keys()));
 
@@ -32,7 +33,7 @@ io.on("connection", async (socket) => {
   conversationIds.forEach((conversationId) => socket.join(conversationId));
 
   socket.on("disconnect", () => {
-    onlineUsers.delete(user._id);
+    onlineUsers.delete(userId);
     io.emit("online-users", Array.from(onlineUsers.keys()));
 
     console.log(`${user.displayName} offline with socket ID: ${socket.id}`);

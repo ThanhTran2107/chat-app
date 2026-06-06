@@ -3,7 +3,7 @@ import type { FriendState } from '../types/store';
 import { create } from 'zustand';
 import filter from 'lodash-es/filter';
 
-export const useFriendStore = create<FriendState>(set => ({
+export const useFriendStore = create<FriendState>((set, get) => ({
   loading: false,
   receivedList: [],
   sentList: [],
@@ -25,9 +25,14 @@ export const useFriendStore = create<FriendState>(set => ({
     try {
       set({ loading: true });
 
-      const resultMessage = await FriendService.sendFriendRequest(to, message);
+      const result = await FriendService.sendFriendRequest(to, message);
 
-      return resultMessage;
+      if (result?.request)
+        set(state => ({
+          sentList: [...(state.sentList ?? []), result.request],
+        }));
+
+      return result?.message ?? '';
     } catch (e) {
       console.error('Error sending friend request:', e);
       throw e;
@@ -61,6 +66,8 @@ export const useFriendStore = create<FriendState>(set => ({
       set(state => ({
         receivedList: filter(state.receivedList, request => request._id !== requestId),
       }));
+
+      await get().getAllFriendRequests();
     } catch (e) {
       console.error('Error accepting friend request:', e);
       throw e;
@@ -77,6 +84,8 @@ export const useFriendStore = create<FriendState>(set => ({
       set(state => ({
         receivedList: filter(state.receivedList, request => request._id !== requestId),
       }));
+
+      await get().getAllFriendRequests();
     } catch (e) {
       console.error('Error declining friend request:', e);
       throw e;

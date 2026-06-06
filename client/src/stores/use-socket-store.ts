@@ -3,6 +3,8 @@ import { io, type Socket } from 'socket.io-client';
 import { useAuthStore } from '@/stores/use-auth-store.ts';
 import type { SocketState } from '@/types/store';
 import { useChatStore } from './use-chat-store';
+import { useFriendStore } from './use-friend-store.ts';
+import filter from 'lodash-es/filter';
 
 const baseURL = import.meta.env.VITE_SOCKET_URL;
 
@@ -65,6 +67,33 @@ export const useSocketStore = create<SocketState>((set, get) => ({
       };
 
       useChatStore.getState().updateConversation(updated);
+    });
+
+    // friend request received
+    socket.on('friend-request-received', request => {
+      if (!request) return;
+
+      useFriendStore.setState(state => ({
+        receivedList: [request, ...(state.receivedList ?? [])],
+      }));
+    });
+
+    // friend request accepted by recipient
+    socket.on('friend-request-accepted', payload => {
+      if (!payload?.requestId) return;
+
+      useFriendStore.setState(state => ({
+        sentList: filter(state.sentList, request => request._id !== payload.requestId) ?? [],
+      }));
+    });
+
+    // friend request declined by recipient
+    socket.on('friend-request-declined', payload => {
+      if (!payload?.requestId) return;
+
+      useFriendStore.setState(state => ({
+        sentList: filter(state.sentList, request => request._id !== payload.requestId) ?? [],
+      }));
     });
   },
   disconnectSocket: () => {

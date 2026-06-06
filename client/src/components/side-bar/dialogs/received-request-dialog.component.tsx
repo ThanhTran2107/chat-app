@@ -40,11 +40,18 @@ export const ReceivedRequestDialog = () => {
           requestInfo={request}
           actions={
             <div className="flex gap-2">
-              <Button size="sm" variant="primary" disabled={loading} onClick={() => handleAccept(request._id)}>
+              <Button
+                className="cursor-pointer"
+                size="sm"
+                variant="primary"
+                disabled={loading}
+                onClick={() => handleAccept(request._id)}
+              >
                 Accept
               </Button>
 
               <Button
+                className="cursor-pointer"
                 size="sm"
                 variant="destructiveOutline"
                 onClick={() => handleDecline(request._id)}

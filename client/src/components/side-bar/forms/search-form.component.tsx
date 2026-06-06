@@ -55,16 +55,20 @@ export const SearchForm = ({
       </div>
 
       <DialogFooter>
-        <DialogClose>
-          <Button type="button" variant="outline" className="glass hover:text-destructive flex-1" onClick={onCancel}>
-            Cancel
-          </Button>
+        <DialogClose
+          nativeButton={false}
+          render={
+            <div className="glass hover:text-destructive border-input flex-1 cursor-pointer rounded-md border px-4 py-2 text-center text-sm" />
+          }
+          onClick={onCancel}
+        >
+          Cancel
         </DialogClose>
 
         <Button
           type="submit"
           disabled={loading || !usernameValue?.trim()}
-          className="bg-gradient-chat transition-smooth flex-1 text-white hover:opacity-90"
+          className="bg-gradient-chat transition-smooth flex-1 cursor-pointer text-white hover:opacity-90"
         >
           {loading ? (
             <Spin />

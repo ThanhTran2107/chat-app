@@ -36,8 +36,8 @@ export const FriendRequestDialog = ({ open, setOpen }: FriendRequestDialogProps)
 
         <Tabs value={tab} onValueChange={setTab} className="flex w-full flex-col">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="received">Received</TabsTrigger>
-            <TabsTrigger value="sent">Sent</TabsTrigger>
+            <TabsTrigger className="cursor-pointer" value="received">Received</TabsTrigger>
+            <TabsTrigger className="cursor-pointer" value="sent">Sent</TabsTrigger>
           </TabsList>
 
           <TabsContent value="received" className="mt-3 w-full">

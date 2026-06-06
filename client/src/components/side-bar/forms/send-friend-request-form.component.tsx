@@ -50,14 +50,19 @@ export const SendFriendRequestForm = ({
         </div>
 
         <DialogFooter>
-          <Button type="button" variant="outline" className="glass hover:text-destructive flex-1" onClick={onBack}>
+          <Button
+            type="button"
+            variant="outline"
+            className="glass hover:text-destructive flex-1 cursor-pointer"
+            onClick={onBack}
+          >
             Back
           </Button>
 
           <Button
             type="submit"
             disabled={loading}
-            className="bg-gradient-chat transition-smooth flex-1 text-white hover:opacity-90"
+            className="bg-gradient-chat transition-smooth flex-1 cursor-pointer text-white hover:opacity-90"
           >
             {loading ? (
               <Spin />

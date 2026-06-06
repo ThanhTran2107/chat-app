@@ -3,6 +3,7 @@
 import { Bell, ChevronsUpDownIcon, UserIcon } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,19 +17,28 @@ import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui
 import { useSidebar } from '@/components/ui/contexts/sidebar-context';
 import { type User } from '@/types/user.ts';
 import { LogoutButton } from '../logout-button.component';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FriendRequestDialog } from './dialogs/friend-request-dialog.component';
+import { useFriendStore } from '@/stores/use-friend-store';
 
 export function NavUser({ user }: { user: User }) {
   const { isMobile } = useSidebar();
   const [friendRequestOpen, setFriendRequestOpen] = useState(false);
+  const receivedCount = useFriendStore(state => state.receivedList.length);
+  const getAllFriendRequests = useFriendStore(state => state.getAllFriendRequests);
+
+  useEffect(() => {
+    getAllFriendRequests();
+  }, [getAllFriendRequests]);
 
   return (
     <>
       <SidebarMenu>
         <SidebarMenuItem>
           <DropdownMenu>
-            <DropdownMenuTrigger render={<SidebarMenuButton size="lg" className="aria-expanded:bg-muted" />}>
+            <DropdownMenuTrigger
+              render={<SidebarMenuButton size="lg" className="aria-expanded:bg-muted cursor-pointer" />}
+            >
               <Avatar>
                 <AvatarImage src={user.avatarUrl} alt={user.displayName} />
                 <AvatarFallback>{user.displayName.charAt(0)}</AvatarFallback>
@@ -37,7 +47,17 @@ export function NavUser({ user }: { user: User }) {
                 <span className="truncate font-medium">{user.displayName}</span>
                 <span className="truncate text-xs">{user.email}</span>
               </div>
-              <ChevronsUpDownIcon className="ml-auto size-4" />
+              <div className="ml-auto flex items-center gap-2">
+                {receivedCount > 0 && (
+                  <Badge
+                    variant="secondary"
+                    className="text-secondary-foreground group-hover/dropdown-menu-item:text-secondary-foreground! group-focus/dropdown-menu-item:text-secondary-foreground! ml-auto uppercase"
+                  >
+                    {receivedCount}
+                  </Badge>
+                )}
+                <ChevronsUpDownIcon className="size-4" />
+              </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent
               className="min-w-56 rounded-lg"
@@ -52,8 +72,11 @@ export function NavUser({ user }: { user: User }) {
                       <AvatarImage src={user.avatarUrl} alt={user.displayName} />
                       <AvatarFallback>{user.displayName.charAt(0)}</AvatarFallback>
                     </Avatar>
-                    <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-medium">{user.displayName}</span>
+                    
+                    <div className="grid flex-1 gap-0.5 text-left text-sm leading-tight">
+                      <span className="truncate font-medium">
+                        {user.displayName} (<span className="truncate text-xs">@{user.username}</span>)
+                      </span>
                       <span className="truncate text-xs">{user.email}</span>
                     </div>
                   </div>
@@ -63,7 +86,7 @@ export function NavUser({ user }: { user: User }) {
               <DropdownMenuSeparator />
 
               <DropdownMenuGroup>
-                <DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer">
                   <UserIcon className="text-muted-foreground dark:group-focus:text-accent-foreground!" />
                   Account
                 </DropdownMenuItem>
@@ -71,6 +94,14 @@ export function NavUser({ user }: { user: User }) {
                 <DropdownMenuItem onClick={() => setFriendRequestOpen(true)} className="cursor-pointer">
                   <Bell className="text-muted-foreground dark:group-focus:text-accent-foreground!" />
                   Notifications
+                  {receivedCount > 0 && (
+                    <Badge
+                      variant="secondary"
+                      className="text-secondary-foreground group-hover/dropdown-menu-item:text-secondary-foreground! group-focus/dropdown-menu-item:text-secondary-foreground! ml-auto uppercase"
+                    >
+                      {receivedCount}
+                    </Badge>
+                  )}
                 </DropdownMenuItem>
               </DropdownMenuGroup>
 

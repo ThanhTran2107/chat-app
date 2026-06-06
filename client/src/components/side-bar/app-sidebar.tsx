@@ -45,7 +45,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <h1 className="text-[1.5rem]! font-bold text-white">Moji</h1>
                 <div className="flex items-center gap-2">
                   <Sun className="size-4 text-white/80" />
-                  <Switch checked={isDark} onCheckedChange={toggleTheme} className="data-checked:bg-gray-300!" />
+                  <Switch
+                    checked={isDark}
+                    onCheckedChange={toggleTheme}
+                    className="cursor-pointer data-checked:bg-gray-300!"
+                  />
                   <Moon className="size-4 text-white/80" />
                 </div>
               </div>
