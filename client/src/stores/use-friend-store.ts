@@ -1,7 +1,9 @@
-import { FriendService } from '@/utils/services/friend.service';
-import type { FriendState } from '../types/store';
-import { create } from 'zustand';
 import filter from 'lodash-es/filter';
+import { create } from 'zustand';
+
+import { FriendService } from '@/utils/services/friend.service';
+
+import type { FriendState } from '../types/store';
 
 export const useFriendStore = create<FriendState>((set, get) => ({
   loading: false,
@@ -95,7 +97,7 @@ export const useFriendStore = create<FriendState>((set, get) => ({
     }
   },
   getFriendList: async () => {
-  try {
+    try {
       set({ loading: true });
 
       const friends = await FriendService.getFriendList();

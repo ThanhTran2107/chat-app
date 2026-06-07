@@ -1,12 +1,15 @@
 import { useChatStore } from '@/stores/use-chat-store';
-import { ChatWelcomeScreen } from '../components/chat-windows/chat-welcome-screen.component';
+
+import { useEffect } from 'react';
+
+import { Spin } from '@/components/antd/spin.component';
 // import { ChatWindowSkeleton } from '../components/chat-windows/chat-window-skeleton.component';
 import { SidebarInset } from '@/components/ui/sidebar';
-import { ChatWindowHeader } from '../components/chat-windows/chat-window-header.component';
+
+import { ChatWelcomeScreen } from '../components/chat-windows/chat-welcome-screen.component';
 import { ChatWindowBody } from '../components/chat-windows/chat-window-body.component';
+import { ChatWindowHeader } from '../components/chat-windows/chat-window-header.component';
 import { MessageInput } from '../components/messages/message-input.component';
-import { Spin } from '@/components/antd/spin.component';
-import { useEffect } from 'react';
 
 export const ChatWindowLayout = () => {
   const { activeConversationId, conversations, messageLoading: loading, markAsSeen } = useChatStore();

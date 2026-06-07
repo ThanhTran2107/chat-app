@@ -1,10 +1,13 @@
 import { useFriendStore } from '@/stores/use-friend-store';
 import isEmpty from 'lodash-es/isEmpty';
 import map from 'lodash-es/map';
-import { Button } from '@/components/ui/button';
-import { FriendRequestItem } from './friend-request-item.component';
 import { toast } from 'sonner';
+
+import { Button } from '@/components/ui/button';
+
 import { getApiErrorMessage } from '@/lib/axios';
+
+import { FriendRequestItem } from './friend-request-item.component';
 
 export const ReceivedRequestDialog = () => {
   const { acceptRequest, declineRequest, receivedList, loading } = useFriendStore();

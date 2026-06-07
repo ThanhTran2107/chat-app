@@ -1,4 +1,5 @@
 import { useAuthStore } from '@/stores/use-auth-store';
+import { useThemeStore } from '@/stores/use-theme-store';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
@@ -15,7 +16,6 @@ import { Field, FieldGroup, FieldLabel, FieldSeparator } from '@/components/ui/f
 import { Input } from '@/components/ui/input';
 
 import { type LoginFormValues, ROUTES, loginSchema } from '@/utils/constants';
-import { useThemeStore } from '@/stores/use-theme-store';
 
 import { getApiErrorMessage } from '@/lib/axios';
 import { cn } from '@/lib/utils';

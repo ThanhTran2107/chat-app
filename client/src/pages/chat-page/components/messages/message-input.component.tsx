@@ -1,13 +1,16 @@
-import type { Conversation } from '@/types/chat';
-import { ImagePlus, Send } from 'lucide-react';
-import { useState } from 'react';
 import { useAuthStore } from '@/stores/use-auth-store';
+import { useChatStore } from '@/stores/use-chat-store';
+import type { Conversation } from '@/types/chat';
+import filter from 'lodash-es/filter';
+import { ImagePlus, Send } from 'lucide-react';
+import { toast } from 'sonner';
+
+import { useState } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+
 import { EmojiPicker } from './emoji-picker.component';
-import { useChatStore } from '@/stores/use-chat-store';
-import { toast } from 'sonner';
-import filter from 'lodash-es/filter';
 
 export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation }) => {
   const [value, setValue] = useState('');

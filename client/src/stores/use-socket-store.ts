@@ -1,10 +1,11 @@
-import { create } from 'zustand';
-import { io, type Socket } from 'socket.io-client';
 import { useAuthStore } from '@/stores/use-auth-store.ts';
 import type { SocketState } from '@/types/store';
+import filter from 'lodash-es/filter';
+import { type Socket, io } from 'socket.io-client';
+import { create } from 'zustand';
+
 import { useChatStore } from './use-chat-store';
 import { useFriendStore } from './use-friend-store.ts';
-import filter from 'lodash-es/filter';
 
 const baseURL = import.meta.env.VITE_SOCKET_URL;
 
@@ -94,6 +95,12 @@ export const useSocketStore = create<SocketState>((set, get) => ({
       useFriendStore.setState(state => ({
         sentList: filter(state.sentList, request => request._id !== payload.requestId) ?? [],
       }));
+    });
+
+    // new group created
+    socket.on('new-group', conversation => {
+      useChatStore.getState().addConvo(conversation);
+      socket.emit('join-conversation', conversation._id);
     });
   },
   disconnectSocket: () => {

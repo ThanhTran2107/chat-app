@@ -1,11 +1,14 @@
-import { type FieldErrors, type UseFormRegister, type Control, useWatch } from 'react-hook-form';
-import type { IFormValues } from '@/pages/chat-page/components/add-friend-model.component.tsx';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { DialogClose, DialogFooter } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Spin } from '@/components/antd/spin.component';
 import { Search } from 'lucide-react';
+
+import { type Control, type FieldErrors, type UseFormRegister, useWatch } from 'react-hook-form';
+
+import type { IFormValues } from '@/pages/chat-page/components/add-friend-model.component.tsx';
+
+import { Spin } from '@/components/antd/spin.component';
+import { Button } from '@/components/ui/button';
+import { DialogClose, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface SearchFormProps {
   register: UseFormRegister<IFormValues>;

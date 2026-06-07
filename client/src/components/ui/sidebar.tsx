@@ -1,4 +1,3 @@
-import { useIsMobile } from '@/utils/hooks/use-mobile';
 import { mergeProps } from '@base-ui/react/merge-props';
 import { useRender } from '@base-ui/react/use-render';
 import { type VariantProps, cva } from 'class-variance-authority';
@@ -12,6 +11,8 @@ import { Separator } from '@/components/ui/separator';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+
+import { useIsMobile } from '@/utils/hooks/use-mobile';
 
 import { cn } from '@/lib/utils';
 

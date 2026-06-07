@@ -1,6 +1,8 @@
-import { UserAvatar } from '@/pages/chat-page/components/friends/user-avatar.component';
 import { type FriendRequest } from '@/types/user';
+
 import { type ReactNode } from 'react';
+
+import { UserAvatar } from '@/pages/chat-page/components/friends/user-avatar.component';
 
 interface FriendRequestItemProps {
   requestInfo: FriendRequest;

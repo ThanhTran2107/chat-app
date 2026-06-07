@@ -1,10 +1,13 @@
-import { useLayoutEffect, useRef } from 'react';
 import { useChatStore } from '@/stores/use-chat-store';
-import { ChatWelcomeScreen } from './chat-welcome-screen.component';
-import { MessageItem } from '../messages/message-item.component';
 import { isEmpty, map } from 'lodash-es';
+
+import { useLayoutEffect, useRef } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
+
 import { Spin } from '@/components/antd/spin.component';
+
+import { MessageItem } from '../messages/message-item.component';
+import { ChatWelcomeScreen } from './chat-welcome-screen.component';
 
 export const ChatWindowBody = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);

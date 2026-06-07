@@ -1,7 +1,8 @@
+import type { Socket } from 'socket.io-client';
+
 import type { Conversation } from './chat.ts';
 import type { Message } from './chat.ts';
 import type { FriendRequest, User } from './user.ts';
-import type { Socket } from 'socket.io-client';
 
 // Types for the authentication state managed by Zustand
 export interface AuthState {
@@ -33,6 +34,7 @@ export interface ChatState {
   activeConversationId: string | null; // The ID of the currently active conversation, null if none is active
   convoLoading: boolean; // Indicates if conversations are currently being loaded
   messageLoading: boolean; // Indicates if messages are currently being loaded
+  loading: boolean; // General loading state for chat-related operations
   reset: () => void; // Function to reset the chat state to its initial values
   setActiveConversation: (id: string | null) => void; // Function to set the active conversation
   fetchConversations: () => Promise<void>; // Function to fetch the list of conversations

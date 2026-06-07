@@ -1,11 +1,14 @@
-import { DialogFooter } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import type { IFormValues } from '@/pages/chat-page/components/add-friend-model.component.tsx';
 import TextArea from 'antd/es/input/TextArea';
 import { UserPlus } from 'lucide-react';
+
 import { type Control, Controller } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
+
+import type { IFormValues } from '@/pages/chat-page/components/add-friend-model.component.tsx';
+
 import { Spin } from '@/components/antd/spin.component';
+import { Button } from '@/components/ui/button';
+import { DialogFooter } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 
 interface SendFriendRequestFormProps {
   control: Control<IFormValues>;

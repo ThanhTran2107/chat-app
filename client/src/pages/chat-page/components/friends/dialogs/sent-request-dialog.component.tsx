@@ -1,6 +1,7 @@
 import { useFriendStore } from '@/stores/use-friend-store.ts';
 import isEmpty from 'lodash-es/isEmpty';
 import map from 'lodash-es/map';
+
 import { FriendRequestItem } from './friend-request-item.component';
 
 export const SentRequestDialog = () => {

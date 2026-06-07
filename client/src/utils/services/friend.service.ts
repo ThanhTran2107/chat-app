@@ -1,5 +1,6 @@
-import { api } from '@/lib/axios';
 import { API_ENDPOINTS } from '@/utils/constants';
+
+import { api } from '@/lib/axios';
 
 export const FriendService = {
   async searchByUsername(username: string) {

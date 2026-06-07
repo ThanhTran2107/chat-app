@@ -1,8 +1,11 @@
 import type { Conversation, Message, Participant } from '@/types/chat.ts';
-import { cn, formatMessageTime } from '@/lib/utils';
-import { UserAvatar } from '../friends/user-avatar.component';
 import { Card } from 'antd';
+
 import { Badge } from '@/components/ui/badge';
+
+import { cn, formatMessageTime } from '@/lib/utils';
+
+import { UserAvatar } from '../friends/user-avatar.component';
 
 interface MessageItemProps {
   message: Message;
@@ -28,7 +31,9 @@ export const MessageItem = ({ message, index, messages, selectedConvo, lastMessa
     <>
       {/*time*/}
       {isShowTime && (
-        <span className="flex justify-center text-muted-foreground px-1 text-xs">{formatMessageTime(new Date(message.createdAt))}</span>
+        <span className="text-muted-foreground flex justify-center px-1 text-xs">
+          {formatMessageTime(new Date(message.createdAt))}
+        </span>
       )}
 
       <div className={cn('message-bounce flex items-start gap-2', message.isOwn ? 'justify-end' : 'justify-start')}>

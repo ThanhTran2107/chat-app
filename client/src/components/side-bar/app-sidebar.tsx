@@ -1,14 +1,17 @@
 'use client';
 
+import { useAuthStore } from '@/stores/use-auth-store';
 import { useThemeStore } from '@/stores/use-theme-store';
 import { Moon, Sun } from 'lucide-react';
 
 import * as React from 'react';
 
+import { AddFriendModel } from '@/pages/chat-page/components/add-friend-model.component.tsx';
 import { CreateNewChat } from '@/pages/chat-page/components/create-new-chat.component';
 import { FriendChatList } from '@/pages/chat-page/components/friends/friend-chat-list.component';
-// import { NewGroupChatModel } from '@/components/chat/new-group-chat-model';
 import { GroupChatList } from '@/pages/chat-page/components/groups/group-chat-list.component';
+import { NewGroupChatModel } from '@/pages/chat-page/components/new-group-chat-model.component';
+
 import {
   Sidebar,
   SidebarContent,
@@ -23,9 +26,8 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { Switch } from '@/components/ui/switch';
-import { useAuthStore } from '@/stores/use-auth-store';
+
 import { NavUser } from './nav-user.tsx';
-import { AddFriendModel } from '@/pages/chat-page/components/add-friend-model.component.tsx';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { isDark, toggleTheme } = useThemeStore();
@@ -71,7 +73,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarGroup>
           <SidebarGroupLabel className="uppercase">Groups</SidebarGroupLabel>
           <SidebarGroupAction title="Create Group Chat" className="cursor-pointer">
-            {/* <NewGroupChatModel /> */}
+            <NewGroupChatModel />
           </SidebarGroupAction>
 
           <SidebarGroupContent>

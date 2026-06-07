@@ -1,9 +1,14 @@
 'use client';
 
+import { useFriendStore } from '@/stores/use-friend-store';
+import { type User } from '@/types/user.ts';
 import { Bell, ChevronsUpDownIcon, UserIcon } from 'lucide-react';
+
+import { useEffect, useState } from 'react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { useSidebar } from '@/components/ui/contexts/sidebar-context';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,12 +19,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { useSidebar } from '@/components/ui/contexts/sidebar-context';
-import { type User } from '@/types/user.ts';
-import { LogoutButton } from '../logout-button.component';
-import { useEffect, useState } from 'react';
+
 import { FriendRequestDialog } from '../../pages/chat-page/components/friends/dialogs/friend-request-dialog.component';
-import { useFriendStore } from '@/stores/use-friend-store';
+import { LogoutButton } from '../logout-button.component';
 
 export function NavUser({ user }: { user: User }) {
   const { isMobile } = useSidebar();

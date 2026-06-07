@@ -1,7 +1,7 @@
+import { useThemeStore } from '@/stores/use-theme-store';
 import { Separator as SeparatorPrimitive } from '@base-ui/react/separator';
 
 import { cn } from '@/lib/utils';
-import { useThemeStore } from '@/stores/use-theme-store';
 
 function Separator({ className, orientation = 'horizontal', ...props }: SeparatorPrimitive.Props) {
   const { isDark } = useThemeStore();

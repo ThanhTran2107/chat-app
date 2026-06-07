@@ -1,12 +1,14 @@
 import { useAuthStore } from '@/stores/use-auth-store';
+import { LogOut } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { useNavigate } from 'react-router';
 
-import { ROUTES } from '@/utils/constants';
 import { Button } from '@/components/ui/button';
+
+import { ROUTES } from '@/utils/constants';
+
 import { getApiErrorMessage } from '@/lib/axios';
-import { LogOut } from 'lucide-react';
 
 export const LogoutButton = () => {
   const { logOut } = useAuthStore();

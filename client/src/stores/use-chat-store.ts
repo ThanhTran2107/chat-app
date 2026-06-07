@@ -1,13 +1,14 @@
 import { type ChatState } from '@/types/store';
+import find from 'lodash-es/find';
+import isEmpty from 'lodash-es/isEmpty';
+import map from 'lodash-es/map';
+import some from 'lodash-es/some';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 import { ChatService } from '@/utils/services/chat.service';
+
 import { useAuthStore } from './use-auth-store';
-import isEmpty from 'lodash-es/isEmpty';
-import map from 'lodash-es/map';
-import find from 'lodash-es/find';
-import some from 'lodash-es/some';
 import { useSocketStore } from './use-socket-store';
 
 export const useChatStore = create<ChatState>()(
@@ -18,6 +19,7 @@ export const useChatStore = create<ChatState>()(
       activeConversationId: null,
       convoLoading: false, // convo loading
       messageLoading: false, // message loading
+      loading: false,
 
       setActiveConversation: id => set({ activeConversationId: id }),
       reset: () =>
@@ -191,6 +193,8 @@ export const useChatStore = create<ChatState>()(
 
       createConversation: async (type, memberIds, name) => {
         try {
+          set({ loading: true });
+
           const conversation = await ChatService.createConversation(type, memberIds, name);
 
           get().addConvo(conversation);
@@ -199,6 +203,8 @@ export const useChatStore = create<ChatState>()(
         } catch (e) {
           console.error('Create conversation error:', e);
           throw e;
+        } finally {
+          set({ loading: false });
         }
       },
     }),

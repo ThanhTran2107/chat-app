@@ -1,4 +1,5 @@
 import { isAxiosError } from 'axios';
+
 import { API_ENDPOINTS } from '@/utils/constants';
 
 import { api } from '@/lib/axios';

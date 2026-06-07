@@ -8,10 +8,10 @@ import { ChatPage } from './pages/chat-page/chat.page';
 import { LoginPage } from './pages/login-page/login.page';
 import { RegisterPage } from './pages/register-page/register.page';
 import { ProtectedRoute } from './routes/protected-route';
-import { useThemeStore } from './stores/use-theme-store';
-import { ROUTES } from './utils/constants';
 import { useAuthStore } from './stores/use-auth-store';
 import { useSocketStore } from './stores/use-socket-store';
+import { useThemeStore } from './stores/use-theme-store';
+import { ROUTES } from './utils/constants';
 
 function App() {
   const { isDark, setTheme } = useThemeStore();

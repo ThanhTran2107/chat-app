@@ -1,12 +1,16 @@
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useFriendStore } from '@/stores/use-friend-store';
 import type { User } from '@/types/user';
 import { UserPlus } from 'lucide-react';
-import { useState } from 'react';
-import { useFriendStore } from '@/stores/use-friend-store';
-import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+
 import { SearchForm } from '@/pages/chat-page/components/friends/forms/search-form.component';
 import { SendFriendRequestForm } from '@/pages/chat-page/components/friends/forms/send-friend-request-form.component';
+
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+
 import { getApiErrorMessage } from '@/lib/axios';
 
 export interface IFormValues {

@@ -1,11 +1,13 @@
-import { DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { useFriendStore } from '@/stores/use-friend-store';
-import { MessageCircleMore, Users } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import { UserAvatar } from '@/pages/chat-page/components/friends/user-avatar.component';
-import map from 'lodash-es/map';
-import isEmpty from 'lodash-es/isEmpty';
 import { useChatStore } from '@/stores/use-chat-store';
+import { useFriendStore } from '@/stores/use-friend-store';
+import isEmpty from 'lodash-es/isEmpty';
+import map from 'lodash-es/map';
+import { MessageCircleMore, Users } from 'lucide-react';
+
+import { UserAvatar } from '@/pages/chat-page/components/friends/user-avatar.component';
+
+import { Card } from '@/components/ui/card';
+import { DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 export const FriendListDialog = ({ onClose }: { onClose?: () => void }) => {
   const { friends } = useFriendStore();

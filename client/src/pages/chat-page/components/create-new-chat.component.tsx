@@ -1,9 +1,12 @@
-import { Card } from '@/components/ui/card';
-import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 import { useFriendStore } from '@/stores/use-friend-store';
 import { MessageCircle } from 'lucide-react';
-import { FriendListDialog } from './friends/dialogs/friend-list-dialog.component';
+
 import { useState } from 'react';
+
+import { Card } from '@/components/ui/card';
+import { Dialog, DialogTrigger } from '@/components/ui/dialog';
+
+import { FriendListDialog } from './friends/dialogs/friend-list-dialog.component';
 
 export const CreateNewChat = () => {
   const { getFriendList } = useFriendStore();

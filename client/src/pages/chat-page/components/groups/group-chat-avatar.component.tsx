@@ -1,6 +1,7 @@
-import { UserAvatar } from '../friends/user-avatar.component';
 import { type Participant } from '@/types/chat.ts';
 import { Ellipsis } from 'lucide-react';
+
+import { UserAvatar } from '../friends/user-avatar.component';
 
 interface GroupChatAvatarProps {
   participants: Participant[]; // Assuming Participant is a type that includes user info and their role in the group

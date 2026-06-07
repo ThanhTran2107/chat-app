@@ -1,14 +1,16 @@
-import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useAuthStore } from '@/stores/use-auth-store';
 import { useChatStore } from '@/stores/use-chat-store';
-import type { Conversation } from '@/types/chat';
-import { UserAvatar } from '../friends/user-avatar.component';
-import { StatusBadge } from '../status-badge.component';
-import { GroupChatAvatar } from '../groups/group-chat-avatar.component';
-import { Separator } from '@/components/ui/separator';
-import isEmpty from 'lodash-es/isEmpty';
-import filter from 'lodash-es/filter';
 import { useSocketStore } from '@/stores/use-socket-store';
+import type { Conversation } from '@/types/chat';
+import filter from 'lodash-es/filter';
+import isEmpty from 'lodash-es/isEmpty';
+
+import { Separator } from '@/components/ui/separator';
+import { SidebarTrigger } from '@/components/ui/sidebar';
+
+import { UserAvatar } from '../friends/user-avatar.component';
+import { GroupChatAvatar } from '../groups/group-chat-avatar.component';
+import { StatusBadge } from '../status-badge.component';
 
 export const ChatWindowHeader = ({ chat }: { chat?: Conversation }) => {
   const { conversations, activeConversationId } = useChatStore();

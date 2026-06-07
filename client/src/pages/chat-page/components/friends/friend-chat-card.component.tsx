@@ -1,5 +1,6 @@
 import { useAuthStore } from '@/stores/use-auth-store.ts';
 import { useChatStore } from '@/stores/use-chat-store.ts';
+import { useSocketStore } from '@/stores/use-socket-store';
 import { type Conversation } from '@/types/chat.ts';
 
 import { cn } from '@/lib/utils';
@@ -8,7 +9,6 @@ import { ChatCard } from '../chat-card.component';
 import { StatusBadge } from '../status-badge.component';
 import { UnreadCountBadge } from '../unread-count-badge.component';
 import { UserAvatar } from './user-avatar.component';
-import { useSocketStore } from '@/stores/use-socket-store';
 
 export const FriendChatCard = ({ convo }: { convo: Conversation }) => {
   const { user } = useAuthStore();

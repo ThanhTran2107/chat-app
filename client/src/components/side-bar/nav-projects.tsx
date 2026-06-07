@@ -2,6 +2,7 @@
 
 import { FolderIcon, MoreHorizontalIcon, ShareIcon, Trash2Icon } from 'lucide-react';
 
+import { useSidebar } from '@/components/ui/contexts/sidebar-context';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,7 +18,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { useSidebar } from '@/components/ui/contexts/sidebar-context';
 
 export function NavProjects({
   projects,
