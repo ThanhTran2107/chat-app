@@ -17,6 +17,8 @@ export const API_ENDPOINTS = Object.freeze({
 
   // User-related endpoints
   USER_ME: 'user/me',
+  USER_SEARCH: (username: string) => `user/search?username=${username}`,
+  USER_UPLOAD_AVATAR: 'user/uploadAvatar',
 
   // Friend-related endpoints
   FRIEND_REQUEST: 'friend/request',

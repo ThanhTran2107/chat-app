@@ -27,6 +27,7 @@ export const useAuthStore = create<AuthState>()(
         localStorage.removeItem('auth-session');
       }, // Reset the authentication state to its initial values
       setAccessToken: token => set({ accessToken: token }), // Update the access token in the state
+      setUser: user => set({ user }),
 
       // Register a new user
       register: async (username, password, email, lastName, firstName) => {

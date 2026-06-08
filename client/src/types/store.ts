@@ -13,6 +13,7 @@ export interface AuthState {
   // Action functions to update the authentication state
   clearState: () => void;
   setAccessToken: (token: string) => void;
+  setUser: (user: User | null) => void;
 
   // Asynchronous actions for authentication operations
   register: (username: string, password: string, email: string, lastName: string, firstName: string) => Promise<void>;
@@ -66,4 +67,8 @@ export interface FriendState {
   acceptRequest: (requestId: string) => Promise<void>; // Function to accept a friend request by its ID
   declineRequest: (requestId: string) => Promise<void>; // Function to decline a friend request by its ID
   getFriendList: () => Promise<void>; // Function to fetch the list of friends
+}
+
+export interface UserState {
+  updatedAvatarUrl: (formData: FormData) => Promise<void>; // Function to update the user's avatar, takes FormData and returns the new avatar URL
 }

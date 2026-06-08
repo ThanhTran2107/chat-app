@@ -6,6 +6,8 @@ import { Bell, ChevronsUpDownIcon, UserIcon } from 'lucide-react';
 
 import { useEffect, useState } from 'react';
 
+import { ProfileDialog } from '@/pages/chat-page/components/profile/profile-dialog.component';
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useSidebar } from '@/components/ui/contexts/sidebar-context';
@@ -26,6 +28,8 @@ import { LogoutButton } from '../logout-button.component';
 export function NavUser({ user }: { user: User }) {
   const { isMobile } = useSidebar();
   const [friendRequestOpen, setFriendRequestOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+
   const receivedCount = useFriendStore(state => state.receivedList.length);
   const getAllFriendRequests = useFriendStore(state => state.getAllFriendRequests);
 
@@ -88,7 +92,7 @@ export function NavUser({ user }: { user: User }) {
               <DropdownMenuSeparator />
 
               <DropdownMenuGroup>
-                <DropdownMenuItem className="cursor-pointer">
+                <DropdownMenuItem onClick={() => setProfileOpen(true)} className="cursor-pointer">
                   <UserIcon className="text-muted-foreground dark:group-focus:text-accent-foreground!" />
                   Account
                 </DropdownMenuItem>
@@ -118,6 +122,8 @@ export function NavUser({ user }: { user: User }) {
       </SidebarMenu>
 
       <FriendRequestDialog open={friendRequestOpen} setOpen={setFriendRequestOpen} />
+
+      <ProfileDialog open={profileOpen} setOpen={setProfileOpen} />
     </>
   );
 }
