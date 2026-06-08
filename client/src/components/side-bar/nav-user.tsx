@@ -49,6 +49,7 @@ export function NavUser({ user }: { user: User }) {
                 <AvatarImage src={user.avatarUrl} alt={user.displayName} />
                 <AvatarFallback>{user.displayName.charAt(0)}</AvatarFallback>
               </Avatar>
+
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user.displayName}</span>
                 <span className="truncate text-xs">{user.email}</span>
@@ -65,6 +66,7 @@ export function NavUser({ user }: { user: User }) {
                 <ChevronsUpDownIcon className="size-4" />
               </div>
             </DropdownMenuTrigger>
+
             <DropdownMenuContent
               className="min-w-56 rounded-lg"
               side={isMobile ? 'bottom' : 'right'}

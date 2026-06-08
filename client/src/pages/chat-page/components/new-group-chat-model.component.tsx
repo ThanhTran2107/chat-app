@@ -76,7 +76,7 @@ export const NewGroupChatModel = () => {
       <DialogTrigger
         nativeButton={false}
         render={
-          <div className="hover:bg-sidebar-accent z-10 flex size-5 cursor-pointer items-center justify-center rounded-full transition" />
+          <div className="hover:bg-sidebar-accent z-10 mr-1 flex size-5 cursor-pointer items-center justify-center rounded-full transition" />
         }
         onClick={handleGetFriends}
       >
@@ -86,7 +86,7 @@ export const NewGroupChatModel = () => {
 
       <DialogContent className="border-none sm:max-w-106.25">
         <DialogHeader>
-          <DialogTitle className="capitalize">Create a new group chat</DialogTitle>
+          <DialogTitle className="text-xl capitalize">Create a new group chat</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">

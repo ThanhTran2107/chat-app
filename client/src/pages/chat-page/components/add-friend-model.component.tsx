@@ -95,7 +95,7 @@ export const AddFriendModel = () => {
 
       <DialogContent className="border-none sm:max-w-106.25">
         <DialogHeader>
-          <DialogTitle className="text-2xl">Add friend</DialogTitle>
+          <DialogTitle className="text-xl">Add friend</DialogTitle>
         </DialogHeader>
 
         {!isFound ? (

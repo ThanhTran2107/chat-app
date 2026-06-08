@@ -34,7 +34,7 @@ export const FriendRequestDialog = ({ open, setOpen }: FriendRequestDialogProps)
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Friend requests</DialogTitle>
+          <DialogTitle className="text-xl">Friend requests</DialogTitle>
         </DialogHeader>
 
         <Tabs value={tab} onValueChange={setTab} className="flex w-full flex-col">

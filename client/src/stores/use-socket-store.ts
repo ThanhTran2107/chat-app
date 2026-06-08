@@ -1,11 +1,29 @@
 import { useAuthStore } from '@/stores/use-auth-store.ts';
 import type { SocketState } from '@/types/store';
+import { Howl } from 'howler';
 import filter from 'lodash-es/filter';
 import { type Socket, io } from 'socket.io-client';
 import { create } from 'zustand';
 
 import { useChatStore } from './use-chat-store';
 import { useFriendStore } from './use-friend-store.ts';
+
+const notificationSound = new Howl({
+  src: ['/notify-1s.wav?v=3'],
+  volume: 0.4,
+  html5: true,
+  preload: true,
+});
+
+const playNotificationSound = () => {
+  if (typeof window === 'undefined') return;
+
+  try {
+    notificationSound.play();
+  } catch (e) {
+    console.error('Notification sound error:', e);
+  }
+};
 
 const baseURL = import.meta.env.VITE_SOCKET_URL;
 
@@ -77,6 +95,13 @@ export const useSocketStore = create<SocketState>((set, get) => ({
       useFriendStore.setState(state => ({
         receivedList: [request, ...(state.receivedList ?? [])],
       }));
+
+      setTimeout(() => playNotificationSound(), 0);
+
+      useFriendStore
+        .getState()
+        .getAllFriendRequests()
+        .catch(error => console.error('Failed to refresh friend requests:', error));
     });
 
     // friend request accepted by recipient
