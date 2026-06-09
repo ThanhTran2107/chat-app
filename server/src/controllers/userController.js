@@ -1,4 +1,5 @@
 import { User } from "../models/User.js";
+import { notifyFriendsOfUserPresence, onlineUsers } from "../socket/index.js";
 import { uploadImageFromBuffer } from "../middlewares/uploadMiddleware.js";
 
 export const authMe = async (req, res) => {
@@ -33,7 +34,8 @@ export const searchUserByUsername = async (req, res) => {
 export const updateProfile = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { displayName, username, email, phoneNumber, bio } = req.body;
+    const { displayName, username, email, phoneNumber, bio, showOnlineStatus } =
+      req.body;
 
     const updates = {};
 
@@ -42,6 +44,8 @@ export const updateProfile = async (req, res) => {
     if (email !== undefined) updates.email = email;
     if (phoneNumber !== undefined) updates.phoneNumber = phoneNumber;
     if (bio !== undefined) updates.bio = bio;
+    if (showOnlineStatus !== undefined)
+      updates.showOnlineStatus = showOnlineStatus;
 
     if (Object.keys(updates).length === 0)
       return res
@@ -75,6 +79,11 @@ export const updateProfile = async (req, res) => {
 
     if (!updatedUser)
       return res.status(404).json({ message: "User not found" });
+
+    if (showOnlineStatus !== undefined && onlineUsers.has(userId.toString())) {
+      const userStatus = updatedUser.showOnlineStatus ? "online" : "offline";
+      await notifyFriendsOfUserPresence(userId, userStatus);
+    }
 
     return res.status(200).json({ user: updatedUser });
   } catch (e) {

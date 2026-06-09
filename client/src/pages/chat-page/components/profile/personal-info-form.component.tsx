@@ -1,18 +1,20 @@
-import { useState } from 'react';
-import type { FormEvent } from 'react';
+import { useUserStore } from '@/stores/use-user-store';
 import type { User } from '@/types/user';
+import { Spin } from 'antd';
 import map from 'lodash-es/map';
 import { Heart } from 'lucide-react';
 import { toast } from 'sonner';
+
+import { useState } from 'react';
+import type { FormEvent } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+
 import { getApiErrorMessage } from '@/lib/axios';
-import { useUserStore } from '@/stores/use-user-store';
-import { Spin } from 'antd';
 
 type FormState = {
   displayName: string;

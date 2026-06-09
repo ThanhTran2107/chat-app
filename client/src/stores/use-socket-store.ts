@@ -30,6 +30,8 @@ const baseURL = import.meta.env.VITE_SOCKET_URL;
 export const useSocketStore = create<SocketState>((set, get) => ({
   socket: null,
   onlineUsers: [],
+  friendPresence: {},
+
   connectSocket: () => {
     const accessToken = useAuthStore.getState().accessToken;
     const existingSocket = get().socket;
@@ -46,6 +48,18 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     socket.on('connect', () => null);
     // online users
     socket.on('online-users', userIds => set({ onlineUsers: userIds }));
+    // friend presence change (online/offline)
+    socket.on('friend-presence-changed', ({ userId, status }) => {
+      if (!userId || !status) return;
+
+      set(state => ({
+        friendPresence: {
+          ...state.friendPresence,
+          [userId]: status,
+        },
+      }));
+    });
+
     // new message
     socket.on('new-message', ({ message, conversation, unreadCounts }) => {
       if (!message || !conversation) return;
@@ -128,6 +142,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
       socket.emit('join-conversation', conversation._id);
     });
   },
+
   disconnectSocket: () => {
     const socket = get().socket;
 

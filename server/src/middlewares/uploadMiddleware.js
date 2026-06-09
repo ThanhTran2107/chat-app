@@ -4,7 +4,7 @@ import { v2 as cloudinary } from "cloudinary";
 export const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 1024 * 1024 * 1, // 1 MB
+    fileSize: 5 * 1024 * 1024, // Giới hạn kích thước file là 5MB
   },
 });
 

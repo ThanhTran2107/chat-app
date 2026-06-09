@@ -52,6 +52,7 @@ export interface ChatState {
 export interface SocketState {
   socket: Socket | null;
   onlineUsers: string[];
+  friendPresence: Record<string, 'online' | 'offline'>;
   connectSocket: () => void;
   disconnectSocket: () => void;
 }
@@ -77,5 +78,6 @@ export interface UserState {
     email?: string;
     phoneNumber?: string;
     bio?: string;
+    showOnlineStatus?: boolean;
   }) => Promise<User>;
 }

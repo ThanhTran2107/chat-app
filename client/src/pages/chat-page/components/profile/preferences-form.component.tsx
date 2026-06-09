@@ -1,5 +1,8 @@
+import { useAuthStore } from '@/stores/use-auth-store';
 import { useThemeStore } from '@/stores/use-theme-store';
+import { useUserStore } from '@/stores/use-user-store';
 import { Moon, Sun } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { useState } from 'react';
 
@@ -7,11 +10,30 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 
+import { getApiErrorMessage } from '@/lib/axios';
+
 export const PreferencesForm = () => {
   const { isDark, toggleTheme } = useThemeStore();
+  const { user } = useAuthStore();
+  const updateProfile = useUserStore(state => state.updateProfile);
+  const [loading, setLoading] = useState(false);
 
-  //   các bạn cần handle logic setOnlineStatus
-  const [onlineStatus, setOnlineStatus] = useState(false);
+  const handleOnlineStatusChange = async (value: boolean) => {
+    if (!user) return;
+
+    setLoading(true);
+
+    try {
+      await updateProfile({ showOnlineStatus: value });
+    } catch (e) {
+      console.error('Error updating online status preference:', e);
+      toast.error(getApiErrorMessage(e, 'Failed to update online status preference. Please try again.'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!user) return null;
 
   return (
     <Card className="glass-strong border-border/30">
@@ -54,8 +76,9 @@ export const PreferencesForm = () => {
           </div>
           <Switch
             id="online-status"
-            checked={onlineStatus}
-            onCheckedChange={setOnlineStatus}
+            checked={user.showOnlineStatus ?? true}
+            disabled={loading}
+            onCheckedChange={handleOnlineStatusChange}
             className="data-[state=checked]:bg-primary-glow cursor-pointer"
           />
         </div>

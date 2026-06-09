@@ -7,6 +7,7 @@ export interface User {
   avatarUrl?: string;
   avatarId?: string;
   phoneNumber?: string;
+  showOnlineStatus?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }

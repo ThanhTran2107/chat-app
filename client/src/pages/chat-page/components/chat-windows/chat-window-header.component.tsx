@@ -15,7 +15,7 @@ import { StatusBadge } from '../status-badge.component';
 export const ChatWindowHeader = ({ chat }: { chat?: Conversation }) => {
   const { conversations, activeConversationId } = useChatStore();
   const { user } = useAuthStore();
-  const { onlineUsers } = useSocketStore();
+  const { friendPresence } = useSocketStore();
 
   let otherUser;
 
@@ -59,7 +59,7 @@ export const ChatWindowHeader = ({ chat }: { chat?: Conversation }) => {
                   avatarUrl={otherUser?.avatarUrl || undefined}
                 />
                 {/* Online status indicator for direct chats */}
-                <StatusBadge status={onlineUsers.includes(otherUser?._id ?? '') ? 'online' : 'offline'} />
+                <StatusBadge status={friendPresence[otherUser?._id ?? ''] === 'online' ? 'online' : 'offline'} />
               </>
             ) : (
               <GroupChatAvatar participants={chat.participants} type="sidebar" />

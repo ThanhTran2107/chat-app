@@ -13,7 +13,7 @@ import { UserAvatar } from './user-avatar.component';
 export const FriendChatCard = ({ convo }: { convo: Conversation }) => {
   const { user } = useAuthStore();
   const { activeConversationId, setActiveConversation, messages, fetchMessages } = useChatStore();
-  const { onlineUsers } = useSocketStore();
+  const { friendPresence } = useSocketStore();
 
   if (!user) return null;
 
@@ -40,8 +40,7 @@ export const FriendChatCard = ({ convo }: { convo: Conversation }) => {
       leftSection={
         <>
           <UserAvatar type="sidebar" name={otherUser.displayName ?? ''} avatarUrl={otherUser.avatarUrl ?? undefined} />
-          {/* todo: socket io */}
-          <StatusBadge status={onlineUsers.includes(otherUser?._id ?? '') ? 'online' : 'offline'} />
+          <StatusBadge status={friendPresence[otherUser?._id ?? ''] === 'online' ? 'online' : 'offline'} />
           {unreadCount > 0 && <UnreadCountBadge unreadCount={unreadCount} />}
         </>
       }

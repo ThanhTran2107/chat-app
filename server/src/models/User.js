@@ -23,8 +23,9 @@ const userSchema = new mongoose.Schema(
     displayName: { type: String, required: true, trim: true },
     avatarUrl: { type: String }, // link CDN để hiển thị hình
     avatarId: { type: String }, // Cloudinary public_id để xóa ảnh
-    bio: { type: String, trim: true, maxlength: 500 }, 
+    bio: { type: String, trim: true, maxlength: 500 },
     phoneNumber: { type: String, trim: true, parse: true },
+    showOnlineStatus: { type: Boolean, default: true },
   },
   { timestamps: true },
 );

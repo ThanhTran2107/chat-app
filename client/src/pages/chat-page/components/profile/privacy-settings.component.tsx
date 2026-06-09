@@ -44,7 +44,7 @@ export const PrivacySettings = () => (
         <h4 className="text-destructive mb-3 font-medium">Danger Zone</h4>
         <Button variant="destructive" className="w-full cursor-pointer">
           Delete Account
-        </Button> 
+        </Button>
       </div>
     </CardContent>
   </Card>

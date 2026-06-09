@@ -19,6 +19,7 @@ export const UserService = {
     email?: string;
     phoneNumber?: string;
     bio?: string;
+    showOnlineStatus?: boolean;
   }) => {
     const res = await api.patch(API_ENDPOINTS.USER_ME, profileData);
     return res.data.user;
