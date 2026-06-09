@@ -3,7 +3,6 @@ import axios, { isAxiosError } from 'axios';
 
 import { API_ENDPOINTS } from '@/utils/constants';
 import { ROUTES } from '@/utils/constants';
-import { authService } from '@/utils/services/auth.service';
 
 // Create an Axios instance with default configuration for API calls
 export const api = axios.create({
@@ -53,41 +52,41 @@ api.interceptors.response.use(
       responseMessage.toLowerCase().includes('token expired') ||
       responseMessage.toLowerCase().includes('invalid token');
 
-    if (isAuthError) {
-      useAuthStore.getState().clearState();
+    originalRequest._retryCount = originalRequest._retryCount || 0;
 
-      try {
-        await authService.logOut();
-      } catch (logoutError) {
-        console.warn('Logout request failed after token expiry:', logoutError);
-      }
-
-      window.location.replace(ROUTES.LOGIN);
-
-      return Promise.reject(error);
-    }
-
-    originalRequest._retryCount = originalRequest._retryCount || 0; // Initialize retry count for the original request
-
-    // If the error status is 403 (Forbidden) and we haven't exceeded the retry limit, attempt to refresh the token
-    if (error.response?.status === 403 && originalRequest._retryCount < 4) {
+    // Attempt refresh once when the access token is expired or unauthorized
+    if (
+      isAuthError &&
+      originalRequest._retryCount < 1 &&
+      !originalRequest.url.includes(API_ENDPOINTS.AUTH_LOGIN) &&
+      !originalRequest.url.includes(API_ENDPOINTS.AUTH_REFRESH) &&
+      !originalRequest.url.includes(API_ENDPOINTS.AUTH_REGISTER) &&
+      !originalRequest.url.includes(API_ENDPOINTS.AUTH_LOGOUT)
+    ) {
       originalRequest._retryCount += 1;
 
       try {
-        const res = await api.post(API_ENDPOINTS.AUTH_REFRESH, { withCredentials: true });
+        const res = await api.post(API_ENDPOINTS.AUTH_REFRESH, undefined, { withCredentials: true });
         const newAccessToken = res.data.accessToken;
 
-        useAuthStore.getState().setAccessToken(newAccessToken); // Update the access token in the auth store
+        if (!newAccessToken) throw new Error('Unable to refresh access token');
 
+        useAuthStore.getState().setAccessToken(newAccessToken);
         originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
 
         return api(originalRequest);
-      } catch (e) {
-        console.error('Token refresh error:', e);
+      } catch (refreshError) {
+        console.error('Token refresh error:', refreshError);
         useAuthStore.getState().clearState();
+        window.location.replace(ROUTES.LOGIN);
 
-        return Promise.reject(e);
+        return Promise.reject(refreshError);
       }
+    }
+
+    if (isAuthError) {
+      useAuthStore.getState().clearState();
+      window.location.replace(ROUTES.LOGIN);
     }
 
     return Promise.reject(error);

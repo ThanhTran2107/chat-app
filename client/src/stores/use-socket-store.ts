@@ -1,7 +1,9 @@
 import { useAuthStore } from '@/stores/use-auth-store.ts';
+import type { Conversation } from '@/types/chat.ts';
 import type { SocketState } from '@/types/store';
 import { Howl } from 'howler';
 import filter from 'lodash-es/filter';
+import some from 'lodash-es/some';
 import { type Socket, io } from 'socket.io-client';
 import { create } from 'zustand';
 
@@ -86,7 +88,14 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 
       if (useChatStore.getState().activeConversationId === message.conversationId) useChatStore.getState().markAsSeen();
 
-      useChatStore.getState().updateConversation(updatedConversation);
+      const hasConversation = some(useChatStore.getState().conversations, convo => convo._id === conversation._id);
+
+      if (hasConversation) {
+        useChatStore.getState().updateConversation(updatedConversation);
+      } else {
+        useChatStore.getState().addConversationIfMissing(updatedConversation as Conversation);
+        useSocketStore.getState().socket?.emit('join-conversation', conversation._id);
+      }
     });
 
     // read message
@@ -125,6 +134,12 @@ export const useSocketStore = create<SocketState>((set, get) => ({
       useFriendStore.setState(state => ({
         sentList: filter(state.sentList, request => request._id !== payload.requestId) ?? [],
       }));
+    });
+
+    socket.on('friend-account-deleted', payload => {
+      if (!payload?.userId) return;
+
+      useChatStore.getState().markUserAsDeleted(payload.userId);
     });
 
     // friend request declined by recipient

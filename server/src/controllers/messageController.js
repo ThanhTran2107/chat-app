@@ -36,6 +36,9 @@ export const sendDirectMessage = async (req, res) => {
     });
 
     updateConversationAfterCreateMessage(conversation, message, senderId);
+    await conversation.populate([
+      { path: "participants.userId", select: "displayName avatarUrl" },
+    ]);
 
     await conversation.save();
 

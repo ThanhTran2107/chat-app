@@ -30,6 +30,11 @@ export const authService = {
     return res.data?.user;
   },
 
+  // delete the current user's account
+  deleteAccount: async () => {
+    await api.delete(API_ENDPOINTS.USER_ME, { withCredentials: true });
+  },
+
   // Refresh the access token using the refresh token stored in cookies
   refreshToken: async () => {
     try {

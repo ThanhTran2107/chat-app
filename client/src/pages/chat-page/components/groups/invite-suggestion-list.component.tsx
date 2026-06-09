@@ -13,7 +13,7 @@ export const InviteSuggestionList = ({ filteredFriends, onSelect }: InviteSugges
   if (isEmpty(filteredFriends)) return;
 
   return (
-    <div className="mt-2 max-h-45 divide-y overflow-y-auto rounded-lg border">
+    <div className="scrollbar-hidden mt-2 max-h-45 divide-y overflow-y-auto rounded-lg border">
       {map(filteredFriends, friend => (
         <div
           key={friend._id}

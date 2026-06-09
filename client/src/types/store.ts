@@ -44,8 +44,10 @@ export interface ChatState {
   sendGroupMessage: (conversationId: string, content: string, imgUrl?: string) => Promise<void>; // Function to send a group message
   addMessage: (message: Message) => Promise<void>; // Function to add a new message to the state, used for real-time updates
   updateConversation: (conversation: Partial<Conversation>) => void; // Function to update a conversation in the state, used for real-time updates
+  markUserAsDeleted: (userId: string) => void;
   markAsSeen: () => Promise<void>; // Function to mark a conversation as seen
   addConvo: (convo: Conversation) => void; // Function to add a new conversation to the state
+  addConversationIfMissing: (convo: Conversation) => void; // Add a conversation only when it does not already exist
   createConversation: (type: 'direct' | 'group', memberIds: string[], name: string) => Promise<void>; // Function to create a new conversation
 }
 

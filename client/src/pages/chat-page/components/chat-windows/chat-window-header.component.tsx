@@ -15,7 +15,7 @@ import { StatusBadge } from '../status-badge.component';
 export const ChatWindowHeader = ({ chat }: { chat?: Conversation }) => {
   const { conversations, activeConversationId } = useChatStore();
   const { user } = useAuthStore();
-  const { friendPresence } = useSocketStore();
+  const { friendPresence, onlineUsers } = useSocketStore();
 
   let otherUser;
 
@@ -32,8 +32,6 @@ export const ChatWindowHeader = ({ chat }: { chat?: Conversation }) => {
     const otherUsers = filter(chat.participants, participant => participant._id !== user?._id);
 
     otherUser = !isEmpty(otherUsers) ? otherUsers[0] : null;
-
-    if (!user || !otherUser) return;
   }
 
   const groupName = Array.isArray(chat.group) ? chat.group[0]?.name : chat.group?.name;
@@ -55,11 +53,22 @@ export const ChatWindowHeader = ({ chat }: { chat?: Conversation }) => {
               <>
                 <UserAvatar
                   type={'sidebar'}
-                  name={otherUser?.displayName || 'Moji'}
+                  name={otherUser?.displayName ?? 'Deleted account'}
                   avatarUrl={otherUser?.avatarUrl || undefined}
+                  className={!otherUser?._id ? 'bg-slate-400' : undefined}
                 />
-                {/* Online status indicator for direct chats */}
-                <StatusBadge status={friendPresence[otherUser?._id ?? ''] === 'online' ? 'online' : 'offline'} />
+                {!otherUser?._id ? null : (
+                  <StatusBadge
+                    status={
+                      friendPresence[otherUser?._id ?? ''] === 'online' ||
+                      (friendPresence[otherUser?._id ?? ''] === undefined &&
+                        otherUser?.showOnlineStatus !== false &&
+                        onlineUsers.includes(otherUser._id))
+                        ? 'online'
+                        : 'offline'
+                    }
+                  />
+                )}
               </>
             ) : (
               <GroupChatAvatar participants={chat.participants} type="sidebar" />
@@ -68,7 +77,7 @@ export const ChatWindowHeader = ({ chat }: { chat?: Conversation }) => {
 
           {/* Name and status section */}
           <h2 className="text-foreground! font-semibold">
-            {chat.type === 'direct' ? otherUser?.displayName : groupName}
+            {chat.type === 'direct' ? (otherUser?.displayName ?? 'Deleted account') : groupName}
           </h2>
         </div>
       </div>

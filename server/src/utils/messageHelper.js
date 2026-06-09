@@ -27,14 +27,47 @@ export const updateConversationAfterCreateMessage = (
   });
 };
 
+const formatConversationForSocket = (conversation) => ({
+  _id: conversation._id,
+  type: conversation.type,
+  participants: (conversation.participants || []).map((p) => {
+    const userId = p?.userId?._id?.toString?.() ?? p?.userId?.toString?.();
+
+    return {
+      _id: userId,
+      displayName: p?.userId?.displayName,
+      avatarUrl: p?.userId?.avatarUrl ?? null,
+      showOnlineStatus: p?.userId?.showOnlineStatus,
+      joinedAt: p?.joinedAt,
+    };
+  }),
+  lastMessage: conversation.lastMessage,
+  lastMessageAt: conversation.lastMessageAt,
+  unreadCounts: conversation.unreadCounts,
+});
+
 export const emitNewMessage = ({ io, conversation, message }) => {
-  io.to(conversation._id.toString()).emit("new-message", {
+  const recipients = Array.from(
+    new Set(
+      (conversation.participants || [])
+        .map((p) => {
+          if (!p?.userId) return null;
+          if (typeof p.userId === "string") return p.userId;
+          if (p.userId?._id) return p.userId._id.toString();
+          return p.userId.toString();
+        })
+        .filter(Boolean),
+    ),
+  );
+
+  const payload = {
     message,
-    conversation: {
-      _id: conversation._id,
-      lastMessage: conversation.lastMessage,
-      lastMessageAt: conversation.lastMessageAt,
-    },
+    conversation: formatConversationForSocket(conversation),
     unreadCounts: conversation.unreadCounts,
+  };
+
+  // emit only to user-specific rooms to avoid duplicate delivery when a socket is also in the conversation room
+  recipients.forEach((userId) => {
+    io.to(userId).emit("new-message", payload);
   });
 };

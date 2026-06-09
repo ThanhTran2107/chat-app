@@ -152,6 +152,24 @@ export const useChatStore = create<ChatState>()(
         }));
       },
 
+      markUserAsDeleted: userId => {
+        set(state => ({
+          conversations: map(state.conversations, convo => ({
+            ...convo,
+            participants: convo.participants.map(participant =>
+              participant._id === userId
+                ? {
+                    ...participant,
+                    _id: undefined,
+                    displayName: 'Deleted account',
+                    avatarUrl: null,
+                  }
+                : participant,
+            ),
+          })),
+        }));
+      },
+
       markAsSeen: async () => {
         try {
           const { user } = useAuthStore.getState();
@@ -187,6 +205,16 @@ export const useChatStore = create<ChatState>()(
           return {
             conversations: exists ? state.conversations : [convo, ...state.conversations],
             activeConversationId: convo._id,
+          };
+        });
+      },
+
+      addConversationIfMissing: convo => {
+        set(state => {
+          const exists = some(state.conversations, c => c._id.toString() === convo._id.toString());
+
+          return {
+            conversations: exists ? state.conversations : [convo, ...state.conversations],
           };
         });
       },

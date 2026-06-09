@@ -24,7 +24,7 @@ export const MessageItem = ({ message, index, messages, selectedConvo, lastMessa
   const isGroupBreak = isShowTime || message.senderId !== prev?.senderId;
 
   const participant = selectedConvo.participants.find(
-    (participant: Participant) => participant._id.toString() === message.senderId.toString(),
+    (participant: Participant) => participant._id?.toString() === message.senderId.toString(),
   );
 
   return (

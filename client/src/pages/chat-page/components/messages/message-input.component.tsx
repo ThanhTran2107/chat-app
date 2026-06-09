@@ -20,17 +20,21 @@ export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation })
 
   if (!user) return;
 
+  const otherUser =
+    selectedConvo.type === 'direct'
+      ? filter(selectedConvo.participants, participant => participant._id !== user._id)[0]
+      : undefined;
+
+  const isConversationUnavailable = selectedConvo.type === 'direct' && !otherUser?._id;
+
   const handleSendMessage = async () => {
-    if (!value.trim()) return;
+    if (!value.trim() || isConversationUnavailable) return;
     const currentValue = value;
     setValue('');
 
     try {
       if (selectedConvo.type === 'direct') {
-        const participants = selectedConvo.participants;
-        const otherUser = filter(participants, participant => participant._id !== user._id)[0];
-
-        await sendDirectMessage(otherUser._id, currentValue);
+        await sendDirectMessage(otherUser?._id ?? '', currentValue);
       } else {
         await sendGroupMessage(selectedConvo._id, currentValue);
       }
@@ -58,17 +62,28 @@ export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation })
           onKeyDown={handleKeyPress}
           value={value}
           onChange={e => setValue(e.target.value)}
-          placeholder="Type a message..."
+          placeholder={isConversationUnavailable ? 'Conversation unavailable' : 'Type a message...'}
           className="border-border/50 focus:border-primary/50 transition-smooth h-9 resize-none bg-white pr-20"
+          disabled={isConversationUnavailable}
         />
-        <div className="absolute top-1/2 right-2 flex -translate-y-1/2 transform items-center gap-1">
-          <EmojiPicker onChange={(emoji: string) => setValue(`${value}${emoji}`)} />
+        <div
+          className={
+            'absolute top-1/2 right-2 flex -translate-y-1/2 transform items-center gap-1 ' +
+            (isConversationUnavailable ? 'pointer-events-none opacity-50' : '')
+          }
+        >
+          <EmojiPicker
+            onChange={(emoji: string) => {
+              if (isConversationUnavailable) return;
+              setValue(`${value}${emoji}`);
+            }}
+          />
         </div>
       </div>
 
       <Button
         className="bg-gradient-chat hover:shadow-glow transition-smooth hover:scale-105"
-        disabled={!value.trim()}
+        disabled={isConversationUnavailable || !value.trim()}
         onClick={handleSendMessage}
       >
         <Send className="size-4 text-white" />

@@ -15,7 +15,7 @@ export const GroupChatAvatar = ({ participants, type }: GroupChatAvatarProps) =>
   for (let i = 0; i < limit; i++) {
     const member = participants[i];
     avatars.push(
-      <UserAvatar key={i} type={type} name={member.displayName} avatarUrl={member.avatarUrl ?? undefined} />,
+      <UserAvatar key={i} type={type} name={member.displayName ?? 'Moji'} avatarUrl={member.avatarUrl ?? undefined} />,
     );
   }
 

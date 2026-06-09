@@ -13,13 +13,19 @@ import { UserAvatar } from './user-avatar.component';
 export const FriendChatCard = ({ convo }: { convo: Conversation }) => {
   const { user } = useAuthStore();
   const { activeConversationId, setActiveConversation, messages, fetchMessages } = useChatStore();
-  const { friendPresence } = useSocketStore();
+  const { friendPresence, onlineUsers } = useSocketStore();
 
   if (!user) return null;
 
   const otherUser = convo.participants.find(participant => participant._id !== user._id);
-
-  if (!otherUser) return null;
+  const isDeleted = !otherUser?._id;
+  const otherUserName = otherUser?.displayName ?? 'Deleted account';
+  const isOnline =
+    !isDeleted &&
+    (friendPresence[otherUser?._id ?? ''] === 'online' ||
+      (friendPresence[otherUser?._id ?? ''] === undefined &&
+        otherUser?.showOnlineStatus !== false &&
+        onlineUsers.includes(otherUser?._id ?? '')));
 
   const unreadCount = convo.unreadCounts[user._id];
   const lastMessage = convo.lastMessage?.content ?? '';
@@ -33,14 +39,19 @@ export const FriendChatCard = ({ convo }: { convo: Conversation }) => {
   return (
     <ChatCard
       convoId={convo._id}
-      name={otherUser.displayName ?? ''}
+      name={otherUserName}
       timeStamp={convo.lastMessage?.createdAt ? new Date(convo.lastMessage.createdAt) : undefined}
       isActive={activeConversationId === convo._id}
       unreadCount={unreadCount}
       leftSection={
         <>
-          <UserAvatar type="sidebar" name={otherUser.displayName ?? ''} avatarUrl={otherUser.avatarUrl ?? undefined} />
-          <StatusBadge status={friendPresence[otherUser?._id ?? ''] === 'online' ? 'online' : 'offline'} />
+          <UserAvatar
+            type="sidebar"
+            name={otherUserName}
+            avatarUrl={otherUser?.avatarUrl ?? undefined}
+            className={isDeleted ? 'bg-slate-400' : undefined}
+          />
+          <StatusBadge status={isOnline ? 'online' : 'offline'} />
           {unreadCount > 0 && <UnreadCountBadge unreadCount={unreadCount} />}
         </>
       }

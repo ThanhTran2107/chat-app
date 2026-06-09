@@ -47,6 +47,22 @@ export const notifyFriendsOfUserPresence = async (userId, status) => {
   }
 };
 
+export const notifyFriendsOfDeletedAccount = async (userId) => {
+  const friendIds = await getFriendIds(userId);
+
+  if (!friendIds.length) return;
+
+  for (const friendId of friendIds) {
+    const friendSocketId = onlineUsers.get(friendId);
+
+    if (!friendSocketId) continue;
+
+    io.to(friendSocketId).emit("friend-account-deleted", {
+      userId,
+    });
+  }
+};
+
 export const sendInitialFriendPresence = async (socket, userId) => {
   const friendIds = await getFriendIds(userId);
 

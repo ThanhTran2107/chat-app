@@ -1,12 +1,13 @@
 export interface Participant {
-  _id: string;
-  displayName: string;
+  _id?: string;
+  displayName?: string;
   avatarUrl?: string | null;
+  showOnlineStatus?: boolean;
   joinedAt: string;
 }
 
 export interface SeenUser {
-  _id: string;
+  _id?: string;
   displayName?: string;
   avatarUrl?: string | null;
 }

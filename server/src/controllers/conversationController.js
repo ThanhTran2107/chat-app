@@ -54,7 +54,10 @@ export const createConversation = async (req, res) => {
       return res.status(400).json({ message: "Invalid conversation type" });
 
     await conversation.populate([
-      { path: "participants.userId", select: "displayName avatarUrl" },
+      {
+        path: "participants.userId",
+        select: "displayName avatarUrl showOnlineStatus",
+      },
       { path: "seenBy", select: "displayName avatarUrl" },
       { path: "lastMessage.senderId", select: "displayName avatarUrl" },
     ]);
@@ -63,6 +66,7 @@ export const createConversation = async (req, res) => {
       _id: p.userId?._id,
       displayName: p.userId?.displayName,
       avatarUrl: p.userId?.avatarUrl ?? null,
+      showOnlineStatus: p.userId?.showOnlineStatus,
       joinedAt: p.joinedAt,
     }));
 
@@ -90,7 +94,7 @@ export const getConversations = async (req, res) => {
       .sort({ lastMessageAt: -1, updatedAt: -1 })
       .populate({
         path: "participants.userId",
-        select: "displayName avatarUrl",
+        select: "displayName avatarUrl showOnlineStatus",
       })
       .populate({
         path: "seenBy",
@@ -106,6 +110,7 @@ export const getConversations = async (req, res) => {
         _id: p.userId?._id,
         displayName: p.userId?.displayName,
         avatarUrl: p.userId?.avatarUrl ?? null,
+        showOnlineStatus: p.userId?.showOnlineStatus,
         joinedAt: p.joinedAt,
       }));
 
@@ -208,7 +213,17 @@ export const markAsSeen = async (req, res) => {
         .status(404)
         .json({ message: "Conversation not found after update" });
 
-    io.to(conversationId).emit("read-message", {
+    const participantIds = (updated.participants || [])
+      .map((participant) => {
+        const id = participant?.userId;
+
+        if (!id) return null;
+
+        return typeof id === "string" ? id : id.toString();
+      })
+      .filter(Boolean);
+
+    const payload = {
       conversation: updated,
       lastMessage: {
         _id: updated.lastMessage?._id,
@@ -218,6 +233,12 @@ export const markAsSeen = async (req, res) => {
           _id: updated.lastMessage?.senderId,
         },
       },
+    };
+
+    io.to(conversationId).emit("read-message", payload);
+
+    participantIds.forEach((participantId) => {
+      io.to(participantId).emit("read-message", payload);
     });
 
     return res.status(200).json({

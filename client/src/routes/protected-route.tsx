@@ -31,8 +31,7 @@ export const ProtectedRoute = () => {
         const chatState = useChatStore.getState();
 
         if (currentAccessToken && !currentUser) await fetchMe();
-        if (currentAccessToken && !chatState.convoLoading && !chatState.conversations?.length)
-          await chatState.fetchConversations();
+        if (currentAccessToken && !chatState.convoLoading) await chatState.fetchConversations();
       } catch (e) {
         console.warn('ProtectedRoute initialization warning:', e);
       } finally {

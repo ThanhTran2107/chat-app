@@ -1,5 +1,14 @@
 import { User } from "../models/User.js";
-import { notifyFriendsOfUserPresence, onlineUsers } from "../socket/index.js";
+import { Session } from "../models/Session.js";
+import { FriendRequest } from "../models/FriendRequest.js";
+import { Friend } from "../models/Friend.js";
+import { Conversation } from "../models/Conversation.js";
+import { Message } from "../models/Message.js";
+import {
+  notifyFriendsOfUserPresence,
+  notifyFriendsOfDeletedAccount,
+  onlineUsers,
+} from "../socket/index.js";
 import { uploadImageFromBuffer } from "../middlewares/uploadMiddleware.js";
 
 export const authMe = async (req, res) => {
@@ -116,6 +125,60 @@ export const uploadAvatar = async (req, res) => {
     return res.status(200).json({ avatarUrl: updatedUser.avatarUrl });
   } catch (e) {
     console.error("Upload avatar error:", e);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const deleteProfile = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const user = await User.findById(userId).select("avatarId");
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const userIdString = userId.toString();
+
+    await Promise.all([
+      Session.deleteMany({ userId }),
+      FriendRequest.deleteMany({ $or: [{ from: userId }, { to: userId }] }),
+      Friend.deleteMany({ $or: [{ userA: userId }, { userB: userId }] }),
+    ]);
+
+    await Conversation.updateMany(
+      { "participants.userId": userId, type: "group" },
+      {
+        $pull: { participants: { userId }, seenBy: userId },
+        $unset: { [`unreadCounts.${userIdString}`]: "" },
+      },
+    );
+
+    const orphanConversations = await Conversation.find({
+      type: "group",
+      "participants.1": { $exists: false },
+    }).select("_id");
+
+    const orphanIds = orphanConversations.map(
+      (conversation) => conversation._id,
+    );
+
+    if (orphanIds.length > 0) {
+      await Message.deleteMany({ conversationId: { $in: orphanIds } });
+      await Conversation.deleteMany({ _id: { $in: orphanIds } });
+    }
+
+    await User.findByIdAndDelete(userId);
+
+    if (onlineUsers.has(userIdString)) {
+      await notifyFriendsOfUserPresence(userId, "offline");
+
+      onlineUsers.delete(userIdString);
+    }
+
+    await notifyFriendsOfDeletedAccount(userId);
+
+    return res.sendStatus(204);
+  } catch (e) {
+    console.error("Delete profile error:", e);
     return res.status(500).json({ message: "Internal server error" });
   }
 };

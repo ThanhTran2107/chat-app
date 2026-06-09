@@ -34,8 +34,12 @@ export const protectedRoute = async (req, res, next) => {
     // trả user về trong request
     req.user = user;
     next(); // tiếp tục xử lý request
-  } catch (e) {
-    console.error('Protected route error:', e);
-    return res.status(500).json({ message: "Internal Server Error" });
+  } catch (error) {
+    console.error("Protected route error:", error);
+
+    if (error.name === "TokenExpiredError")
+      return res.status(401).json({ message: "Access token expired" });
+
+    return res.status(401).json({ message: "Invalid access token" });
   }
 };

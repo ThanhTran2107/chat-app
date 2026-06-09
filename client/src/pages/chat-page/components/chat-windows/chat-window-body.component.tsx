@@ -18,6 +18,9 @@ export const ChatWindowBody = () => {
   const selectedConvo = conversations.find(conversation => conversation._id === activeConversationId);
   const lastMessageStatus = !isEmpty(selectedConvo?.seenBy ?? []) ? 'seen' : 'delivered';
 
+  const isUnavailableConversation =
+    selectedConvo?.type === 'direct' && selectedConvo.participants.some(participant => !participant._id);
+
   const conversationMessages = activeConversationId ? allMessages[activeConversationId] : undefined;
   const messages = conversationMessages?.items ?? [];
   const hasMore = conversationMessages?.hasMore ?? false;
@@ -70,6 +73,18 @@ export const ChatWindowBody = () => {
   }, [messages.length, key]);
 
   if (!selectedConvo) return <ChatWelcomeScreen />;
+
+  if (isUnavailableConversation)
+    return (
+      <div className="text-muted-foreground flex h-full items-center justify-center px-4 text-center">
+        <div>
+          <p className="text-lg font-semibold">Unavailable conversation</p>
+          <p className="text-muted-foreground mt-2 text-sm">
+            This chat is no longer available because the other account has been deleted.
+          </p>
+        </div>
+      </div>
+    );
 
   if (isEmpty(messages))
     return (
