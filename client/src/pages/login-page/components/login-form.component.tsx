@@ -9,6 +9,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
 import { Checkbox } from '@/components/antd/checkbox.component';
+import { Spin } from '@/components/antd/spin.component';
 import { SocialButtons } from '@/components/social-buttons.component';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -126,7 +127,10 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                 size="sm"
                 disabled={isSubmitting}
               >
-                Login
+                <div className="flex items-center justify-center gap-2">
+                  {isSubmitting && <Spin className="size-4" />}
+                  Login
+                </div>
               </Button>
 
               {/* Divider */}

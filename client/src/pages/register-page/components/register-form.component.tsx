@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
+import { Spin } from '@/components/antd/spin.component';
 import { SocialButtons } from '@/components/social-buttons.component';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -185,7 +186,16 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<'div'
                 size="sm"
                 disabled={isSubmitting}
               >
-                Create Account
+                <div className="flex items-center justify-center gap-2">
+                  {isSubmitting ? (
+                    <>
+                      <Spin />
+                      Creating...
+                    </>
+                  ) : (
+                    'Create account'
+                  )}
+                </div>
               </Button>
 
               {/* Divider */}
