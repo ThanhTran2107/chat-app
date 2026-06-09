@@ -1,22 +1,35 @@
 import { useChatStore } from '@/stores/use-chat-store';
 import { useFriendStore } from '@/stores/use-friend-store';
+import filter from 'lodash-es/filter';
 import isEmpty from 'lodash-es/isEmpty';
 import map from 'lodash-es/map';
 import { MessageCircleMore, Users } from 'lucide-react';
+
+import { useState } from 'react';
 
 import { UserAvatar } from '@/pages/chat-page/components/friends/user-avatar.component';
 
 import { Card } from '@/components/ui/card';
 import { DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 
 export const FriendListDialog = ({ onClose }: { onClose?: () => void }) => {
   const { friends } = useFriendStore();
   const { createConversation } = useChatStore();
+  const [search, setSearch] = useState('');
 
   const handleAddConversation = async (friendId: string) => {
     await createConversation('direct', [friendId], '');
     onClose?.();
   };
+
+  const filteredFriends = filter(friends, friend => {
+    const query = search.trim().toLowerCase();
+
+    if (!query) return true;
+
+    return friend.displayName.toLowerCase().includes(query) || friend.username.toLowerCase().includes(query);
+  });
 
   return (
     <DialogContent className="glass max-w-md">
@@ -28,10 +41,18 @@ export const FriendListDialog = ({ onClose }: { onClose?: () => void }) => {
 
       {/* Friend list content goes here */}
       <div className="space-y-4">
-        <h1 className="text-muted-foreground mb-3 text-sm font-semibold tracking-wide uppercase">Friend list</h1>
+        <div className="space-y-2">
+          <h1 className="text-muted-foreground text-sm font-semibold tracking-wide uppercase">Friend list</h1>
+          <Input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search friends by name or username..."
+            className="w-full"
+          />
+        </div>
 
         <div className="scrollbar-hidden max-h-60 space-y-3 overflow-y-auto">
-          {map(friends, friend => (
+          {map(filteredFriends, friend => (
             <Card
               key={friend._id}
               onClick={() => handleAddConversation(friend._id)}
@@ -56,6 +77,13 @@ export const FriendListDialog = ({ onClose }: { onClose?: () => void }) => {
             <p className="text-muted-foreground py-8 text-center">
               <Users className="mx-auto mb-3 size-12 opacity-50" />
               Your friend list is empty. Start adding some friends!
+            </p>
+          )}
+
+          {!isEmpty(friends) && isEmpty(filteredFriends) && (
+            <p className="text-muted-foreground py-8 text-center">
+              <Users className="mx-auto mb-3 size-12 opacity-50" />
+              No friends found.
             </p>
           )}
         </div>
