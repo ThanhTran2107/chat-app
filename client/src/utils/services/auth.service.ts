@@ -14,8 +14,8 @@ export const authService = {
   },
 
   // Log in an existing user and return the access token
-  logIn: async (username: string, password: string) => {
-    const res = await api.post(API_ENDPOINTS.AUTH_LOGIN, { username, password });
+  logIn: async (email: string, password: string) => {
+    const res = await api.post(API_ENDPOINTS.AUTH_LOGIN, { email, password });
 
     return res.data;
   },

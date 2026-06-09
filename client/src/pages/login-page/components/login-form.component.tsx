@@ -39,9 +39,10 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
   // Handle form submission for user login
   const handleLogin = async (data: LoginFormValues) => {
     try {
-      const { username, password } = data;
+      const { email, password } = data;
 
-      await logIn(username, password);
+      await logIn(email, password);
+
       toast.success('Login successful!');
       navigate(ROUTES.CHAT, { replace: true });
     } catch (e) {
@@ -64,20 +65,20 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                 </p>
               </div>
 
-              {/* Username */}
+              {/* Email */}
               <Field>
-                <FieldLabel htmlFor="username" className="text-xs">
-                  Username
+                <FieldLabel htmlFor="email" className="text-xs">
+                  Email
                 </FieldLabel>
                 <Input
-                  id="username"
-                  type="text"
-                  placeholder="johndoe"
+                  id="email"
+                  type="email"
+                  placeholder="john@example.com"
                   className="h-7 text-[0.7rem] placeholder:text-[0.7rem] md:text-[0.7rem]"
-                  {...register('username')}
+                  {...register('email')}
                 />
 
-                {errors.username && <p className="text-destructive text-[0.6rem]">{errors.username.message}</p>}
+                {errors.email && <p className="text-destructive text-[0.6rem]">{errors.email.message}</p>}
               </Field>
 
               {/* Password row */}

@@ -33,7 +33,7 @@ export const register = async (req, res) => {
 
     return res.sendStatus(204);
   } catch (e) {
-    console.error('Registration error:', e);
+    console.error("Registration error:", e);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -41,15 +41,15 @@ export const register = async (req, res) => {
 export const logIn = async (req, res) => {
   try {
     // lấy inputs
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
-    if (!username || !password)
+    if (!email || !password)
       return res
         .status(400)
-        .json({ message: "Username and password are required" });
+        .json({ message: "Email and password are required" });
 
     // lấy hashedPassword từ db để so với password input
-    const user = await User.findOne({ username });
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
 
     if (!user) return res.status(401).json({ message: "Invalid credentials" });
 
@@ -87,7 +87,7 @@ export const logIn = async (req, res) => {
     // trả refresh token về trong response
     return res.status(200).json({ accessToken });
   } catch (e) {
-    console.error('Login error:', e);
+    console.error("Login error:", e);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -107,7 +107,7 @@ export const logOut = async (req, res) => {
 
     return res.sendStatus(204);
   } catch (e) {
-    console.error('Logout error:', e);
+    console.error("Logout error:", e);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -136,7 +136,7 @@ export const refreshToken = async (req, res) => {
 
     return res.status(200).json({ accessToken });
   } catch (e) {
-    console.error('Refresh token error:', e);
+    console.error("Refresh token error:", e);
     return res.status(500).json({ message: "Internal server error" });
   }
 };

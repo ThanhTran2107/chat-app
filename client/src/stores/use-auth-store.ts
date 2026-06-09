@@ -44,12 +44,12 @@ export const useAuthStore = create<AuthState>()(
       },
 
       // Log in an existing user and return the access token
-      logIn: async (username, password) => {
+      logIn: async (email, password) => {
         try {
           get().clearState();
           set({ loading: true });
 
-          const { accessToken } = await authService.logIn(username, password);
+          const { accessToken } = await authService.logIn(email, password);
           get().setAccessToken(accessToken);
           localStorage.setItem('auth-session', '1');
 
