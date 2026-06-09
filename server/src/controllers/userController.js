@@ -30,6 +30,59 @@ export const searchUserByUsername = async (req, res) => {
   }
 };
 
+export const updateProfile = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { displayName, username, email, phoneNumber, bio } = req.body;
+
+    const updates = {};
+
+    if (displayName !== undefined) updates.displayName = displayName;
+    if (username !== undefined) updates.username = username;
+    if (email !== undefined) updates.email = email;
+    if (phoneNumber !== undefined) updates.phoneNumber = phoneNumber;
+    if (bio !== undefined) updates.bio = bio;
+
+    if (Object.keys(updates).length === 0)
+      return res
+        .status(400)
+        .json({ message: "No profile fields provided for update" });
+
+    if (updates.username) {
+      const existingUser = await User.findOne({
+        username: updates.username.toLowerCase(),
+        _id: { $ne: userId },
+      });
+
+      if (existingUser)
+        return res.status(400).json({ message: "Username is already taken" });
+    }
+
+    if (updates.email) {
+      const existingEmail = await User.findOne({
+        email: updates.email.toLowerCase(),
+        _id: { $ne: userId },
+      });
+
+      if (existingEmail)
+        return res.status(400).json({ message: "Email is already registered" });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(userId, updates, {
+      new: true,
+      runValidators: true,
+    }).select("-hashedPassword");
+
+    if (!updatedUser)
+      return res.status(404).json({ message: "User not found" });
+
+    return res.status(200).json({ user: updatedUser });
+  } catch (e) {
+    console.error("Update profile error:", e);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const uploadAvatar = async (req, res) => {
   try {
     const file = req.file;

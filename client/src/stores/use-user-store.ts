@@ -25,4 +25,19 @@ export const useUserStore = create<UserState>(() => ({
       throw e;
     }
   },
+
+  updateProfile: async profileData => {
+    try {
+      const { setUser } = useAuthStore.getState();
+      const updatedUser = await UserService.updateProfile(profileData);
+
+      setUser(updatedUser);
+      useChatStore.getState().fetchConversations();
+
+      return updatedUser;
+    } catch (e) {
+      console.error('Error updating profile:', e);
+      throw e;
+    }
+  },
 }));

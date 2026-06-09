@@ -71,4 +71,11 @@ export interface FriendState {
 
 export interface UserState {
   updatedAvatarUrl: (formData: FormData) => Promise<void>; // Function to update the user's avatar, takes FormData and returns the new avatar URL
+  updateProfile: (profileData: {
+    displayName?: string;
+    username?: string;
+    email?: string;
+    phoneNumber?: string;
+    bio?: string;
+  }) => Promise<User>;
 }

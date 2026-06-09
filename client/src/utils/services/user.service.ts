@@ -10,8 +10,17 @@ export const UserService = {
       },
     });
 
-    if (res.status === 400) throw new Error(res.data.message);
-
     return res.data;
+  },
+
+  updateProfile: async (profileData: {
+    displayName?: string;
+    username?: string;
+    email?: string;
+    phoneNumber?: string;
+    bio?: string;
+  }) => {
+    const res = await api.patch(API_ENDPOINTS.USER_ME, profileData);
+    return res.data.user;
   },
 };

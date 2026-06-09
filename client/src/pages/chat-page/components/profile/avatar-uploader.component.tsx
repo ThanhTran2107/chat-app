@@ -51,7 +51,7 @@ export const AvatarUploader = () => {
         size="icon"
         variant="secondary"
         onClick={handleClick}
-        className="hover:bg-background absolute -right-2 -bottom-2 size-9 rounded-full shadow-md transition duration-300 hover:scale-115"
+        className="hover:bg-background absolute -right-2 -bottom-2 size-9 cursor-pointer rounded-full shadow-md transition duration-300 hover:scale-115"
         disabled={loading}
       >
         <Camera className="size-4" />

@@ -14,15 +14,16 @@ export const UserAvatar = ({ type, name, avatarUrl, className }: IUserAvatarProp
 
   if (!name) name = 'Moji';
 
+  const avatarSizeClass =
+    type === 'sidebar' ? 'size-12 text-base' : type === 'chat' ? 'size-8 text-sm' : 'size-24 text-3xl shadow-md';
+  const fallbackTextClass = type === 'profile' ? 'text-3xl' : type === 'sidebar' ? 'text-base' : 'text-sm';
+
   return (
-    <Avatar
-      className={cn(
-        className ?? '',
-        type === 'sidebar' ? 'size-12 text-base' : type === 'chat' ? 'size-8 text-sm' : 'size-24 text-3xl shadow-md',
-      )}
-    >
+    <Avatar className={cn(className ?? '', avatarSizeClass)}>
       <AvatarImage src={avatarUrl} alt={name} />
-      <AvatarFallback className={`${bgColor} font-semibold text-white`}>{name.charAt(0)}</AvatarFallback>
+      <AvatarFallback className={`${bgColor} font-semibold text-white ${fallbackTextClass}`}>
+        {name.charAt(0)}
+      </AvatarFallback>
     </Avatar>
   );
 };

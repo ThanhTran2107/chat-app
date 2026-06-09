@@ -33,13 +33,13 @@ export const ProfileDialog = ({ open, setOpen }: ProfileDialogProps) => {
             {/* tabs */}
             <Tabs defaultValue="personal" className="my-4 flex flex-col gap-4">
               <TabsList className="glass-light grid w-full grid-cols-3">
-                <TabsTrigger value="personal" className="data-[state=active]:glass-strong">
+                <TabsTrigger value="personal" className="data-[state=active]:glass-strong cursor-pointer">
                   Personal
                 </TabsTrigger>
-                <TabsTrigger value="preferences" className="data-[state=active]:glass-strong">
+                <TabsTrigger value="preferences" className="data-[state=active]:glass-strong cursor-pointer">
                   Preferences
                 </TabsTrigger>
-                <TabsTrigger value="privacy" className="data-[state=active]:glass-strong">
+                <TabsTrigger value="privacy" className="data-[state=active]:glass-strong cursor-pointer">
                   Privacy
                 </TabsTrigger>
               </TabsList>
