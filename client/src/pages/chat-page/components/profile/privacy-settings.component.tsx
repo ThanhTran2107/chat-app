@@ -107,15 +107,16 @@ export const PrivacySettings = () => {
           <DialogFooter className="gap-2">
             <Button
               variant="outline"
-              className="w-full sm:w-auto"
+              className="w-full cursor-pointer sm:w-auto"
               onClick={() => setIsDialogOpen(false)}
               disabled={isDeleting}
             >
               Cancel
             </Button>
+
             <Button
               variant="destructive"
-              className="w-full sm:w-auto"
+              className="w-full cursor-pointer sm:w-auto"
               onClick={handleDeleteAccount}
               disabled={isDeleting}
             >

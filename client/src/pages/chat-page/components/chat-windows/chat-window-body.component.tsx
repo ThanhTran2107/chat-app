@@ -26,6 +26,7 @@ export const ChatWindowBody = () => {
   const hasMore = conversationMessages?.hasMore ?? false;
 
   const reversedMessages = [...messages].reverse();
+  const latestMessageId = messages[messages.length - 1]?._id;
 
   const key = `chat-scroll-${activeConversationId}`;
 
@@ -54,7 +55,7 @@ export const ChatWindowBody = () => {
     if (!messagesEndRef.current) return;
 
     messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
-  }, [activeConversationId]);
+  }, [activeConversationId, latestMessageId]);
 
   useLayoutEffect(() => {
     const container = containerRef.current;
@@ -70,7 +71,7 @@ export const ChatWindowBody = () => {
 
       requestAnimationFrame(() => (container.scrollTop = scrollTop));
     }
-  }, [messages.length, key]);
+  }, [key]);
 
   if (!selectedConvo) return <ChatWelcomeScreen />;
 
@@ -88,7 +89,7 @@ export const ChatWindowBody = () => {
 
   if (isEmpty(messages))
     return (
-      <div className="text-muted-foreground flex h-full items-center justify-center">Start a conversation now!</div>
+      <div className="text-muted-foreground flex h-full items-center justify-center">Start a conversation now !</div>
     );
 
   return (
