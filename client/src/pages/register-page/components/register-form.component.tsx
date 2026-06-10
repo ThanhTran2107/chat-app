@@ -8,10 +8,9 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
 import { Spin } from '@/components/antd/spin.component';
-import { SocialButtons } from '@/components/social-buttons.component';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Field, FieldGroup, FieldLabel, FieldSeparator } from '@/components/ui/field';
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 
 import { ROUTES, type RegisterFormValues, registerSchema } from '@/utils/constants';
@@ -197,14 +196,6 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<'div'
                   )}
                 </div>
               </Button>
-
-              {/* Divider */}
-              <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card text-[0.7rem] italic">
-                Or continue with
-              </FieldSeparator>
-
-              {/* Social buttons */}
-              <SocialButtons />
 
               {/* Sign in link */}
               <p className="text-muted-foreground text-center text-[0.7rem] italic">

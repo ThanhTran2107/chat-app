@@ -5,7 +5,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
 import { Checkbox } from '@/components/antd/checkbox.component';
@@ -24,22 +24,36 @@ import { cn } from '@/lib/utils';
 export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) {
   const [showPassword, setShowPassword] = useState(false);
 
-  const { logIn } = useAuthStore();
   const navigate = useNavigate();
+  const { logIn } = useAuthStore();
   const { isDark } = useThemeStore();
+
+  const savedEmail = typeof window !== 'undefined' ? (localStorage.getItem('rememberedEmail') ?? '') : '';
 
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: savedEmail,
+      password: '',
+      rememberMe: !!savedEmail,
+    },
   });
 
   // Handle form submission for user login
   const handleLogin = async (data: LoginFormValues) => {
     try {
-      const { email, password } = data;
+      const { email, password, rememberMe } = data;
+
+      if (rememberMe) {
+        localStorage.setItem('rememberedEmail', email);
+      } else {
+        localStorage.removeItem('rememberedEmail');
+      }
 
       await logIn(email, password);
 
@@ -112,12 +126,20 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                 {errors.password && <p className="text-destructive text-[0.6rem]">{errors.password.message}</p>}
 
                 <div className="flex items-center gap-2">
-                  <Checkbox
-                    className={isDark ? 'text-white/80!' : 'text-black/80!'}
-                    style={{ color: isDark ? '#ffffff' : '#000000' }}
-                  >
-                    <span className="text-xs leading-snug font-medium">Remember me</span>
-                  </Checkbox>
+                  <Controller
+                    control={control}
+                    name="rememberMe"
+                    render={({ field }) => (
+                      <Checkbox
+                        checked={field.value}
+                        onChange={event => field.onChange(event.target.checked)}
+                        className={isDark ? 'text-white/80!' : 'text-black/80!'}
+                        style={{ color: isDark ? '#ffffff' : '#000000' }}
+                      >
+                        <span className="text-xs leading-snug font-medium">Remember me</span>
+                      </Checkbox>
+                    )}
+                  />
                 </div>
               </Field>
 

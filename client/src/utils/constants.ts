@@ -69,6 +69,7 @@ export const loginSchema = z.object({
   password: z.string().min(PASSWORD_MIN_LENGTH, {
     message: `Password must be at least ${PASSWORD_MIN_LENGTH} characters`,
   }),
+  rememberMe: z.boolean().optional(),
 });
 
 // Types for form values
