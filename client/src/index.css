@@ -259,6 +259,14 @@
     scrollbar-width: none;
   }
 
+  .hide-password-toggle[type='password']::-webkit-textfield-decoration-container,
+  .hide-password-toggle[type='password']::-webkit-password-toggle-button,
+  .hide-password-toggle[type='password']::-webkit-clear-button,
+  .hide-password-toggle[type='password']::-ms-reveal,
+  .hide-password-toggle[type='password']::-ms-clear {
+    display: none !important;
+  }
+
   .scrollbar-hidden::-webkit-scrollbar {
     display: none;
   }

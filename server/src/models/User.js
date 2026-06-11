@@ -13,6 +13,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    authProvider: {
+      type: String,
+      enum: ["local", "google", "facebook"],
+      default: "local",
+    },
     email: {
       type: String,
       required: true,
@@ -21,11 +26,13 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
     },
     displayName: { type: String, required: true, trim: true },
-    avatarUrl: { type: String }, // link CDN để hiển thị hình
-    avatarId: { type: String }, // Cloudinary public_id để xóa ảnh
+    avatarUrl: { type: String }, // avatar image URL stored on Cloudinary
+    avatarId: { type: String }, // Cloudinary public_id for deleting the image
     bio: { type: String, trim: true, maxlength: 500 },
     phoneNumber: { type: String, trim: true, parse: true },
     showOnlineStatus: { type: Boolean, default: true },
+    passwordResetToken: { type: String },
+    passwordResetExpires: { type: Date },
   },
   { timestamps: true },
 );

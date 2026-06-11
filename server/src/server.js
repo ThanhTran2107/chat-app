@@ -1,5 +1,5 @@
+import "dotenv/config";
 import express from "express";
-import dotenv from "dotenv";
 import { connectDB } from "./libs/db.js";
 import { authRoute } from "./routes/authRoute.js";
 import { userRoute } from "./routes/userRoute.js";
@@ -13,8 +13,6 @@ import SwaggerUI from "swagger-ui-express";
 import fs from "fs";
 import { app, httpServer } from "./socket/index.js";
 import { v2 as cloudinary } from "cloudinary";
-
-dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 

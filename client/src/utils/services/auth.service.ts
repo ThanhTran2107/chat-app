@@ -34,6 +34,20 @@ export const authService = {
     return res.data;
   },
 
+  // Request a password reset email for the user
+  forgotPassword: async (email: string) => {
+    const res = await api.post(API_ENDPOINTS.AUTH_FORGOT_PASSWORD, { email });
+
+    return res.data;
+  },
+
+  // Reset password using token from the reset email
+  resetPassword: async (token: string, password: string) => {
+    const res = await api.post(API_ENDPOINTS.AUTH_RESET_PASSWORD, { token, password });
+
+    return res.data;
+  },
+
   // Log out the current user
   logOut: async () => await api.post(API_ENDPOINTS.AUTH_LOGOUT, undefined, { withCredentials: true }),
 

@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 import { SocialButtons } from '@/pages/login-page/components/social-buttons.component';
 
@@ -105,6 +105,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
 
                   <button
                     type="button"
+                    onClick={() => navigate(ROUTES.FORGOT_PASSWORD)}
                     className="cursor-pointer text-[0.7rem] font-medium text-sky-600 italic hover:underline"
                   >
                     Forgot?
@@ -114,7 +115,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                   <Input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
-                    className="h-7 pr-7 text-[0.7rem] placeholder:text-[0.7rem] md:text-[0.7rem]"
+                    className="hide-password-toggle h-7 pr-7 text-[0.7rem] placeholder:text-[0.7rem] md:text-[0.7rem]"
                     {...register('password')}
                   />
                   <button

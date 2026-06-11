@@ -1,10 +1,14 @@
 import express from "express";
-import { register } from "../controllers/authController.js";
-import { logIn } from "../controllers/authController.js";
-import { googleLogin } from "../controllers/authController.js";
-import { facebookLogin } from "../controllers/authController.js";
-import { logOut } from "../controllers/authController.js";
-import { refreshToken } from "../controllers/authController.js";
+import {
+  register,
+  logIn,
+  logOut,
+  refreshToken,
+  googleLogin,
+  facebookLogin,
+  forgotPassword,
+  resetPassword,
+} from "../controllers/authController.js";
 
 export const authRoute = express.Router();
 
@@ -19,3 +23,7 @@ authRoute.post("/facebook", facebookLogin);
 authRoute.post("/logout", logOut);
 
 authRoute.post("/refresh", refreshToken);
+
+authRoute.post("/forgot-password", forgotPassword);
+
+authRoute.post("/reset-password", resetPassword);

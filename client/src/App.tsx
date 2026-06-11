@@ -2,11 +2,13 @@
 import { Toaster } from 'sonner';
 
 import { useEffect } from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import { ChatPage } from './pages/chat-page/chat.page';
+import { ForgotPasswordPage } from './pages/forgot-password-page/forgot-password.page';
 import { LoginPage } from './pages/login-page/login.page';
 import { RegisterPage } from './pages/register-page/register.page';
+import { ResetPasswordPage } from './pages/reset-password-page/reset-password.page';
 import { ProtectedRoute } from './routes/protected-route';
 import { useAuthStore } from './stores/use-auth-store';
 import { useSocketStore } from './stores/use-socket-store';
@@ -35,6 +37,8 @@ function App() {
         <Routes>
           <Route path={ROUTES.LOGIN} element={<LoginPage />} />
           <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
+          <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPasswordPage />} />
+          <Route path={ROUTES.RESET_PASSWORD} element={<ResetPasswordPage />} />
           <Route element={<ProtectedRoute />}>
             <Route path={ROUTES.CHAT} element={<ChatPage />} />
           </Route>

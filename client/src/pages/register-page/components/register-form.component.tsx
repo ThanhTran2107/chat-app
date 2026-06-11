@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 import { Spin } from '@/components/antd/spin.component';
 import { Button } from '@/components/ui/button';
@@ -135,7 +135,7 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<'div'
                     <Input
                       id="password"
                       type={showPassword ? 'text' : 'password'}
-                      className="h-7 pr-7 text-[0.7rem] placeholder:text-[0.7rem] md:text-[0.7rem]"
+                      className="hide-password-toggle h-7 pr-7 text-[0.7rem] placeholder:text-[0.7rem] md:text-[0.7rem]"
                       {...formRegister('password')}
                     />
                     <button
@@ -159,7 +159,7 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<'div'
                     <Input
                       id="confirm-password"
                       type={showConfirmPassword ? 'text' : 'password'}
-                      className="h-7 pr-7 text-[0.7rem] placeholder:text-[0.7rem] md:text-[0.7rem]"
+                      className="hide-password-toggle h-7 pr-7 text-[0.7rem] placeholder:text-[0.7rem] md:text-[0.7rem]"
                       {...formRegister('confirmPassword')}
                     />
                     <button

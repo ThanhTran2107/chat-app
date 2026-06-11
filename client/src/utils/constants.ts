@@ -16,6 +16,8 @@ export const API_ENDPOINTS = Object.freeze({
   AUTH_FACEBOOK: 'auth/facebook',
   AUTH_LOGOUT: 'auth/logout',
   AUTH_REFRESH: 'auth/refresh',
+  AUTH_FORGOT_PASSWORD: 'auth/forgot-password',
+  AUTH_RESET_PASSWORD: 'auth/reset-password',
 
   // User-related endpoints
   USER_ME: 'user/me',
@@ -41,6 +43,8 @@ export const API_ENDPOINTS = Object.freeze({
 export const ROUTES = Object.freeze({
   LOGIN: '/login',
   REGISTER: '/register',
+  FORGOT_PASSWORD: '/forgot-password',
+  RESET_PASSWORD: '/reset-password',
   CHAT: '/',
 });
 
@@ -79,6 +83,26 @@ export const loginSchema = z.object({
   rememberMe: z.boolean().optional(),
 });
 
+export const forgotPasswordSchema = z.object({
+  email: z.email({ message: 'Invalid email address' }),
+});
+
+export const resetPasswordSchema = z
+  .object({
+    password: z.string().min(PASSWORD_MIN_LENGTH, {
+      message: `Password must be at least ${PASSWORD_MIN_LENGTH} characters`,
+    }),
+    confirmPassword: z.string().min(PASSWORD_MIN_LENGTH, {
+      message: `Confirm password must be at least ${PASSWORD_MIN_LENGTH} characters`,
+    }),
+  })
+  .refine(data => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
+
 // Types for form values
 export type RegisterFormValues = z.infer<typeof registerSchema>;
 export type LoginFormValues = z.infer<typeof loginSchema>;
+export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;

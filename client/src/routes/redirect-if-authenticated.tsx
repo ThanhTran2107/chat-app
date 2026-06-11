@@ -1,6 +1,6 @@
 import { useAuthStore } from '@/stores/use-auth-store';
 
-import { Navigate } from 'react-router';
+import { Navigate } from 'react-router-dom';
 
 import { ROUTES } from '@/utils/constants';
 

@@ -3,9 +3,11 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { User } from "../models/User.js";
 import { Session } from "../models/Session.js";
+import { sendPasswordResetEmail } from "../libs/mailer.js";
 
 const ACCESS_TOKEN_TTL = "30m";
 const REFRESH_TOKEN_TTL = 14 * 24 * 60 * 60 * 1000; // 14 days
+const RESET_TOKEN_TTL = 30 * 60 * 1000; // 30 minutes
 
 export const register = async (req, res) => {
   try {
@@ -14,19 +16,20 @@ export const register = async (req, res) => {
     if (!username || !password || !email || !firstName || !lastName)
       return res.status(400).json({ message: "All fields are required" });
 
-    // kiểm tra username tồn tại chưa
+    // check if the username already exists
     const duplicate = await User.findOne({ username });
 
     if (duplicate)
       return res.status(409).json({ message: "Username already exists" });
 
-    // mã hóa password
+    // hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // tạo user mới
+    // create a new user
     await User.create({
       username,
       hashedPassword,
+      authProvider: "local",
       email,
       displayName: `${lastName} ${firstName}`,
     });
@@ -69,12 +72,13 @@ const createSocialUser = async ({
   firstName,
   lastName,
   avatarUrl,
+  authProvider,
 }) => {
   let usernameBase = email
     .split("@")[0]
     .toLowerCase()
     .replace(/[^a-z0-9]/g, "");
-    
+
   if (!usernameBase) usernameBase = "user";
 
   let username = usernameBase;
@@ -91,6 +95,7 @@ const createSocialUser = async ({
   return User.create({
     username,
     hashedPassword,
+    authProvider: authProvider || "google",
     email: email.toLowerCase().trim(),
     displayName: displayName || `${lastName ?? ""} ${firstName ?? ""}`.trim(),
     avatarUrl,
@@ -102,9 +107,7 @@ const getGoogleUserInfo = async (accessToken) => {
     `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${encodeURIComponent(accessToken)}`,
   );
 
-  if (!response.ok) {
-    throw new Error("Google token validation failed");
-  }
+  if (!response.ok) throw new Error("Google token validation failed");
 
   return response.json();
 };
@@ -121,7 +124,7 @@ const getFacebookUserInfo = async (accessToken) => {
 
 export const logIn = async (req, res) => {
   try {
-    // lấy inputs
+    // get inputs
     const { email, password } = req.body;
 
     if (!email || !password)
@@ -129,35 +132,41 @@ export const logIn = async (req, res) => {
         .status(400)
         .json({ message: "Email and password are required" });
 
-    // lấy hashedPassword từ db để so với password input
+    // get hashedPassword from the database to compare with the input password
     const user = await User.findOne({ email: email.toLowerCase().trim() });
 
     if (!user) return res.status(401).json({ message: "Invalid credentials" });
 
-    // kiểm tra password
+    if (user.authProvider !== "local")
+      return res.status(403).json({
+        message:
+          "This account is linked to social login. Please sign in with Google or Facebook, or set a local password first.",
+      });
+
+    // verify password
     const passwordCorrect = await bcrypt.compare(password, user.hashedPassword);
 
     if (!passwordCorrect)
       return res.status(401).json({ message: "Invalid credentials" });
 
-    // nếu khớp, tạo accessToken với JWT
+    // if valid, create accessToken with JWT
     const accessToken = jwt.sign(
       { userId: user._id },
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: ACCESS_TOKEN_TTL },
     );
 
-    // tạo refreshToken
+    // create refreshToken
     const refreshToken = crypto.randomBytes(64).toString("hex");
 
-    // tạo session mới để lưu refreshToken
+    // create a new session to store the refreshToken
     await Session.create({
       userId: user._id,
       refreshToken,
       expiresAt: new Date(Date.now() + REFRESH_TOKEN_TTL),
     });
 
-    // trả refresh token về trong cookie
+    // set refresh token cookie
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -165,7 +174,7 @@ export const logIn = async (req, res) => {
       maxAge: REFRESH_TOKEN_TTL,
     });
 
-    // trả refresh token về trong response
+    // return access token in response
     return res.status(200).json({ accessToken });
   } catch (e) {
     console.error("Login error:", e);
@@ -197,6 +206,7 @@ export const googleLogin = async (req, res) => {
         firstName: googleUser.given_name,
         lastName: googleUser.family_name,
         avatarUrl: googleUser.picture,
+        authProvider: "google",
       });
 
     const token = await createSessionForUser(user, res);
@@ -236,11 +246,12 @@ export const facebookLogin = async (req, res) => {
         firstName: fbUser.first_name,
         lastName: fbUser.last_name,
         avatarUrl: pictureUrl,
+        authProvider: "facebook",
       });
     }
 
     const token = await createSessionForUser(user, res);
-    
+
     return res.status(200).json({ accessToken: token });
   } catch (e) {
     console.error("Facebook login error:", e);
@@ -250,20 +261,107 @@ export const facebookLogin = async (req, res) => {
 
 export const logOut = async (req, res) => {
   try {
-    // lấy refresh token từ cookie
+    // get refresh token from cookie
     const token = req.cookies?.refreshToken;
 
     if (token) {
-      // xóa refresh token trong Session
+      // delete refresh token from Session
       await Session.deleteOne({ refreshToken: token });
 
-      // xóa cookie
+      // clear cookie
       res.clearCookie("refreshToken");
     }
 
     return res.sendStatus(204);
   } catch (e) {
     console.error("Logout error:", e);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) return res.status(400).json({ message: "Email is required" });
+
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
+
+    if (!user)
+      return res
+        .status(200)
+        .json({ message: "If that email exists, a reset link has been sent." });
+
+    const provider = user.authProvider || "local";
+    if (provider !== "local")
+      return res.status(400).json({
+        message:
+          "This account is linked to social login. Please sign in with Google or Facebook, or set a local password first.",
+      });
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const resetTokenHash = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+    const resetTokenExpiry = new Date(Date.now() + RESET_TOKEN_TTL);
+
+    user.passwordResetToken = resetTokenHash;
+    user.passwordResetExpires = resetTokenExpiry;
+    await user.save();
+
+    const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+    const resetUrl = `${clientUrl}${process.env.PASSWORD_RESET_PATH || "/reset-password"}?token=${resetToken}`;
+
+    await sendPasswordResetEmail({
+      to: user.email,
+      url: resetUrl,
+    });
+
+    return res
+      .status(200)
+      .json({ message: "If that email exists, a reset link has been sent." });
+  } catch (e) {
+    console.error("Forgot password error:", e);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  try {
+    const { token, password } = req.body;
+
+    if (!token || !password)
+      return res
+        .status(400)
+        .json({ message: "Token and new password are required" });
+
+    const resetTokenHash = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+
+    const user = await User.findOne({
+      passwordResetToken: resetTokenHash,
+      passwordResetExpires: { $gt: new Date() },
+    });
+
+    if (!user)
+      return res
+        .status(400)
+        .json({ message: "Invalid or expired reset token" });
+
+    user.hashedPassword = await bcrypt.hash(password, 10);
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+
+    await user.save();
+
+    return res
+      .status(200)
+      .json({ message: "Password has been reset successfully" });
+  } catch (e) {
+    console.error("Reset password error:", e);
     return res.status(500).json({ message: "Internal server error" });
   }
 };

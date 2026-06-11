@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { User } from "../models/User.js";
 
-// function để xác nhận access token
+// verifies an access token
 const verifyAccessToken = (token) => {
   return new Promise((resolve, reject) => {
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
@@ -14,26 +14,26 @@ const verifyAccessToken = (token) => {
 
 export const protectedRoute = async (req, res, next) => {
   try {
-    // lấy token từ header Authorization
+    // get token from Authorization header
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1]; // Bearer <token>
 
     if (!token)
       return res.status(401).json({ message: "Access token missing" });
 
-    // xác nhận token hợp lệ
+    // validate the token
     const decodedUser = await verifyAccessToken(token);
 
-    // tìm user
+    // find the user
     const user = await User.findById(decodedUser.userId).select(
-      "-hashedPassword", // không trả về hashedPassword
+      "-hashedPassword", // do not return hashedPassword
     );
 
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    // trả user về trong request
+    // attach user to the request
     req.user = user;
-    next(); // tiếp tục xử lý request
+    next(); // continue processing the request
   } catch (error) {
     console.error("Protected route error:", error);
 
