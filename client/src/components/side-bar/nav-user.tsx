@@ -23,7 +23,7 @@ import {
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 
 import { FriendRequestDialog } from '../../pages/chat-page/components/friends/dialogs/friend-request-dialog.component';
-import { LogoutButton } from '../logout-button.component';
+import { LogoutButton } from '../../pages/chat-page/components/logout-button.component';
 
 export function NavUser({ user }: { user: User }) {
   const { isMobile } = useSidebar();

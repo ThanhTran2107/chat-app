@@ -17,7 +17,9 @@ export interface AuthState {
 
   // Asynchronous actions for authentication operations
   register: (username: string, password: string, email: string, lastName: string, firstName: string) => Promise<void>;
-  logIn: (username: string, password: string) => Promise<void>;
+  logIn: (email: string, password: string) => Promise<void>;
+  logInWithGoogle: (accessToken: string) => Promise<void>;
+  logInWithFacebook: (accessToken: string) => Promise<void>;
   logOut: () => Promise<void>;
   fetchMe: () => Promise<void>;
   refreshToken: () => Promise<void>;

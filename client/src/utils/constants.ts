@@ -12,6 +12,8 @@ export const API_ENDPOINTS = Object.freeze({
   // Authentication endpoints
   AUTH_REGISTER: 'auth/register',
   AUTH_LOGIN: 'auth/login',
+  AUTH_GOOGLE: 'auth/google',
+  AUTH_FACEBOOK: 'auth/facebook',
   AUTH_LOGOUT: 'auth/logout',
   AUTH_REFRESH: 'auth/refresh',
 
@@ -40,6 +42,11 @@ export const ROUTES = Object.freeze({
   LOGIN: '/login',
   REGISTER: '/register',
   CHAT: '/',
+});
+
+export const AUTH_ID = Object.freeze({
+  GOOGLE_CLIENT_ID: '631241229433-9eumlhji2vg8aimnv50qgrjaj3bb3u2p.apps.googleusercontent.com',
+  FACEBOOK_APP_ID: '554442523971007',
 });
 
 // Validation schemas

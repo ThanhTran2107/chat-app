@@ -38,6 +38,87 @@ export const register = async (req, res) => {
   }
 };
 
+const createSessionForUser = async (user, res) => {
+  const accessToken = jwt.sign(
+    { userId: user._id },
+    process.env.ACCESS_TOKEN_SECRET,
+    { expiresIn: ACCESS_TOKEN_TTL },
+  );
+
+  const refreshToken = crypto.randomBytes(64).toString("hex");
+
+  await Session.create({
+    userId: user._id,
+    refreshToken,
+    expiresAt: new Date(Date.now() + REFRESH_TOKEN_TTL),
+  });
+
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    maxAge: REFRESH_TOKEN_TTL,
+  });
+
+  return accessToken;
+};
+
+const createSocialUser = async ({
+  email,
+  displayName,
+  firstName,
+  lastName,
+  avatarUrl,
+}) => {
+  let usernameBase = email
+    .split("@")[0]
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+    
+  if (!usernameBase) usernameBase = "user";
+
+  let username = usernameBase;
+  let counter = 1;
+
+  while (await User.findOne({ username })) {
+    username = `${usernameBase}${counter}`;
+    counter += 1;
+  }
+
+  const randomPassword = crypto.randomBytes(32).toString("hex");
+  const hashedPassword = await bcrypt.hash(randomPassword, 10);
+
+  return User.create({
+    username,
+    hashedPassword,
+    email: email.toLowerCase().trim(),
+    displayName: displayName || `${lastName ?? ""} ${firstName ?? ""}`.trim(),
+    avatarUrl,
+  });
+};
+
+const getGoogleUserInfo = async (accessToken) => {
+  const response = await fetch(
+    `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${encodeURIComponent(accessToken)}`,
+  );
+
+  if (!response.ok) {
+    throw new Error("Google token validation failed");
+  }
+
+  return response.json();
+};
+
+const getFacebookUserInfo = async (accessToken) => {
+  const response = await fetch(
+    `https://graph.facebook.com/me?fields=id,email,first_name,last_name,picture&access_token=${encodeURIComponent(accessToken)}`,
+  );
+
+  if (!response.ok) throw new Error("Facebook token validation failed");
+
+  return response.json();
+};
+
 export const logIn = async (req, res) => {
   try {
     // lấy inputs
@@ -88,6 +169,81 @@ export const logIn = async (req, res) => {
     return res.status(200).json({ accessToken });
   } catch (e) {
     console.error("Login error:", e);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const googleLogin = async (req, res) => {
+  try {
+    const { accessToken } = req.body;
+
+    if (!accessToken)
+      return res
+        .status(400)
+        .json({ message: "Google access token is required" });
+
+    const googleUser = await getGoogleUserInfo(accessToken);
+    const email = googleUser.email?.toLowerCase().trim();
+
+    if (!email || !googleUser.email_verified)
+      return res.status(401).json({ message: "Invalid Google account" });
+
+    let user = await User.findOne({ email });
+
+    if (!user)
+      user = await createSocialUser({
+        email,
+        displayName: googleUser.name,
+        firstName: googleUser.given_name,
+        lastName: googleUser.family_name,
+        avatarUrl: googleUser.picture,
+      });
+
+    const token = await createSessionForUser(user, res);
+
+    return res.status(200).json({ accessToken: token });
+  } catch (e) {
+    console.error("Google login error:", e);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const facebookLogin = async (req, res) => {
+  try {
+    const { accessToken } = req.body;
+
+    if (!accessToken)
+      return res
+        .status(400)
+        .json({ message: "Facebook access token is required" });
+
+    const fbUser = await getFacebookUserInfo(accessToken);
+    const email = fbUser.email?.toLowerCase().trim();
+
+    if (!email)
+      return res.status(401).json({ message: "Invalid Facebook account" });
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      const pictureUrl = fbUser.picture?.data?.url;
+      console.log("Facebook user info:", { fbUser, pictureUrl });
+
+      user = await createSocialUser({
+        email,
+        displayName:
+          `${fbUser.first_name ?? ""} ${fbUser.last_name ?? ""}`.trim(),
+        firstName: fbUser.first_name,
+        lastName: fbUser.last_name,
+        avatarUrl: pictureUrl,
+      });
+    }
+
+    const token = await createSessionForUser(user, res);
+    
+    return res.status(200).json({ accessToken: token });
+  } catch (e) {
+    console.error("Facebook login error:", e);
     return res.status(500).json({ message: "Internal server error" });
   }
 };

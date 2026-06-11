@@ -20,6 +20,20 @@ export const authService = {
     return res.data;
   },
 
+  // Log in with a Google access token
+  logInWithGoogle: async (accessToken: string) => {
+    const res = await api.post(API_ENDPOINTS.AUTH_GOOGLE, { accessToken });
+
+    return res.data;
+  },
+
+  // Log in with a Facebook access token
+  logInWithFacebook: async (accessToken: string) => {
+    const res = await api.post(API_ENDPOINTS.AUTH_FACEBOOK, { accessToken });
+
+    return res.data;
+  },
+
   // Log out the current user
   logOut: async () => await api.post(API_ENDPOINTS.AUTH_LOGOUT, undefined, { withCredentials: true }),
 

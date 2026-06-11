@@ -8,9 +8,10 @@ import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
+import { SocialButtons } from '@/pages/login-page/components/social-buttons.component';
+
 import { Checkbox } from '@/components/antd/checkbox.component';
 import { Spin } from '@/components/antd/spin.component';
-import { SocialButtons } from '@/components/social-buttons.component';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Field, FieldGroup, FieldLabel, FieldSeparator } from '@/components/ui/field';
@@ -102,7 +103,10 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                     Password
                   </FieldLabel>
 
-                  <button type="button" className="text-[0.7rem] font-medium text-sky-600 italic hover:underline">
+                  <button
+                    type="button"
+                    className="cursor-pointer text-[0.7rem] font-medium text-sky-600 italic hover:underline"
+                  >
                     Forgot?
                   </button>
                 </div>

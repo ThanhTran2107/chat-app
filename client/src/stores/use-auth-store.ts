@@ -63,6 +63,46 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
+      // Log in using Google access token
+      logInWithGoogle: async accessToken => {
+        try {
+          get().clearState();
+          set({ loading: true });
+
+          const { accessToken: token } = await authService.logInWithGoogle(accessToken);
+          get().setAccessToken(token);
+          localStorage.setItem('auth-session', '1');
+
+          await get().fetchMe();
+          await useChatStore.getState().fetchConversations();
+        } catch (e) {
+          console.error('Google login error:', e);
+          throw e;
+        } finally {
+          set({ loading: false });
+        }
+      },
+
+      // Log in using Facebook access token
+      logInWithFacebook: async accessToken => {
+        try {
+          get().clearState();
+          set({ loading: true });
+
+          const { accessToken: token } = await authService.logInWithFacebook(accessToken);
+          get().setAccessToken(token);
+          localStorage.setItem('auth-session', '1');
+
+          await get().fetchMe();
+          await useChatStore.getState().fetchConversations();
+        } catch (e) {
+          console.error('Facebook login error:', e);
+          throw e;
+        } finally {
+          set({ loading: false });
+        }
+      },
+
       // Clear the authentication state and log out the user
       logOut: async () => {
         try {

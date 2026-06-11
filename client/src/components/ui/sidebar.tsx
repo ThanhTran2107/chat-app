@@ -12,7 +12,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
-import { useIsMobile } from '@/utils/hooks/use-mobile';
+import { useIsMobile } from '@/utils/hooks/use-mobile.hook';
 
 import { cn } from '@/lib/utils';
 
