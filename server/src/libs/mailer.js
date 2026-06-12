@@ -4,6 +4,7 @@ import { fileURLToPath } from "url";
 import nodemailer from "nodemailer";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 const resetTemplatePath = path.join(
   __dirname,
   "templates",
@@ -14,6 +15,7 @@ const verifyTemplatePath = path.join(
   "templates",
   "verify-email-form.html",
 );
+
 const resetPasswordTemplate = fs.readFileSync(resetTemplatePath, "utf-8");
 const verifyEmailTemplate = fs.readFileSync(verifyTemplatePath, "utf-8");
 

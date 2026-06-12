@@ -20,7 +20,7 @@ export const ProfileDialog = ({ open, setOpen }: ProfileDialogProps) => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="scrollbar-hidden max-h-[80vh] w-[50vw]! max-w-none! overflow-y-auto border-0 bg-transparent p-0 shadow-2xl">
+      <DialogContent className="beautiful-scrollbar max-h-[80vh] w-[50vw]! max-w-none! overflow-y-auto border-0 bg-transparent p-0 shadow-2xl">
         <div className="bg-gradient-glass">
           <div className="mx-auto max-w-4xl p-4">
             {/* heading */}

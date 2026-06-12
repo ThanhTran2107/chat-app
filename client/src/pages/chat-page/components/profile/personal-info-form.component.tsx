@@ -116,6 +116,7 @@ export const PersonalInfoForm = ({ userInfo }: Props) => {
                   value={formState[key]}
                   placeholder={placeholder}
                   onChange={e => handleFieldChange(key, e.target.value)}
+                  disabled={key === 'email'}
                   className="glass-light border-border/30"
                 />
               </div>

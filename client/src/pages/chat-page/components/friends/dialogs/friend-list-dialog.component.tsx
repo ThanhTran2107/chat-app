@@ -51,7 +51,7 @@ export const FriendListDialog = ({ onClose }: { onClose?: () => void }) => {
           />
         </div>
 
-        <div className="scrollbar-hidden max-h-60 space-y-3 overflow-y-auto">
+        <div className="beautiful-scrollbar max-h-60 space-y-3 overflow-y-auto">
           {map(filteredFriends, friend => (
             <Card
               key={friend._id}

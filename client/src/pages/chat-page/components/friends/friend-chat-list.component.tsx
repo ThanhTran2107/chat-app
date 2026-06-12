@@ -12,7 +12,7 @@ export const FriendChatList = () => {
   const friendConversations = filter(conversations, convo => convo.type === 'direct');
 
   return (
-    <div className="flex-1 space-y-3 overflow-y-auto p-2 px-2">
+    <div className="beautiful-scrollbar flex-1 space-y-3 overflow-y-auto p-2 px-2">
       {map(friendConversations, convo => (
         <FriendChatCard key={convo._id} convo={convo} />
       ))}

@@ -80,7 +80,7 @@ export const ResendVerificationPage = () => {
                 variant="outline"
                 className="w-full"
                 size="sm"
-                onClick={() => navigate(ROUTES.LOGIN)}
+                onClick={() => navigate(ROUTES.LOGIN, { replace: true })}
               >
                 Back to Login
               </Button>

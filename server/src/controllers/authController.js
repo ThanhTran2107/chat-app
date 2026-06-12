@@ -179,7 +179,6 @@ export const facebookLogin = async (req, res) => {
 
     if (!user) {
       const pictureUrl = fbUser.picture?.data?.url;
-      console.log("Facebook user info:", { fbUser, pictureUrl });
 
       user = await createSocialUser({
         email,

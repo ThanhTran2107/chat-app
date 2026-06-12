@@ -113,7 +113,7 @@ export const AddFriendModel = () => {
           <SendFriendRequestForm
             control={control}
             loading={loading}
-            searchedUsername={searchedUsername}
+            searchUser={searchUser}
             onSubmit={handleSendRequest}
             onBack={() => setIsFound(null)}
           />
