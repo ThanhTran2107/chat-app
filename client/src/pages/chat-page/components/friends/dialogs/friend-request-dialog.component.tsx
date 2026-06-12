@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useFriendStore } from '@/stores/use-friend-store';
 
 import { type Dispatch, type SetStateAction, useEffect, useState } from 'react';
@@ -27,8 +26,9 @@ export const FriendRequestDialog = ({ open, setOpen }: FriendRequestDialogProps)
       }
     };
 
+    if (!open) return;
     loadRequest();
-  }, []);
+  }, [open, tab, getAllFriendRequests]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

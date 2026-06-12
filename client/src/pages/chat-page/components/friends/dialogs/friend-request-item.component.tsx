@@ -21,7 +21,7 @@ export const FriendRequestItem = ({ requestInfo, actions, type }: FriendRequestI
   return (
     <div className="border-primary-foreground flex items-center justify-between rounded-lg border p-3 shadow-md">
       <div className={`flex ${rowAlignment} gap-3`}>
-        <UserAvatar type="sidebar" name={info.displayName} />
+        <UserAvatar type="sidebar" name={info.displayName} avatarUrl={info.avatarUrl ?? undefined} />
 
         <div className="min-w-0">
           <p className="font-medium">{info.displayName}</p>

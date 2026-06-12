@@ -22,6 +22,12 @@ export const AvatarUploader = () => {
 
     if (!file) return;
 
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select a valid image file.');
+      e.target.value = '';
+      return;
+    }
+
     const formData = new FormData();
     formData.append('file', file);
 
@@ -57,7 +63,7 @@ export const AvatarUploader = () => {
         <Camera className="size-4" />
       </Button>
 
-      <input type="file" hidden ref={fileInputRef} onChange={handleUpload} />
+      <input type="file" accept="image/*" hidden ref={fileInputRef} onChange={handleUpload} />
     </>
   );
 };
