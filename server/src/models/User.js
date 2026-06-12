@@ -25,6 +25,9 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
     },
+    emailVerified: { type: Boolean, default: false },
+    emailVerificationToken: { type: String },
+    emailVerificationExpires: { type: Date },
     displayName: { type: String, required: true, trim: true },
     avatarUrl: { type: String }, // avatar image URL stored on Cloudinary
     avatarId: { type: String }, // Cloudinary public_id for deleting the image

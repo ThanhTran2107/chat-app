@@ -8,6 +8,8 @@ import {
   facebookLogin,
   forgotPassword,
   resetPassword,
+  verifyEmail,
+  resendVerificationEmail,
 } from "../controllers/authController.js";
 
 export const authRoute = express.Router();
@@ -27,3 +29,8 @@ authRoute.post("/refresh", refreshToken);
 authRoute.post("/forgot-password", forgotPassword);
 
 authRoute.post("/reset-password", resetPassword);
+
+authRoute.get("/verify-email", verifyEmail);
+authRoute.post("/verify-email", verifyEmail);
+
+authRoute.post("/resend-verification", resendVerificationEmail);

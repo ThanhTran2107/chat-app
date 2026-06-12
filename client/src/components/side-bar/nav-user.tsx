@@ -26,10 +26,10 @@ import { FriendRequestDialog } from '../../pages/chat-page/components/friends/di
 import { LogoutButton } from '../../pages/chat-page/components/logout-button.component';
 
 export function NavUser({ user }: { user: User }) {
-  const { isMobile } = useSidebar();
   const [friendRequestOpen, setFriendRequestOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
 
+  const { isMobile } = useSidebar();
   const receivedCount = useFriendStore(state => state.receivedList.length);
   const getAllFriendRequests = useFriendStore(state => state.getAllFriendRequests);
 

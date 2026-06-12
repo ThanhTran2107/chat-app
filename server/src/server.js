@@ -11,7 +11,7 @@ import { messageRoute } from "./routes/messageRoute.js";
 import { conversationRoute } from "./routes/conversationRoute.js";
 import SwaggerUI from "swagger-ui-express";
 import fs from "fs";
-import { app, httpServer } from "./socket/index.js";
+import { app, httpServer } from "./sockets/index.js";
 import { v2 as cloudinary } from "cloudinary";
 
 const PORT = process.env.PORT || 3000;

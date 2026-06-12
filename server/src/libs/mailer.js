@@ -4,12 +4,18 @@ import { fileURLToPath } from "url";
 import nodemailer from "nodemailer";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const templatePath = path.join(
+const resetTemplatePath = path.join(
   __dirname,
   "templates",
   "reset-password-form.html",
 );
-const resetPasswordTemplate = fs.readFileSync(templatePath, "utf-8");
+const verifyTemplatePath = path.join(
+  __dirname,
+  "templates",
+  "verify-email-form.html",
+);
+const resetPasswordTemplate = fs.readFileSync(resetTemplatePath, "utf-8");
+const verifyEmailTemplate = fs.readFileSync(verifyTemplatePath, "utf-8");
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -40,6 +46,22 @@ export const sendPasswordResetEmail = async ({ to, url }) => {
     from: process.env.SMTP_USER,
     to,
     subject: "Reset your chat-app password",
+    html,
+  });
+
+  return info;
+};
+
+export const sendVerificationEmail = async ({ to, url }) => {
+  const html = formatTemplate(verifyEmailTemplate, {
+    email: to,
+    verifyLink: url,
+  });
+
+  const info = await transporter.sendMail({
+    from: process.env.SMTP_USER,
+    to,
+    subject: "Verify your chat-app email",
     html,
   });
 

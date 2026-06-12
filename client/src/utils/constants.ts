@@ -3,7 +3,7 @@ import { z } from 'zod';
 // Validation schemas and constants for authentication forms
 
 export const USERNAME_MIN_LENGTH = 3;
-export const PASSWORD_MIN_LENGTH = 6;
+export const PASSWORD_MIN_LENGTH = 8;
 
 export const API_ENDPOINTS = Object.freeze({
   // Base path for all API endpoints
@@ -18,6 +18,8 @@ export const API_ENDPOINTS = Object.freeze({
   AUTH_REFRESH: 'auth/refresh',
   AUTH_FORGOT_PASSWORD: 'auth/forgot-password',
   AUTH_RESET_PASSWORD: 'auth/reset-password',
+  AUTH_VERIFY_EMAIL: 'auth/verify-email',
+  AUTH_RESEND_VERIFICATION: 'auth/resend-verification',
 
   // User-related endpoints
   USER_ME: 'user/me',
@@ -45,6 +47,8 @@ export const ROUTES = Object.freeze({
   REGISTER: '/register',
   FORGOT_PASSWORD: '/forgot-password',
   RESET_PASSWORD: '/reset-password',
+  VERIFY_EMAIL: '/verify-email',
+  RESEND_VERIFICATION: '/resend-verification',
   CHAT: '/',
 });
 
@@ -52,6 +56,27 @@ export const AUTH_ID = Object.freeze({
   GOOGLE_CLIENT_ID: '631241229433-9eumlhji2vg8aimnv50qgrjaj3bb3u2p.apps.googleusercontent.com',
   FACEBOOK_APP_ID: '554442523971007',
 });
+
+const passwordValidationSchema = z
+  .string()
+  .min(PASSWORD_MIN_LENGTH, {
+    message: `Password must be at least ${PASSWORD_MIN_LENGTH} characters`,
+  })
+  .refine(value => /[A-Z]/.test(value), {
+    message: 'Password must contain at least one uppercase letter',
+  })
+  .refine(value => /[a-z]/.test(value), {
+    message: 'Password must contain at least one lowercase letter',
+  })
+  .refine(value => /[0-9]/.test(value), {
+    message: 'Password must contain at least one number',
+  })
+  .refine(value => /[!@#$%^&*()_+\-[\]{};':"\\|,.<>/?]/.test(value), {
+    message: 'Password must contain at least one special character',
+  })
+  .refine(value => !/\s/.test(value), {
+    message: 'Password cannot contain spaces',
+  });
 
 // Validation schemas
 export const registerSchema = z
@@ -62,12 +87,8 @@ export const registerSchema = z
       message: `Username must be at least ${USERNAME_MIN_LENGTH} characters`,
     }),
     email: z.email({ message: 'Invalid email address' }),
-    password: z.string().min(PASSWORD_MIN_LENGTH, {
-      message: `Password must be at least ${PASSWORD_MIN_LENGTH} characters`,
-    }),
-    confirmPassword: z.string().min(PASSWORD_MIN_LENGTH, {
-      message: `Confirm password must be at least ${PASSWORD_MIN_LENGTH} characters`,
-    }),
+    password: passwordValidationSchema,
+    confirmPassword: passwordValidationSchema,
   })
   .refine(data => data.password === data.confirmPassword, {
     message: 'Passwords do not match',
@@ -87,14 +108,14 @@ export const forgotPasswordSchema = z.object({
   email: z.email({ message: 'Invalid email address' }),
 });
 
+export const resendVerificationSchema = z.object({
+  email: z.email({ message: 'Invalid email address' }),
+});
+
 export const resetPasswordSchema = z
   .object({
-    password: z.string().min(PASSWORD_MIN_LENGTH, {
-      message: `Password must be at least ${PASSWORD_MIN_LENGTH} characters`,
-    }),
-    confirmPassword: z.string().min(PASSWORD_MIN_LENGTH, {
-      message: `Confirm password must be at least ${PASSWORD_MIN_LENGTH} characters`,
-    }),
+    password: passwordValidationSchema,
+    confirmPassword: passwordValidationSchema,
   })
   .refine(data => data.password === data.confirmPassword, {
     message: 'Passwords do not match',

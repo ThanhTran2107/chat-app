@@ -1,7 +1,7 @@
 import { User } from "../models/User.js";
 import { FriendRequest } from "../models/FriendRequest.js";
 import { Friend } from "../models/Friend.js";
-import { io, onlineUsers } from "../socket/index.js";
+import { io, onlineUsers } from "../sockets/index.js";
 
 export const sendFriendRequest = async (req, res) => {
   try {

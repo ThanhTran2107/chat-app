@@ -3,7 +3,20 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { User } from "../models/User.js";
 import { Session } from "../models/Session.js";
-import { sendPasswordResetEmail } from "../libs/mailer.js";
+import {
+  sendPasswordResetEmail,
+  sendVerificationEmail,
+} from "../libs/mailer.js";
+import { validatePassword } from "../utils/validation.js";
+import {
+  createSessionForUser,
+  createSocialUser,
+  createEmailVerificationToken,
+} from "../services/authService.js";
+import {
+  getGoogleUserInfo,
+  getFacebookUserInfo,
+} from "../services/oauthService.js";
 
 const ACCESS_TOKEN_TTL = "30m";
 const REFRESH_TOKEN_TTL = 14 * 24 * 60 * 60 * 1000; // 14 days
@@ -16,110 +29,52 @@ export const register = async (req, res) => {
     if (!username || !password || !email || !firstName || !lastName)
       return res.status(400).json({ message: "All fields are required" });
 
-    // check if the username already exists
-    const duplicate = await User.findOne({ username });
+    // check if the username or email already exists
+    const duplicateUsername = await User.findOne({ username });
+    const duplicateEmail = await User.findOne({
+      email: email.toLowerCase().trim(),
+    });
 
-    if (duplicate)
+    if (duplicateUsername)
       return res.status(409).json({ message: "Username already exists" });
+
+    if (duplicateEmail)
+      return res.status(409).json({ message: "Email already exists" });
+
+    const passwordError = validatePassword(password);
+    if (passwordError) return res.status(400).json({ message: passwordError });
 
     // hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // create a new user
-    await User.create({
+    // create a new user with email verification required
+    const user = await User.create({
       username,
       hashedPassword,
       authProvider: "local",
-      email,
+      email: email.toLowerCase().trim(),
       displayName: `${lastName} ${firstName}`,
+      emailVerified: false,
     });
 
-    return res.sendStatus(204);
+    const verificationToken = await createEmailVerificationToken(user);
+
+    const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+    const verifyUrl = `${clientUrl}${process.env.EMAIL_VERIFY_PATH || "/verify-email"}?token=${verificationToken}`;
+
+    await sendVerificationEmail({
+      to: user.email,
+      url: verifyUrl,
+    });
+
+    return res.status(201).json({
+      message:
+        "Registration successful. Please verify your email before logging in.",
+    });
   } catch (e) {
     console.error("Registration error:", e);
     return res.status(500).json({ message: "Internal server error" });
   }
-};
-
-const createSessionForUser = async (user, res) => {
-  const accessToken = jwt.sign(
-    { userId: user._id },
-    process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: ACCESS_TOKEN_TTL },
-  );
-
-  const refreshToken = crypto.randomBytes(64).toString("hex");
-
-  await Session.create({
-    userId: user._id,
-    refreshToken,
-    expiresAt: new Date(Date.now() + REFRESH_TOKEN_TTL),
-  });
-
-  res.cookie("refreshToken", refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    maxAge: REFRESH_TOKEN_TTL,
-  });
-
-  return accessToken;
-};
-
-const createSocialUser = async ({
-  email,
-  displayName,
-  firstName,
-  lastName,
-  avatarUrl,
-  authProvider,
-}) => {
-  let usernameBase = email
-    .split("@")[0]
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, "");
-
-  if (!usernameBase) usernameBase = "user";
-
-  let username = usernameBase;
-  let counter = 1;
-
-  while (await User.findOne({ username })) {
-    username = `${usernameBase}${counter}`;
-    counter += 1;
-  }
-
-  const randomPassword = crypto.randomBytes(32).toString("hex");
-  const hashedPassword = await bcrypt.hash(randomPassword, 10);
-
-  return User.create({
-    username,
-    hashedPassword,
-    authProvider: authProvider || "google",
-    email: email.toLowerCase().trim(),
-    displayName: displayName || `${lastName ?? ""} ${firstName ?? ""}`.trim(),
-    avatarUrl,
-  });
-};
-
-const getGoogleUserInfo = async (accessToken) => {
-  const response = await fetch(
-    `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${encodeURIComponent(accessToken)}`,
-  );
-
-  if (!response.ok) throw new Error("Google token validation failed");
-
-  return response.json();
-};
-
-const getFacebookUserInfo = async (accessToken) => {
-  const response = await fetch(
-    `https://graph.facebook.com/me?fields=id,email,first_name,last_name,picture&access_token=${encodeURIComponent(accessToken)}`,
-  );
-
-  if (!response.ok) throw new Error("Facebook token validation failed");
-
-  return response.json();
 };
 
 export const logIn = async (req, res) => {
@@ -143,38 +98,20 @@ export const logIn = async (req, res) => {
           "This account is linked to social login. Please sign in with Google or Facebook, or set a local password first.",
       });
 
+    if (!user.emailVerified)
+      return res.status(403).json({
+        message:
+          "Email not verified. Please verify your email or request a new verification link.",
+      });
+
     // verify password
     const passwordCorrect = await bcrypt.compare(password, user.hashedPassword);
 
     if (!passwordCorrect)
       return res.status(401).json({ message: "Invalid credentials" });
 
-    // if valid, create accessToken with JWT
-    const accessToken = jwt.sign(
-      { userId: user._id },
-      process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: ACCESS_TOKEN_TTL },
-    );
+    const accessToken = await createSessionForUser(user, res);
 
-    // create refreshToken
-    const refreshToken = crypto.randomBytes(64).toString("hex");
-
-    // create a new session to store the refreshToken
-    await Session.create({
-      userId: user._id,
-      refreshToken,
-      expiresAt: new Date(Date.now() + REFRESH_TOKEN_TTL),
-    });
-
-    // set refresh token cookie
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: REFRESH_TOKEN_TTL,
-    });
-
-    // return access token in response
     return res.status(200).json({ accessToken });
   } catch (e) {
     console.error("Login error:", e);
@@ -208,6 +145,11 @@ export const googleLogin = async (req, res) => {
         avatarUrl: googleUser.picture,
         authProvider: "google",
       });
+
+    if (!user.emailVerified) {
+      user.emailVerified = true;
+      await user.save();
+    }
 
     const token = await createSessionForUser(user, res);
 
@@ -250,6 +192,11 @@ export const facebookLogin = async (req, res) => {
       });
     }
 
+    if (!user.emailVerified) {
+      user.emailVerified = true;
+      await user.save();
+    }
+
     const token = await createSessionForUser(user, res);
 
     return res.status(200).json({ accessToken: token });
@@ -287,10 +234,7 @@ export const forgotPassword = async (req, res) => {
 
     const user = await User.findOne({ email: email.toLowerCase().trim() });
 
-    if (!user)
-      return res
-        .status(200)
-        .json({ message: "If that email exists, a reset link has been sent." });
+    if (!user) return res.status(404).json({ message: "Email does not exist" });
 
     const provider = user.authProvider || "local";
     if (provider !== "local")
@@ -327,6 +271,82 @@ export const forgotPassword = async (req, res) => {
   }
 };
 
+export const verifyEmail = async (req, res) => {
+  try {
+    const token = req.body?.token || req.query?.token;
+
+    if (!token)
+      return res
+        .status(400)
+        .json({ message: "Verification token is required" });
+
+    const verificationTokenHash = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+
+    const user = await User.findOne({
+      emailVerificationToken: verificationTokenHash,
+      emailVerificationExpires: { $gt: new Date() },
+    });
+
+    if (!user)
+      return res
+        .status(400)
+        .json({ message: "Invalid or expired verification token" });
+
+    if (!user.emailVerified) {
+      user.emailVerified = true;
+      await user.save();
+    }
+
+    return res.status(200).json({ message: "Email verified successfully" });
+  } catch (e) {
+    console.error("Verify email error:", e);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const resendVerificationEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) return res.status(400).json({ message: "Email is required" });
+
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
+
+    if (!user)
+      return res.status(200).json({
+        message: "If that email exists, a verification link has been sent.",
+      });
+
+    if (user.authProvider !== "local")
+      return res.status(400).json({
+        message:
+          "This account is linked to social login. Please sign in with Google or Facebook.",
+      });
+
+    if (user.emailVerified)
+      return res.status(200).json({ message: "Email is already verified." });
+
+    const verificationToken = await createEmailVerificationToken(user);
+    const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+    const verifyUrl = `${clientUrl}${process.env.EMAIL_VERIFY_PATH || "/verify-email"}?token=${verificationToken}`;
+
+    await sendVerificationEmail({
+      to: user.email,
+      url: verifyUrl,
+    });
+
+    return res
+      .status(200)
+      .json({ message: "Verification email has been resent." });
+  } catch (e) {
+    console.error("Resend verification email error:", e);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const resetPassword = async (req, res) => {
   try {
     const { token, password } = req.body;
@@ -335,6 +355,9 @@ export const resetPassword = async (req, res) => {
       return res
         .status(400)
         .json({ message: "Token and new password are required" });
+
+    const passwordError = validatePassword(password);
+    if (passwordError) return res.status(400).json({ message: passwordError });
 
     const resetTokenHash = crypto
       .createHash("sha256")

@@ -8,7 +8,7 @@ import {
   notifyFriendsOfUserPresence,
   notifyFriendsOfDeletedAccount,
   onlineUsers,
-} from "../socket/index.js";
+} from "../sockets/index.js";
 import { uploadImageFromBuffer } from "../middlewares/uploadMiddleware.js";
 
 export const authMe = async (req, res) => {

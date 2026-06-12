@@ -40,7 +40,7 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<'div'
 
       await register(username, password, email, lastName, firstName);
 
-      toast.success('Registration successful! Please log in.');
+      toast.success('Registration successful! Check your email to verify your account.');
       navigate(ROUTES.LOGIN);
     } catch (e) {
       toast.error(getApiErrorMessage(e, 'Registration failed. Please try again.'));

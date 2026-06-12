@@ -48,6 +48,22 @@ export const authService = {
     return res.data;
   },
 
+  // Verify registration email using the token sent by email
+  verifyEmail: async (token: string) => {
+    const res = await api.get(API_ENDPOINTS.AUTH_VERIFY_EMAIL, {
+      params: { token },
+    });
+
+    return res.data;
+  },
+
+  // Resend verification email to a registered user
+  resendVerificationEmail: async (email: string) => {
+    const res = await api.post(API_ENDPOINTS.AUTH_RESEND_VERIFICATION, { email });
+
+    return res.data;
+  },
+
   // Log out the current user
   logOut: async () => await api.post(API_ENDPOINTS.AUTH_LOGOUT, undefined, { withCredentials: true }),
 

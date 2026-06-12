@@ -1,0 +1,143 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verify your email</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f7;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      .email-table {
+        background-color: #f4f4f7;
+        padding: 20px;
+        width: 100%;
+      }
+
+      .email-card {
+        max-width: 600px;
+        width: 100%;
+        background: #ffffff;
+        border: 1px solid #eaeaea;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      }
+
+      .email-header {
+        background-color: #00338d;
+        padding: 28px 24px;
+        text-align: center;
+      }
+
+      .email-title {
+        margin: 0;
+        color: #ffffff;
+        font-size: 24px;
+        font-weight: 700;
+        line-height: 1.2;
+      }
+
+      .email-content {
+        padding: 32px;
+      }
+
+      .paragraph {
+        margin: 0 0 16px;
+        color: #333333;
+        font-size: 16px;
+        line-height: 1.6;
+      }
+
+      .paragraph--spaced {
+        margin-bottom: 24px;
+      }
+
+      .button-row {
+        margin: 0 0 26px;
+      }
+
+      .verify-button {
+        display: inline-block;
+        padding: 14px 26px;
+        background-color: #00338d;
+        color: #ffffff;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: 700;
+        font-size: 16px;
+      }
+
+      .link-text {
+        margin: 0 0 24px;
+        word-break: break-word;
+      }
+
+      .link-text a {
+        color: #00338d;
+        text-decoration: none;
+      }
+
+      .expiry-note {
+        margin: 0;
+        color: #777777;
+        font-size: 14px;
+        text-align: center;
+        line-height: 1.5;
+      }
+    </style>
+  </head>
+  <body>
+    <table class="email-table" cellpadding="0" cellspacing="0" border="0">
+      <tr>
+        <td align="center">
+          <table class="email-card" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+              <td class="email-header" align="center">
+                <h2 class="email-title">Verify your email</h2>
+              </td>
+            </tr>
+            <tr>
+              <td class="email-content">
+                <p class="paragraph">Hi there,</p>
+                <p class="paragraph paragraph--spaced">
+                  Thanks for registering with chat-app. Please verify your email
+                  address to activate your account.
+                </p>
+                <table
+                  class="button-row"
+                  cellpadding="0"
+                  cellspacing="0"
+                  border="0"
+                  width="100%"
+                >
+                  <tr>
+                    <td align="center">
+                      <a href="{{verifyLink}}" class="verify-button"
+                        >Verify your email</a
+                      >
+                    </td>
+                  </tr>
+                </table>
+                <p class="paragraph paragraph--spaced">
+                  If the button doesn't work, copy and paste this link into your
+                  browser:
+                </p>
+                <p class="link-text">
+                  <a href="{{verifyLink}}">{{verifyLink}}</a>
+                </p>
+                <p class="expiry-note">
+                  <em>Your verification link is valid for 24 hours.</em>
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

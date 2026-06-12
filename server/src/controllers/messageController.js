@@ -2,7 +2,7 @@ import { Conversation } from "../models/Conversation.js";
 import { Message } from "../models/Message.js";
 import { updateConversationAfterCreateMessage } from "../utils/messageHelper.js";
 import { emitNewMessage } from "../utils/messageHelper.js";
-import { io } from "../socket/index.js";
+import { io } from "../sockets/index.js";
 
 export const sendDirectMessage = async (req, res) => {
   try {

@@ -8,7 +8,9 @@ import { ChatPage } from './pages/chat-page/chat.page';
 import { ForgotPasswordPage } from './pages/forgot-password-page/forgot-password.page';
 import { LoginPage } from './pages/login-page/login.page';
 import { RegisterPage } from './pages/register-page/register.page';
+import { ResendVerificationPage } from './pages/resend-verification-page/resend-verification.page';
 import { ResetPasswordPage } from './pages/reset-password-page/reset-password.page';
+import { VerifyEmailPage } from './pages/verify-email-page/verify-email.page';
 import { ProtectedRoute } from './routes/protected-route';
 import { useAuthStore } from './stores/use-auth-store';
 import { useSocketStore } from './stores/use-socket-store';
@@ -39,6 +41,8 @@ function App() {
           <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
           <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPasswordPage />} />
           <Route path={ROUTES.RESET_PASSWORD} element={<ResetPasswordPage />} />
+          <Route path={ROUTES.VERIFY_EMAIL} element={<VerifyEmailPage />} />
+          <Route path={ROUTES.RESEND_VERIFICATION} element={<ResendVerificationPage />} />
           <Route element={<ProtectedRoute />}>
             <Route path={ROUTES.CHAT} element={<ChatPage />} />
           </Route>

@@ -1,7 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
@@ -18,6 +19,9 @@ import { getApiErrorMessage } from '@/lib/axios';
 import { cn } from '@/lib/utils';
 
 export function ResetPasswordForm({ className, ...props }: React.ComponentProps<'div'>) {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -60,13 +64,23 @@ export function ResetPasswordForm({ className, ...props }: React.ComponentProps<
                 <FieldLabel htmlFor="password" className="text-xs">
                   New password
                 </FieldLabel>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter new password"
-                  className="h-7 text-[0.7rem] placeholder:text-[0.7rem] md:text-[0.7rem]"
-                  {...register('password')}
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Enter new password"
+                    className="hide-password-toggle h-7 pr-7 text-[0.7rem] placeholder:text-[0.7rem] md:text-[0.7rem]"
+                    {...register('password')}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(v => !v)}
+                    className="text-muted-foreground hover:text-foreground absolute inset-y-0 right-1.5 flex items-center"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
+                  </button>
+                </div>
                 {errors.password && <p className="text-destructive text-[0.6rem]">{errors.password.message}</p>}
               </Field>
 
@@ -74,13 +88,23 @@ export function ResetPasswordForm({ className, ...props }: React.ComponentProps<
                 <FieldLabel htmlFor="confirm-password" className="text-xs">
                   Confirm password
                 </FieldLabel>
-                <Input
-                  id="confirm-password"
-                  type="password"
-                  placeholder="Confirm new password"
-                  className="h-7 text-[0.7rem] placeholder:text-[0.7rem] md:text-[0.7rem]"
-                  {...register('confirmPassword')}
-                />
+                <div className="relative">
+                  <Input
+                    id="confirm-password"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    placeholder="Confirm new password"
+                    className="hide-password-toggle h-7 pr-7 text-[0.7rem] placeholder:text-[0.7rem] md:text-[0.7rem]"
+                    {...register('confirmPassword')}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(v => !v)}
+                    className="text-muted-foreground hover:text-foreground absolute inset-y-0 right-1.5 flex items-center"
+                    tabIndex={-1}
+                  >
+                    {showConfirmPassword ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
+                  </button>
+                </div>
                 {errors.confirmPassword && (
                   <p className="text-destructive text-[0.6rem]">{errors.confirmPassword.message}</p>
                 )}
