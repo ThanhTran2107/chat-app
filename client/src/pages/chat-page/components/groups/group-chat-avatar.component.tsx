@@ -2,6 +2,7 @@ import { type Participant } from '@/types/chat.ts';
 import { Ellipsis } from 'lucide-react';
 
 import { UserAvatar } from '../friends/user-avatar.component';
+import { APP_NAME } from '@/utils/constants';
 
 interface GroupChatAvatarProps {
   participants: Participant[]; // Assuming Participant is a type that includes user info and their role in the group
@@ -15,7 +16,12 @@ export const GroupChatAvatar = ({ participants, type }: GroupChatAvatarProps) =>
   for (let i = 0; i < limit; i++) {
     const member = participants[i];
     avatars.push(
-      <UserAvatar key={i} type={type} name={member.displayName ?? 'Moji'} avatarUrl={member.avatarUrl ?? undefined} />,
+      <UserAvatar
+        key={i}
+        type={type}
+        name={member.displayName ?? APP_NAME}
+        avatarUrl={member.avatarUrl ?? undefined}
+      />,
     );
   }
 

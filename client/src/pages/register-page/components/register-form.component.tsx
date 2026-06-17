@@ -55,7 +55,7 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<'div'
             <FieldGroup className="gap-5">
               {/* Header */}
               <div className="flex flex-col text-center">
-                <img src="/logo.svg" alt="Logo" className="mx-auto h-7 w-auto" />
+                <img src="/main-logo.png" alt="Logo" className="mx-auto h-15 w-auto" />
                 <div className="text-2xl font-semibold whitespace-nowrap">Create your account</div>
                 <p className="text-muted-foreground text-[0.7rem] italic">Fill in the details below to get started</p>
               </div>

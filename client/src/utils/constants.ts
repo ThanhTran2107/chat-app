@@ -5,9 +5,11 @@ import { z } from 'zod';
 export const USERNAME_MIN_LENGTH = 3;
 export const PASSWORD_MIN_LENGTH = 8;
 
+export const APP_NAME = 'Tetra';
+
 export const API_ENDPOINTS = Object.freeze({
   // Base path for all API endpoints
-  BASE: '/chat-app',
+  BASE: '/tetra',
 
   // Authentication endpoints
   AUTH_REGISTER: 'auth/register',

@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn, formatMessageTime } from '@/lib/utils';
 
 import { UserAvatar } from '../friends/user-avatar.component';
+import { APP_NAME } from '@/utils/constants';
 
 interface MessageItemProps {
   message: Message;
@@ -43,7 +44,7 @@ export const MessageItem = ({ message, index, messages, selectedConvo, lastMessa
             {isGroupBreak ? (
               <UserAvatar
                 type="chat"
-                name={participant?.displayName ?? 'Moji'}
+                name={participant?.displayName ?? APP_NAME}
                 avatarUrl={participant?.avatarUrl ?? undefined}
               />
             ) : (

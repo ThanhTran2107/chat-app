@@ -55,7 +55,7 @@ export function ResetPasswordForm({ className, ...props }: React.ComponentProps<
           <form className="px-4 py-10 md:px-5 md:py-2.5" onSubmit={handleSubmit(handleResetPassword)}>
             <FieldGroup className="gap-5">
               <div className="flex flex-col text-center">
-                <img src="/logo.svg" alt="Logo" className="mx-auto h-7 w-auto" />
+                <img src="/main-logo.png" alt="Logo" className="mx-auto h-15 w-auto" />
                 <div className="text-2xl font-semibold whitespace-nowrap">Reset password</div>
                 <p className="text-muted-foreground text-[0.7rem] italic">Enter a new password for your account.</p>
               </div>

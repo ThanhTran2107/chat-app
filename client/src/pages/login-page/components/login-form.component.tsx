@@ -17,7 +17,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Field, FieldGroup, FieldLabel, FieldSeparator } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 
-import { type LoginFormValues, ROUTES, loginSchema } from '@/utils/constants';
+import { APP_NAME, type LoginFormValues, ROUTES, loginSchema } from '@/utils/constants';
 
 import { getApiErrorMessage } from '@/lib/axios';
 import { cn } from '@/lib/utils';
@@ -73,8 +73,8 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
             <FieldGroup className="gap-5">
               {/* Header */}
               <div className="flex flex-col text-center">
-                <img src="/logo.svg" alt="Logo" className="mx-auto h-7 w-auto" />
-                <div className="text-2xl font-semibold whitespace-nowrap">Welcome back</div>
+                <img src="/main-logo.png" alt="Logo" className="mx-auto h-15 w-auto" />
+                <div className="text-2xl font-semibold whitespace-nowrap">Welcome back to {APP_NAME}</div>
                 <p className="text-muted-foreground text-[0.7rem] italic">
                   Enter your credentials to access your workspace
                 </p>

@@ -51,7 +51,7 @@ export const VerifyEmailPage = () => {
           <CardContent className="grid p-0 md:grid-cols-2">
             <div className="flex flex-col gap-5 px-4 py-10 md:px-5 md:py-2.5">
               <div className="flex flex-col text-center">
-                <img src="/logo.svg" alt="Logo" className="mx-auto h-7 w-auto" />
+                <img src="/main-logo.png" alt="Logo" className="mx-auto h-15 w-auto" />
                 <div className="text-2xl font-semibold whitespace-nowrap">Verify your email</div>
               </div>
 

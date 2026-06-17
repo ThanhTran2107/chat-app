@@ -41,14 +41,14 @@ const swaggerDocument = JSON.parse(
 app.use("/api-docs", SwaggerUI.serve, SwaggerUI.setup(swaggerDocument));
 
 // Public route
-app.use("/chat-app/auth", authRoute);
+app.use("/tetra/auth", authRoute);
 
 // Private route
 app.use(protectedRoute);
-app.use("/chat-app/user", userRoute);
-app.use("/chat-app/friend", friendRoute);
-app.use("/chat-app/message", messageRoute);
-app.use("/chat-app/conversation", conversationRoute);
+app.use("/tetra/user", userRoute);
+app.use("/tetra/friend", friendRoute);
+app.use("/tetra/message", messageRoute);
+app.use("/tetra/conversation", conversationRoute);
 
 connectDB().then(() =>
   httpServer.listen(PORT, () =>

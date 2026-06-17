@@ -44,7 +44,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="bg-linear-to-r from-violet-700 via-fuchsia-600 to-pink-500 text-white shadow-lg shadow-violet-500/20 hover:opacity-95"
             >
               <div className="item-center flex w-full justify-between px-2">
-                <h1 className="text-[1.5rem]! font-bold text-white">Moji</h1>
+                <h1 className="text-[1.5rem]! font-bold text-white">Tetra</h1>
                 <div className="flex items-center gap-2">
                   <Sun className="size-4 text-white/80" />
                   <Switch

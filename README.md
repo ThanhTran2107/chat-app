@@ -1,6 +1,6 @@
-﻿# Chat App
+﻿# Tetra
 
-A full-stack chat application using **React 19 + TypeScript** (frontend) and **Node.js + Express 5** (backend), with **MongoDB** as the database. The project includes user authentication, session management, friend / conversation APIs, Swagger docs, and foundational direct/group messaging endpoints.
+A full-stack chat application with a **React 18 + TypeScript** SPA frontend and a **Node.js + Express 5** backend. The project now includes registration, login, email verification, password recovery, friend search and requests, profile management, conversation and messaging APIs, Cloudinary avatar upload, and Swagger documentation.
 
 ---
 
@@ -10,7 +10,6 @@ A full-stack chat application using **React 19 + TypeScript** (frontend) and **N
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
 - [Current Features](#current-features)
-- [Planned Features](#planned-features)
 - [API Reference](#api-reference)
 - [Setup & Installation](#setup--installation)
 - [Environment Variables](#environment-variables)
@@ -20,10 +19,10 @@ A full-stack chat application using **React 19 + TypeScript** (frontend) and **N
 
 ## Overview
 
-Chat App is a web-based messaging platform where users can register, log in, manage friends, and use conversation/message APIs. The project is split into two separate workspaces:
+Tetra is a web-based messaging platform where users can register, verify their email, recover access with password reset, manage friends, and participate in direct/group conversations. The codebase is split into two workspaces:
 
-- **`client/`** — React SPA (Single Page Application)
-- **`server/`** — REST API server
+- **`client/`** — React SPA frontend
+- **`server/`** — Express REST API backend
 
 ---
 
@@ -31,30 +30,32 @@ Chat App is a web-based messaging platform where users can register, log in, man
 
 ### Frontend (`client/`)
 
-- **React 19**, **TypeScript**
-- **Vite** (dev server & build)
-- **Tailwind CSS v4** (styling)
-- **shadcn/ui**, **base-ui**, **Ant Design** (UI components)
-- **React Router v7** (routing)
-- **React Hook Form**, **Zod** (form & validation)
-- **Zustand** (state management)
-- **Axios** (HTTP client)
-- **Sonner** (toast notifications)
-- **Lucide React** (icons)
-- **Prettier, ESLint, Husky, lint-staged** (format/lint)
+- **React 18**, **TypeScript**
+- **Vite**
+- **Tailwind CSS v4**
+- **React Router v7**
+- **React Hook Form**, **Zod**
+- **Zustand**
+- **Axios**
+- **Sonner**
+- **Lucide React**
+- **@base-ui/react**, **Ant Design**
+- **socket.io-client**
 - **@fontsource-variable/geist**, **class-variance-authority**, **clsx**, **tailwind-merge**, **tailwindcss-animate**, **tw-animate-css**
 
 ### Backend (`server/`)
 
 - **Node.js + Express 5**
 - **MongoDB + Mongoose**
-- **bcrypt** (hash password)
-- **jsonwebtoken** (JWT)
+- **bcrypt**
+- **jsonwebtoken**
 - **cookie-parser**
-- **dotenv**
 - **cors**
+- **dotenv**
+- **nodemailer**
+- **cloudinary**
 - **swagger-ui-express**
-- **nodemon** (dev auto-restart)
+- **socket.io**
 
 ---
 
@@ -71,22 +72,23 @@ chat-app/
 │   │   │   ├── antd/ (checkbox, spin)
 │   │   │   └── ui/ (button, card, field, input, label, separator, ...)
 │   │   ├── lib/ (axios.ts, utils.ts)
-│   │   ├── pages/ (chat.page.tsx, login.page.tsx, register.page.tsx)
+│   │   ├── pages/ (chat-page, login-page, register-page, forgot-password-page, reset-password-page, verify-email-page, resend-verification-page)
 │   │   ├── routes/ (protected-route.tsx, redirect-if-authenticated.tsx)
-│   │   ├── stores/ (use-auth-store.ts)
-│   │   ├── types/ (store.ts, user.ts)
+│   │   ├── stores/ (use-auth-store.ts, use-chat-store.ts)
+│   │   ├── types/ (chat.ts, store.ts, user.ts)
 │   │   └── utils/ (constants.ts, services/auth.service.ts)
 │   ├── package.json, tsconfig.json, vite.config.ts, eslint.config.js, ...
 │
 └── server/
   ├── src/
   │   ├── controllers/ (authController.js, userController.js, friendController.js, messageController.js, conversationController.js)
-  │   ├── libs/ (db.js)
-  │   ├── middlewares/ (authMiddleware.js, friendMiddleware.js)
+  │   ├── libs/ (db.js, mailer.js)
+  │   ├── middlewares/ (authMiddleware.js, friendMiddleware.js, uploadMiddleware.js)
   │   ├── models/ (User.js, Session.js, Friend.js, FriendRequest.js, Conversation.js, Message.js)
   │   ├── routes/ (authRoute.js, userRoute.js, friendRoute.js, messageRoute.js, conversationRoute.js)
   │   ├── utils/ (messageHelper.js)
   │   ├── swagger.json
+  │   ├── sockets/ (index.js)
   │   └── server.js
   └── package.json
 ```
@@ -97,54 +99,49 @@ chat-app/
 
 ### Backend
 
-- **User auth**: register, login, logout, refresh token
-- **JWT protection**: all private APIs require `Authorization: Bearer <accessToken>`
-- **Session-based refresh**: refresh token stored in cookie and validated with `Session` model
-- **User profile**: `/chat-app/user/me`
-- **Friend system**:
+- **Authentication flows**
+  - register with email and password
+  - login and logout
+  - refresh token support via cookie-based sessions
+  - email verification with verification link
+  - resend verification email
+  - forgot password and reset password via email link
+- **JWT protected API** for private routes
+- **User profile**
+  - get current profile
+  - update display name, username, email, phone number, bio, and online visibility
+  - upload avatar through Cloudinary
+  - delete account and cleanup user-related sessions, friends, conversations, and messages
+- **Friend system**
+  - search users by username
   - send friend requests
-  - accept friend requests
-  - decline friend requests
-  - list friends
-  - list sent / received requests
-- **Conversations**:
-  - create direct conversations
-  - create group conversations
-  - list user conversations
-  - paginate conversation messages
-- **Messaging API**:
+  - accept/decline friend requests
+  - list friends and request status
+- **Conversations and messaging**
+  - create direct or group conversations
+  - list conversations for the authenticated user
+  - load conversation messages
   - send direct messages
   - send group messages
-  - update conversation metadata and unread counts
-- **Swagger docs**: backend API documentation served at `/api-docs`
+  - mark conversations as seen
+- **Email delivery** via SMTP templates
+- **Swagger docs** available at `/api-docs`
 
 ### Frontend
 
-- **Register page**: form validation and social login UI controls
-- **Login page**: auth form with UI state and token storage
-- **Chat page**: user info and logout support
-- **Auth state management**: Zustand for auth data
-- **Route protection**: redirects based on login state
-- **Toasts**: Sonner notifications for success/error states
+- **Authentication pages**: register, login, forgot password, reset password, verify email, resend verification
+- **Social login** support for Google and Facebook
+- **Chat page** with sidebar layout
+- **Route guarding**: protected routes and redirect-if-authenticated flow
+- **Form validation** using Zod and react-hook-form
+- **Toasts** for success and error states using Sonner
+- **Friend search and user cards** for adding contacts
+- **Profile UI** with disabled email input in profile edit
+- **Auth store refresh** after email verification to keep user state current
 
-### User Model
+### Data Model
 
-Each user includes: `username`, `hashedPassword`, `email`, `displayName`, `avatarUrl`, `avatarId`, `bio`, `phoneNumber`
-
----
-
-## Planned Features
-
-- [ ] Complete chat UI and integrate message list with backend
-- [ ] Real-time chat with WebSocket / Socket.IO
-- [ ] Online/offline presence status
-- [ ] Read receipts and typing indicators
-- [ ] File and image attachments
-- [ ] Search users and view profiles
-- [ ] Notifications
-- [ ] OAuth login (Google, Meta)
-- [ ] Theme toggle (dark/light)
-- [ ] Docker and CI/CD
+Users include fields for `username`, `email`, `emailVerified`, `emailVerificationToken`, `emailVerificationExpires`, `hashedPassword`, `displayName`, `avatarUrl`, `avatarId`, `bio`, and `phoneNumber`.
 
 ---
 
@@ -164,47 +161,23 @@ Open API docs at:
 http://localhost:3000/api-docs
 ```
 
-### Auth Routes — `/chat-app/auth`
+### Auth Routes — `/tetra/auth`
 
-| Method | Endpoint                  | Auth | Description                          |
-| ------ | ------------------------- | ---- | ------------------------------------ |
-| POST   | `/chat-app/auth/register` | None | Register a new user                  |
-| POST   | `/chat-app/auth/login`    | None | Log in, returns access token         |
-| POST   | `/chat-app/auth/logout`   | None | Log out, clears refresh token cookie |
-| POST   | `/chat-app/auth/refresh`  | None | Refresh access token from cookie     |
+| Method | Endpoint                             | Auth | Description                                    |
+| ------ | ------------------------------------ | ---- | ---------------------------------------------- |
+| POST   | `/tetra/auth/register`            | None | Register a new user                            |
+| POST   | `/tetra/auth/login`               | None | Authenticate and return an access token        |
+| POST   | `/tetra/auth/google`              | None | Authenticate using Google OAuth access token   |
+| POST   | `/tetra/auth/facebook`            | None | Authenticate using Facebook OAuth access token |
+| POST   | `/tetra/auth/logout`              | None | Logout and clear refresh token cookie          |
+| POST   | `/tetra/auth/refresh`             | None | Refresh access token from cookie               |
+| POST   | `/tetra/auth/forgot-password`     | None | Send password reset email                      |
+| POST   | `/tetra/auth/reset-password`      | None | Reset password with token                      |
+| GET    | `/tetra/auth/verify-email`        | None | Verify email using token query parameter       |
+| POST   | `/tetra/auth/verify-email`        | None | Verify email with form submission              |
+| POST   | `/tetra/auth/resend-verification` | None | Resend the verification email                  |
 
-#### POST `/chat-app/auth/register`
-
-```json
-{
-  "firstName": "John",
-  "lastName": "Doe",
-  "username": "johndoe",
-  "email": "john@example.com",
-  "password": "yourpassword"
-}
-```
-
-Response: `204 No Content`
-
-#### POST `/chat-app/auth/login`
-
-```json
-{
-  "username": "johndoe",
-  "password": "yourpassword"
-}
-```
-
-Response:
-
-```json
-{
-  "accessToken": "<jwt>"
-}
-```
-
-### User Routes — `/chat-app/user` _(Protected)_
+### User Routes — `/tetra/user` _(Protected)_
 
 Requires header:
 
@@ -212,34 +185,60 @@ Requires header:
 Authorization: Bearer <accessToken>
 ```
 
-| Method | Endpoint            | Description                                    |
-| ------ | ------------------- | ---------------------------------------------- |
-| GET    | `/chat-app/user/me` | Get the currently authenticated user's profile |
+| Method | Endpoint                                    | Description                    |
+| ------ | ------------------------------------------- | ------------------------------ |
+| GET    | `/tetra/user/me`                         | Get authenticated user profile |
+| PATCH  | `/tetra/user/me`                         | Update profile fields          |
+| POST   | `/tetra/user/uploadAvatar`               | Upload user avatar             |
+| DELETE | `/tetra/user/me`                         | Delete current user account    |
+| GET    | `/tetra/user/search?username=<username>` | Search users by username       |
 
-### Friend Routes — `/chat-app/friend` _(Protected)_
+### Friend Routes — `/tetra/friend` _(Protected)_
 
-| Method | Endpoint                                      | Description                             |
-| ------ | --------------------------------------------- | --------------------------------------- |
-| POST   | `/chat-app/friend/request`                     | Send a friend request                   |
-| POST   | `/chat-app/friend/request/:requestId/accept`   | Accept a friend request                 |
-| POST   | `/chat-app/friend/request/:requestId/decline`  | Decline a friend request                |
-| GET    | `/chat-app/friend/get-all`                     | Get friend list                         |
-| GET    | `/chat-app/friend/requests`                    | List sent and received friend requests  |
+| Method | Endpoint                                      | Description                            |
+| ------ | --------------------------------------------- | -------------------------------------- |
+| POST   | `/tetra/friend/request`                    | Send a friend request                  |
+| POST   | `/tetra/friend/request/:requestId/accept`  | Accept a friend request                |
+| POST   | `/tetra/friend/request/:requestId/decline` | Decline a friend request               |
+| GET    | `/tetra/friend/get-all`                    | Get friend list                        |
+| GET    | `/tetra/friend/requests`                   | List sent and received friend requests |
 
-### Message Routes — `/chat-app/message` _(Protected)_
+### Message Routes — `/tetra/message` _(Protected)_
 
-| Method | Endpoint                    | Description                        |
-| ------ | --------------------------- | ---------------------------------- |
-| POST   | `/chat-app/message/direct`  | Send a direct one-on-one message   |
-| POST   | `/chat-app/message/group`   | Send a group conversation message  |
+| Method | Endpoint                   | Description                       |
+| ------ | -------------------------- | --------------------------------- |
+| POST   | `/tetra/message/direct` | Send a direct one-on-one message  |
+| POST   | `/tetra/message/group`  | Send a group conversation message |
 
-### Conversation Routes — `/chat-app/conversation` _(Protected)_
+### Conversation Routes — `/tetra/conversation` _(Protected)_
 
-| Method | Endpoint                                      | Description                                 |
-| ------ | --------------------------------------------- | ------------------------------------------- |
-| POST   | `/chat-app/conversation`                       | Create a direct or group conversation       |
-| GET    | `/chat-app/conversation`                       | Get conversations for the current user      |
-| GET    | `/chat-app/conversation/:conversationId/messages` | Get messages for a conversation           |
+| Method | Endpoint                                          | Description                            |
+| ------ | ------------------------------------------------- | -------------------------------------- |
+| POST   | `/tetra/conversation`                          | Create a direct or group conversation  |
+| GET    | `/tetra/conversation`                          | Get conversations for the current user |
+| GET    | `/tetra/conversation/:conversationId/messages` | Get messages for a conversation        |
+| PATCH  | `/tetra/conversation/:conversationId/seen`     | Mark conversation messages as seen     |
+
+---
+
+## Setup & Installation
+
+1. Clone the repository.
+2. Install backend dependencies:
+
+```bash
+cd server
+npm install
+```
+
+3. Install frontend dependencies:
+
+```bash
+cd ../client
+npm install
+```
+
+4. Create `server/.env` with required environment variables.
 
 ---
 
@@ -254,87 +253,68 @@ PORT=3000
 MONGODB_CONNECTIONSTRING=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/<dbname>
 ACCESS_TOKEN_SECRET=your_super_secret_key_here
 CLIENT_URL=http://localhost:5173
+CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your_smtp_user@example.com
+SMTP_PASS=your_smtp_password
+EMAIL_VERIFY_PATH=/verify-email
+PASSWORD_RESET_PATH=/reset-password
 ```
 
-| Variable                   | Description                                        |
-| -------------------------- | -------------------------------------------------- |
-| `PORT`                     | Port the server listens on (default: `3000`)       |
-| `MONGODB_CONNECTIONSTRING` | MongoDB connection string (Atlas or local)         |
-| `ACCESS_TOKEN_SECRET`      | Secret key used to sign & verify JWT access tokens |
-| `CLIENT_URL`               | Frontend origin allowed by CORS                   |
-
-### Client (`client/.env`) _(optional)_
-
-```env
-VITE_API_BASE_URL=http://localhost:3000
-```
+| Variable                 | Description                                |
+| ------------------------ | ------------------------------------------ |
+| PORT                     | Backend server port                        |
+| MONGODB_CONNECTIONSTRING | MongoDB connection URI                     |
+| ACCESS_TOKEN_SECRET      | Secret used to sign JWT access tokens      |
+| CLIENT_URL               | Frontend origin for CORS and email links   |
+| CLOUDINARY_CLOUD_NAME    | Cloudinary cloud name                      |
+| CLOUDINARY_API_KEY       | Cloudinary API key                         |
+| CLOUDINARY_API_SECRET    | Cloudinary API secret                      |
+| SMTP_HOST                | SMTP server host for email delivery        |
+| SMTP_PORT                | SMTP server port                           |
+| SMTP_SECURE              | `true` for TLS/SSL, otherwise `false`      |
+| SMTP_USER                | SMTP username/email used as sender         |
+| SMTP_PASS                | SMTP password                              |
+| EMAIL_VERIFY_PATH        | Frontend path for email verification links |
+| PASSWORD_RESET_PATH      | Frontend path for password reset links     |
 
 ---
 
-## Setup & Installation
+## Running the Project
 
-### Requirements
+Use separate terminals for frontend and backend.
 
-- Node.js >= 18
-- npm >= 9
-- MongoDB (Atlas/local)
-
-### 1. Clone the repository
-
-```bash
-git clone <repository-url>
-cd chat-app
-```
-
-### 2. Install backend dependencies
-
-```bash
-cd server
-npm install
-```
-
-Create `.env` from your environment settings.
-
-### 3. Install frontend dependencies
-
-```bash
-cd ../client
-npm install
-```
-
-### 4. Run the project
-
-Open 2 terminals:
-
-**Terminal 1: Backend**
+Backend:
 
 ```bash
 cd server
 npm run dev
-# Server runs at http://localhost:3000
 ```
 
-**Terminal 2: Frontend**
+Frontend:
 
 ```bash
 cd client
 npm run dev
-# Frontend runs at http://localhost:5173
 ```
+
+Open the app in your browser at `http://localhost:5173`.
 
 ---
 
 ## Notes
 
-- Backend routes are mounted under `/chat-app`
+- Backend routes are mounted under `/tetra`
 - Swagger docs are available at `/api-docs`
 - JWT access token must be sent in `Authorization: Bearer <accessToken>`
-- Refresh token is stored in a secure cookie and used by `/chat-app/auth/refresh`
+- Refresh token is stored in a secure cookie and used by `/tetra/auth/refresh`
 - Messaging APIs support direct and group message creation via server endpoints
 
----
-
-## Server Scripts
+## Backend Scripts
 
 - `npm run dev`: Run backend with nodemon in development
 - `npm start`: Run backend in production

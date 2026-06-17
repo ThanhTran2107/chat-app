@@ -1,6 +1,7 @@
 import { SidebarInset } from '@/components/ui/sidebar';
 
 import { ChatWindowHeader } from './chat-window-header.component';
+import { APP_NAME } from '@/utils/constants';
 
 export const ChatWelcomeScreen = () => {
   return (
@@ -15,7 +16,7 @@ export const ChatWelcomeScreen = () => {
 
           <h2 className="mb-2 text-2xl font-bold">
             <span className="bg-linear-to-r from-violet-700 via-fuchsia-600 to-pink-500 bg-clip-text text-transparent">
-              Welcome to the Chat!
+              Welcome to {APP_NAME} !
             </span>
           </h2>
 

@@ -3,6 +3,7 @@ import { UserX2 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.tsx';
 
 import { cn } from '@/lib/utils.ts';
+import { APP_NAME } from '@/utils/constants';
 
 interface IUserAvatarProps {
   type: 'sidebar' | 'chat' | 'profile';
@@ -15,7 +16,7 @@ export const UserAvatar = ({ type, name, avatarUrl, className }: IUserAvatarProp
   const isDeleted = name === 'Deleted account';
   const bgColor = isDeleted ? 'bg-slate-600' : !avatarUrl ? 'bg-blue-500' : '';
 
-  if (!name) name = 'Moji';
+  if (!name) name = APP_NAME;
 
   const avatarSizeClass =
     type === 'sidebar' ? 'size-12 text-base' : type === 'chat' ? 'size-8 text-sm' : 'size-24 text-3xl shadow-md';

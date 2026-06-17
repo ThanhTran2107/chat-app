@@ -47,7 +47,7 @@ export const sendPasswordResetEmail = async ({ to, url }) => {
   const info = await transporter.sendMail({
     from: process.env.SMTP_USER,
     to,
-    subject: "Reset your chat-app password",
+    subject: "Reset your Tetra password",
     html,
   });
 
@@ -63,7 +63,7 @@ export const sendVerificationEmail = async ({ to, url }) => {
   const info = await transporter.sendMail({
     from: process.env.SMTP_USER,
     to,
-    subject: "Verify your chat-app email",
+    subject: "Verify your Tetra email",
     html,
   });
 
