@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import { ChatPage } from './pages/chat-page/chat.page';
+import { LandingPage } from './pages/landing-page/landing.page';
 import { ForgotPasswordPage } from './pages/forgot-password-page/forgot-password.page';
 import { LoginPage } from './pages/login-page/login.page';
 import { RegisterPage } from './pages/register-page/register.page';
@@ -37,6 +38,7 @@ function App() {
       <Toaster richColors />
       <BrowserRouter>
         <Routes>
+          <Route path="/" element={<LandingPage />} />
           <Route path={ROUTES.LOGIN} element={<LoginPage />} />
           <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
           <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPasswordPage />} />

@@ -106,8 +106,8 @@ export const useAuthStore = create<AuthState>()(
       // Clear the authentication state and log out the user
       logOut: async () => {
         try {
-          get().clearState();
           await authService.logOut();
+          get().clearState();
         } catch (e) {
           console.error('Logout error:', e);
           throw e;

@@ -51,7 +51,7 @@ export const ROUTES = Object.freeze({
   RESET_PASSWORD: '/reset-password',
   VERIFY_EMAIL: '/verify-email',
   RESEND_VERIFICATION: '/resend-verification',
-  CHAT: '/',
+  CHAT: '/chat',
 });
 
 export const AUTH_ID = Object.freeze({

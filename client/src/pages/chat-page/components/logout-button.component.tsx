@@ -6,8 +6,6 @@ import { useNavigate } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
 
-import { ROUTES } from '@/utils/constants';
-
 import { getApiErrorMessage } from '@/lib/axios';
 
 export const LogoutButton = () => {
@@ -20,7 +18,7 @@ export const LogoutButton = () => {
       await logOut();
 
       toast.success('Logout successful!');
-      navigate(ROUTES.LOGIN, { replace: true });
+      navigate('/', { replace: true });
     } catch (e) {
       console.error('Logout error:', e);
       toast.error(getApiErrorMessage(e, 'Logout failed. Please try again.'));
