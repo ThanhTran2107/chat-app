@@ -1,18 +1,18 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, LockKeyhole } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 
 import { Spin } from '@/components/antd/spin.component';
+import { AuthIllustration } from '@/components/ui/auth-illustration.component';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 
-import { ROUTES, type ResetPasswordFormValues, resetPasswordSchema } from '@/utils/constants';
+import { APP_NAME, ROUTES, type ResetPasswordFormValues, resetPasswordSchema } from '@/utils/constants';
 import { authService } from '@/utils/services/auth.service';
 
 import { getApiErrorMessage } from '@/lib/axios';
@@ -48,72 +48,109 @@ export function ResetPasswordForm({ className, ...props }: React.ComponentProps<
     }
   };
 
-  return (
-    <div className={cn('flex flex-col gap-1', className)} {...props}>
-      <Card className="overflow-hidden p-0">
-        <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="px-4 py-10 md:px-5 md:py-2.5" onSubmit={handleSubmit(handleResetPassword)}>
-            <FieldGroup className="gap-5">
-              <div className="flex flex-col text-center">
-                <img src="/main-logo.png" alt="Logo" className="mx-auto h-15 w-auto" />
-                <div className="text-2xl font-semibold whitespace-nowrap">Reset password</div>
-                <p className="text-muted-foreground text-[0.7rem] italic">Enter a new password for your account.</p>
-              </div>
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      const passwordInput = document.getElementById('password') as HTMLInputElement | null;
+      passwordInput?.focus();
+    }, 120);
 
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  return (
+    <div
+      className={cn(
+        'grid overflow-hidden rounded-[28px] border border-slate-200/80 bg-white/95 shadow-[0_30px_90px_rgba(15,23,42,0.16)] lg:grid-cols-[1.05fr_0.95fr] dark:border-white/10 dark:bg-[#0d1c2d] dark:shadow-[0_40px_140px_rgba(0,0,0,0.35)]',
+        className,
+      )}
+      {...props}
+    >
+      <div className="relative flex flex-col justify-between bg-white/90 px-5 py-6 sm:px-7 lg:px-8 dark:bg-[#0d1c2d]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(124,58,237,0.12),transparent_40%)] dark:bg-[radial-gradient(circle_at_top_left,rgba(214,140,255,0.15),transparent_40%)]" />
+        <div className="relative">
+          <div className="mb-5 flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center overflow-hidden">
+              <img src="/main-logo.png" alt={`${APP_NAME} logo`} className="h-full w-full object-contain" />
+            </div>
+            <div>
+              <p className="text-base font-semibold tracking-[0.24em] text-slate-900 uppercase dark:text-white">
+                {APP_NAME}
+              </p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">Secure access</p>
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <h1 className="text-2xl font-semibold text-slate-900 sm:text-3xl dark:text-white">Reset password</h1>
+            <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+              Enter a new password for your account.
+            </p>
+          </div>
+
+          <form className="space-y-3" onSubmit={handleSubmit(handleResetPassword)}>
+            <FieldGroup className="gap-3">
               <Field>
-                <FieldLabel htmlFor="password" className="text-xs">
+                <FieldLabel
+                  htmlFor="password"
+                  className="text-[0.7rem] font-semibold tracking-[0.22em] text-slate-600 uppercase dark:text-slate-400"
+                >
                   New password
                 </FieldLabel>
                 <div className="relative">
+                  <LockKeyhole className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
                   <Input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
+                    autoFocus
                     placeholder="Enter new password"
-                    className="hide-password-toggle h-7 pr-7 text-[0.7rem] placeholder:text-[0.7rem] md:text-[0.7rem]"
+                    className="hide-password-toggle h-11 rounded-2xl border border-slate-200 bg-white pr-10 pl-10 text-sm text-slate-900 shadow-inner shadow-slate-900/5 transition placeholder:text-slate-400 focus:border-violet-400/70 focus:ring-0 dark:border-white/10 dark:bg-[#071424] dark:text-white dark:shadow-black/20 dark:placeholder:text-slate-500 dark:focus:border-[#d68cff]/60"
                     {...register('password')}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(v => !v)}
-                    className="text-muted-foreground hover:text-foreground absolute inset-y-0 right-1.5 flex items-center"
+                    className="absolute inset-y-0 right-3 flex cursor-pointer items-center text-slate-500 transition hover:text-slate-800 dark:hover:text-slate-200"
                     tabIndex={-1}
                   >
-                    {showPassword ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
+                    {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                   </button>
                 </div>
-                {errors.password && <p className="text-destructive text-[0.6rem]">{errors.password.message}</p>}
+                {errors.password && <p className="text-[0.7rem] text-rose-400">{errors.password.message}</p>}
               </Field>
 
               <Field>
-                <FieldLabel htmlFor="confirm-password" className="text-xs">
+                <FieldLabel
+                  htmlFor="confirm-password"
+                  className="text-[0.7rem] font-semibold tracking-[0.22em] text-slate-600 uppercase dark:text-slate-400"
+                >
                   Confirm password
                 </FieldLabel>
                 <div className="relative">
+                  <LockKeyhole className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
                   <Input
                     id="confirm-password"
                     type={showConfirmPassword ? 'text' : 'password'}
                     placeholder="Confirm new password"
-                    className="hide-password-toggle h-7 pr-7 text-[0.7rem] placeholder:text-[0.7rem] md:text-[0.7rem]"
+                    className="hide-password-toggle h-11 rounded-2xl border border-slate-200 bg-white pr-10 pl-10 text-sm text-slate-900 shadow-inner shadow-slate-900/5 transition placeholder:text-slate-400 focus:border-violet-400/70 focus:ring-0 dark:border-white/10 dark:bg-[#071424] dark:text-white dark:shadow-black/20 dark:placeholder:text-slate-500 dark:focus:border-[#d68cff]/60"
                     {...register('confirmPassword')}
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(v => !v)}
-                    className="text-muted-foreground hover:text-foreground absolute inset-y-0 right-1.5 flex items-center"
+                    className="absolute inset-y-0 right-3 flex cursor-pointer items-center text-slate-500 transition hover:text-slate-800 dark:hover:text-slate-200"
                     tabIndex={-1}
                   >
-                    {showConfirmPassword ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
+                    {showConfirmPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                   </button>
                 </div>
                 {errors.confirmPassword && (
-                  <p className="text-destructive text-[0.6rem]">{errors.confirmPassword.message}</p>
+                  <p className="text-[0.7rem] text-rose-400">{errors.confirmPassword.message}</p>
                 )}
               </Field>
 
               <Button
                 type="submit"
-                className="hover:bg-primary/80 w-full cursor-pointer"
-                size="sm"
+                className="h-11 w-full cursor-pointer rounded-2xl bg-[#d68cff] text-sm font-semibold text-white shadow-lg shadow-[#d68cff]/25 transition hover:brightness-110"
                 disabled={isSubmitting}
               >
                 <div className="flex items-center justify-center gap-2">
@@ -122,24 +159,21 @@ export function ResetPasswordForm({ className, ...props }: React.ComponentProps<
                 </div>
               </Button>
 
-              <p className="text-muted-foreground text-center text-[0.7rem] italic">
+              <p className="text-center text-sm text-slate-600 dark:text-slate-400">
                 Remembered your password?{' '}
-                <a href={ROUTES.LOGIN} className="cursor-pointer font-medium underline underline-offset-4">
-                  Login
-                </a>
+                <Link
+                  to={ROUTES.LOGIN}
+                  className="font-semibold text-violet-700 transition hover:text-violet-600 dark:text-[#d68cff] dark:hover:text-[#f0b8ff]"
+                >
+                  Sign in
+                </Link>
               </p>
             </FieldGroup>
           </form>
+        </div>
+      </div>
 
-          <div className="hidden flex-col items-center bg-violet-300 md:flex">
-            <img
-              src="/placeholderSignUp.png"
-              alt="Password reset illustration"
-              className="mb-10 min-h-0 w-full flex-1 object-contain"
-            />
-          </div>
-        </CardContent>
-      </Card>
+      <AuthIllustration />
     </div>
   );
 }

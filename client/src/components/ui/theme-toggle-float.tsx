@@ -1,5 +1,5 @@
-import { Moon, Sun } from 'lucide-react';
 import { useThemeStore } from '@/stores/use-theme-store';
+import { Moon, Sun } from 'lucide-react';
 
 export function ThemeToggleFloat() {
   const { isDark, toggleTheme } = useThemeStore();

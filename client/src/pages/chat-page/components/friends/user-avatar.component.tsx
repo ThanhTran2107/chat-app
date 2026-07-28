@@ -2,8 +2,9 @@ import { UserX2 } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.tsx';
 
-import { cn } from '@/lib/utils.ts';
 import { APP_NAME } from '@/utils/constants';
+
+import { cn } from '@/lib/utils.ts';
 
 interface IUserAvatarProps {
   type: 'sidebar' | 'chat' | 'profile';

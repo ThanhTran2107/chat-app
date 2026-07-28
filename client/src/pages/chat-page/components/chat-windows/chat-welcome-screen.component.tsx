@@ -1,7 +1,8 @@
 import { SidebarInset } from '@/components/ui/sidebar';
 
-import { ChatWindowHeader } from './chat-window-header.component';
 import { APP_NAME } from '@/utils/constants';
+
+import { ChatWindowHeader } from './chat-window-header.component';
 
 export const ChatWelcomeScreen = () => {
   return (

@@ -3,10 +3,11 @@ import { Card } from 'antd';
 
 import { Badge } from '@/components/ui/badge';
 
+import { APP_NAME } from '@/utils/constants';
+
 import { cn, formatMessageTime } from '@/lib/utils';
 
 import { UserAvatar } from '../friends/user-avatar.component';
-import { APP_NAME } from '@/utils/constants';
 
 interface MessageItemProps {
   message: Message;

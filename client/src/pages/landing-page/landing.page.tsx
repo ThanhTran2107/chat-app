@@ -1,7 +1,10 @@
 import { Cloud, MessageSquare, Rocket, ShieldCheck, Smartphone, Zap } from 'lucide-react';
+
 import { Link } from 'react-router-dom';
 
 import { ThemeToggleFloat } from '@/components/ui/theme-toggle-float';
+
+import { APP_NAME } from '@/utils/constants';
 
 export function LandingPage() {
   return (
@@ -17,7 +20,7 @@ export function LandingPage() {
             className="flex items-center gap-3 text-xl font-semibold tracking-[0.12em] text-slate-950 dark:text-white"
           >
             <img src="/main-logo.png" alt="Tetra logo" className="h-12 w-12 rounded-full object-cover" />
-            <span>Tetra</span>
+            <span>{APP_NAME}</span>
           </Link>
 
           <nav className="hidden items-center gap-8 rounded-full bg-white/80 px-4 py-2 text-sm text-slate-700 shadow-[0_10px_70px_rgba(15,23,42,0.08)] md:flex dark:bg-slate-950/80 dark:text-slate-300">
@@ -57,8 +60,8 @@ export function LandingPage() {
                 Secure by design
               </h1>
               <p className="max-w-2xl text-base leading-8 text-slate-700 sm:text-lg dark:text-slate-300">
-                Tetra delivers a real-time chat platform with end-to-end encryption, elegant design, and seamless sync
-                across every device. Build secure connections for your team, clients, and community.
+                {APP_NAME} delivers a real-time chat platform with end-to-end encryption, elegant design, and seamless
+                sync across every device. Build secure connections for your team, clients, and community.
               </p>
             </div>
 
@@ -105,7 +108,7 @@ export function LandingPage() {
                   <div className="h-3.5 w-3.5 rounded-full bg-emerald-400/80" />
                   <div className="flex items-center gap-2 text-xs tracking-[0.32em] text-slate-500 uppercase">
                     <span className="rounded-full bg-slate-100/70 px-2 py-1 text-slate-800 dark:bg-white/5 dark:text-slate-100">
-                      Tetra Chat
+                      {APP_NAME} Chat
                     </span>
                     <span className="text-slate-600 dark:text-slate-300">Online</span>
                   </div>
@@ -165,12 +168,12 @@ export function LandingPage() {
 
         <section id="features" className="mt-20 scroll-mt-50 space-y-8">
           <div className="max-w-2xl space-y-4">
-            <p className="text-sm tracking-[0.3em] text-violet-600 uppercase dark:text-violet-300">Why Tetra</p>
+            <p className="text-sm tracking-[0.3em] text-violet-600 uppercase dark:text-violet-300">Why {APP_NAME}</p>
             <h2 className="text-3xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-4xl dark:text-white">
-              Why choose Tetra?
+              Why choose {APP_NAME}?
             </h2>
             <p className="text-base leading-8 text-slate-700 dark:text-slate-300">
-              Tetra is built to deliver a fast, secure, and smooth chat experience across every platform.
+              {APP_NAME} is built to deliver a fast, secure, and smooth chat experience across every platform.
             </p>
           </div>
 
@@ -215,10 +218,10 @@ export function LandingPage() {
               <p className="text-sm tracking-[0.3em] text-violet-300 uppercase">Trusted by</p>
               <div className="space-y-3">
                 <h2 className="text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl dark:text-white">
-                  Loved by over 10,000 users worldwide
+                  Loved by over 10,000 {APP_NAME} users worldwide
                 </h2>
                 <p className="max-w-xl text-base leading-8 text-slate-700 dark:text-slate-300">
-                  Teams, creators, and communities choose Tetra for instant messaging, secure conversations, and a
+                  Teams, creators, and communities choose {APP_NAME} for instant messaging, secure conversations, and a
                   polished experience that scales with every group.
                 </p>
               </div>
@@ -291,7 +294,7 @@ export function LandingPage() {
 
       <footer className="border-t border-slate-200/70 bg-slate-50 px-4 py-8 text-slate-500 backdrop-blur-xl sm:px-6 lg:px-8 dark:border-white/10 dark:bg-[#050916]/80 dark:text-slate-400">
         <div className="mx-auto flex max-w-7xl flex-col gap-6 md:flex-row md:items-center md:justify-between">
-          <p className="text-sm">© 2026 Tetra Communications. All rights reserved.</p>
+          <p className="text-sm">© 2026 {APP_NAME} Communications. All rights reserved.</p>
           <div className="flex flex-wrap items-center gap-4 text-sm">
             <a href="#" className="transition hover:text-slate-950 dark:hover:text-white">
               Privacy

@@ -5,8 +5,8 @@ import { useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import { ChatPage } from './pages/chat-page/chat.page';
-import { LandingPage } from './pages/landing-page/landing.page';
 import { ForgotPasswordPage } from './pages/forgot-password-page/forgot-password.page';
+import { LandingPage } from './pages/landing-page/landing.page';
 import { LoginPage } from './pages/login-page/login.page';
 import { RegisterPage } from './pages/register-page/register.page';
 import { ResendVerificationPage } from './pages/resend-verification-page/resend-verification.page';
