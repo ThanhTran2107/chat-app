@@ -59,7 +59,7 @@ function DialogContent({
             data-slot="dialog-close"
             nativeButton={false}
             render={
-              <div className="text-popover-foreground hover:bg-popover/20 absolute top-2 right-2 flex h-9 w-9 items-center justify-center rounded-full" />
+              <div className="text-popover-foreground hover:bg-popover/20 absolute top-2 right-2 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full" />
             }
           >
             <XIcon />

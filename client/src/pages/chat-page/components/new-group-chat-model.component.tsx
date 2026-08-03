@@ -147,7 +147,7 @@ export const NewGroupChatModel = () => {
             <Button
               type="submit"
               disabled={loading}
-              className="bg-gradient-chat transition-smooth flex-1 rounded-full text-white hover:opacity-90"
+              className="bg-gradient-chat transition-smooth flex-1 cursor-pointer rounded-full text-white hover:opacity-90"
             >
               {loading ? (
                 <>
