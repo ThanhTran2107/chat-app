@@ -89,51 +89,65 @@ export const NewGroupChatModel = () => {
           <DialogTitle className="text-xl capitalize">Create a new group chat</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Group name input */}
-          <div className="space-y-2">
-            <Label htmlFor="groupName" className="text-sm font-semibold">
+          <div className="space-y-3">
+            <Label
+              htmlFor="groupName"
+              className="text-muted-foreground text-xs font-semibold tracking-widest uppercase"
+            >
               Group Name
             </Label>
 
             <Input
               id="groupName"
               placeholder="Enter group name"
-              className="glass border-border/50 focus:border-primary/50 transition-smooth"
+              className="glass border-border/50 focus:border-primary/50 transition-smooth rounded-xl"
               value={groupName}
               onChange={e => setGroupName(e.target.value)}
               required
             />
-
-            {/* Friend search input */}
-            <div className="mt-2 space-y-2">
-              <Label htmlFor="invite" className="text-sm font-semibold">
-                Invite Friends
-              </Label>
-
-              <Input
-                id="invite"
-                placeholder="Search friends"
-                className="glass border-border/50 focus:border-primary/50 transition-smooth"
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-              />
-
-              {/* invite suggestion list */}
-              {search && !isEmpty(filteredFriends) && (
-                <InviteSuggestionList filteredFriends={filteredFriends} onSelect={handleSelectFriend} />
-              )}
-
-              {/* invited users list */}
-              <SelectedUserList invitedUsers={invitedUsers} onRemove={handleRemoveFriend} />
-            </div>
           </div>
 
-          <DialogFooter>
+          {/* Friend search input */}
+          <div className="space-y-4">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label
+                  htmlFor="invite"
+                  className="text-muted-foreground text-xs font-semibold tracking-widest uppercase"
+                >
+                  Invite Friends
+                </Label>
+
+                <span className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
+                  Selected {invitedUsers.length}
+                </span>
+              </div>
+
+              <div className="relative">
+                <Input
+                  id="invite"
+                  placeholder="Search friends"
+                  className="glass border-border/50 focus:border-primary/50 transition-smooth rounded-xl"
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* selected users list */}
+            {invitedUsers.length > 0 && <SelectedUserList invitedUsers={invitedUsers} onRemove={handleRemoveFriend} />}
+
+            {/* invite suggestion list */}
+            <InviteSuggestionList filteredFriends={filteredFriends} onSelect={handleSelectFriend} />
+          </div>
+
+          <DialogFooter className="pt-2">
             <Button
               type="submit"
               disabled={loading}
-              className="bg-gradient-chat transition-smooth flex-1 text-white hover:opacity-90"
+              className="bg-gradient-chat transition-smooth flex-1 rounded-full text-white hover:opacity-90"
             >
               {loading ? (
                 <>
