@@ -34,16 +34,16 @@ export const SearchForm = ({
   const usernameValue = useWatch({ control, name: 'username' });
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="username" className="text-sm font-medium">
+    <form onSubmit={onSubmit} className="space-y-6">
+      <div className="space-y-3">
+        <Label htmlFor="username" className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
           Find by username
         </Label>
 
         <Input
           id="username"
           placeholder="Enter username"
-          className="glass border-border/50 focus:border-primary/50 transition-smooth mt-2"
+          className="glass border-border/50 focus:border-primary/50 transition-smooth rounded-xl"
           {...register('username', { required: 'Username is required' })}
           disabled={loading}
         />
@@ -61,7 +61,7 @@ export const SearchForm = ({
         <DialogClose
           nativeButton={false}
           render={
-            <div className="glass hover:text-destructive border-input flex-1 cursor-pointer rounded-md border px-4 py-2 text-center text-sm" />
+            <div className="glass hover:text-destructive border-input border-border/50 flex-1 cursor-pointer rounded-full border px-4 py-2 text-center text-sm" />
           }
           onClick={onCancel}
         >
@@ -71,7 +71,7 @@ export const SearchForm = ({
         <Button
           type="submit"
           disabled={loading || !usernameValue?.trim()}
-          className="bg-gradient-chat transition-smooth flex-1 cursor-pointer text-white hover:opacity-90"
+          className="bg-gradient-chat transition-smooth flex-1 cursor-pointer rounded-full text-white hover:opacity-90"
         >
           {loading ? (
             <Spin />

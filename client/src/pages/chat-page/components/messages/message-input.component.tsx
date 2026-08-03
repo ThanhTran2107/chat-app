@@ -53,7 +53,7 @@ export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation })
 
   return (
     <div className="bg-backgrounds flex min-h-14 items-center gap-2 p-3">
-      <Button variant="ghost" size="icon" className="hover:bg-primary/10 transition-smooth">
+      <Button variant="ghost" size="icon" className="hover:bg-primary/10 transition-smooth cursor-pointer">
         <ImagePlus className="size-4" />
       </Button>
 
@@ -82,7 +82,7 @@ export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation })
       </div>
 
       <Button
-        className="bg-gradient-chat hover:shadow-glow transition-smooth hover:scale-105"
+        className="bg-gradient-chat hover:shadow-glow transition-smooth cursor-pointer hover:scale-105"
         disabled={isConversationUnavailable || !value.trim()}
         onClick={handleSendMessage}
       >

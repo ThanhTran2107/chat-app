@@ -28,12 +28,12 @@ export const SendFriendRequestForm = ({
   onBack,
 }: SendFriendRequestFormProps) => {
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={onSubmit} className="space-y-6">
       <div className="space-y-4">
-        <span className="success-message">🎇 Great news ! We found </span>
+        <span className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">Friend found</span>
 
         {searchUser && (
-          <div className="border-border/50 bg-surface mt-4 rounded-2xl border p-4 shadow-sm">
+          <div className="border-border/50 bg-muted/20 shadow-soft mt-4 rounded-2xl border p-4">
             <div className="flex items-center gap-4">
               <UserAvatar
                 type="sidebar"
@@ -49,8 +49,8 @@ export const SendFriendRequestForm = ({
           </div>
         )}
 
-        <div className="mt-2 space-y-2">
-          <Label className="text-sm font-semibold" htmlFor="message">
+        <div className="space-y-3">
+          <Label className="text-muted-foreground text-xs font-semibold tracking-widest uppercase" htmlFor="message">
             Introduction
           </Label>
 
@@ -63,7 +63,7 @@ export const SendFriendRequestForm = ({
                 rows={5}
                 maxLength={200}
                 placeholder="Hi there! Would you like to connect?"
-                className="glass border-border/50 focus:border-primary/50 transition-smooth beautiful-scrollbar resize-none"
+                className="glass border-border/50 focus:border-primary/50 transition-smooth beautiful-scrollbar resize-none rounded-xl"
                 {...field}
               />
             )}
@@ -74,7 +74,7 @@ export const SendFriendRequestForm = ({
           <Button
             type="button"
             variant="outline"
-            className="glass hover:text-destructive flex-1 cursor-pointer"
+            className="glass hover:text-destructive border-border/50 flex-1 cursor-pointer rounded-full border px-4 py-2"
             onClick={onBack}
           >
             Back
@@ -83,7 +83,7 @@ export const SendFriendRequestForm = ({
           <Button
             type="submit"
             disabled={loading}
-            className="bg-gradient-chat transition-smooth flex-1 cursor-pointer text-white hover:opacity-90"
+            className="bg-gradient-chat transition-smooth flex-1 cursor-pointer rounded-full text-white hover:opacity-90"
           >
             {loading ? (
               <Spin />

@@ -89,7 +89,7 @@ export const ChatWindowBody = () => {
 
   if (isEmpty(messages))
     return (
-      <div className="text-muted-foreground flex h-full items-center justify-center">Start a conversation now !</div>
+      <div className="text-muted-foreground flex h-full items-center justify-center">Start a conversation now!</div>
     );
 
   return (

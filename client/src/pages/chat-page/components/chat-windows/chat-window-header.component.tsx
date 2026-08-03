@@ -39,7 +39,7 @@ export const ChatWindowHeader = ({ chat }: { chat?: Conversation }) => {
   return (
     <header className="bg-background sticky top-0 z-10 flex items-center px-4 py-2">
       <div className="flex w-full items-center gap-2">
-        <SidebarTrigger className="text-foreground -ml-1" />
+        <SidebarTrigger className="text-foreground -ml-1 cursor-pointer" />
 
         <Separator
           orientation="vertical"

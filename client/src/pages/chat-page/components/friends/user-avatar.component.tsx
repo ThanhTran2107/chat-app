@@ -24,10 +24,12 @@ export const UserAvatar = ({ type, name, avatarUrl, className }: IUserAvatarProp
   const fallbackTextClass = type === 'profile' ? 'text-3xl' : type === 'sidebar' ? 'text-base' : 'text-sm';
   const iconSizeClass = type === 'profile' ? 'size-10' : type === 'sidebar' ? 'size-6' : 'size-5';
 
+  const fallbackPositionClass = type === 'profile' ? 'items-end pb-7' : '';
+
   return (
     <Avatar className={cn(className ?? '', avatarSizeClass)}>
       <AvatarImage src={avatarUrl} alt={name} />
-      <AvatarFallback className={`${bgColor} font-semibold text-white ${fallbackTextClass}`}>
+      <AvatarFallback className={`${bgColor} font-semibold text-white ${fallbackTextClass} ${fallbackPositionClass}`}>
         {isDeleted ? <UserX2 className={iconSizeClass} /> : name.charAt(0)}
       </AvatarFallback>
     </Avatar>
