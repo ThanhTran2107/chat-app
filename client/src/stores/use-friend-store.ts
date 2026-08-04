@@ -5,6 +5,8 @@ import { FriendService } from '@/utils/services/friend.service';
 
 import type { FriendState } from '../types/store';
 
+let getAllFriendRequestsPromise: Promise<void> | null = null;
+
 export const useFriendStore = create<FriendState>((set, get) => ({
   loading: false,
   receivedList: [],
@@ -44,21 +46,28 @@ export const useFriendStore = create<FriendState>((set, get) => ({
     }
   },
   getAllFriendRequests: async () => {
-    try {
-      set({ loading: true });
+    if (getAllFriendRequestsPromise) return getAllFriendRequestsPromise;
 
-      const result = await FriendService.getAllFriendRequests();
+    getAllFriendRequestsPromise = (async () => {
+      try {
+        set({ loading: true });
 
-      if (!result) return;
+        const result = await FriendService.getAllFriendRequests();
 
-      const { sent, received } = result;
-      set({ sentList: sent, receivedList: received });
-    } catch (e) {
-      console.error('Error fetching friend requests:', e);
-      throw e;
-    } finally {
-      set({ loading: false });
-    }
+        if (!result) return;
+
+        const { sent, received } = result;
+        set({ sentList: sent, receivedList: received });
+      } catch (e) {
+        console.error('Error fetching friend requests:', e);
+        throw e;
+      } finally {
+        set({ loading: false });
+        getAllFriendRequestsPromise = null;
+      }
+    })();
+
+    return getAllFriendRequestsPromise;
   },
   acceptRequest: async requestId => {
     try {

@@ -8,6 +8,8 @@ import { persist } from 'zustand/middleware';
 
 import { authService } from '@/utils/services/auth.service';
 
+let fetchMePromise: Promise<void> | null = null;
+
 // Zustand store for managing authentication state and actions
 export const useAuthStore = create<AuthState>()(
   persist(
@@ -116,19 +118,26 @@ export const useAuthStore = create<AuthState>()(
 
       // Fetch the current user's information
       fetchMe: async () => {
-        try {
-          set({ loading: true });
+        if (fetchMePromise) return fetchMePromise;
 
-          const user = await authService.fetchMe();
-          set({ user });
-        } catch (e) {
-          console.error('Fetch user error:', e);
-          set({ user: null, accessToken: null });
+        fetchMePromise = (async () => {
+          try {
+            set({ loading: true });
 
-          throw e;
-        } finally {
-          set({ loading: false });
-        }
+            const user = await authService.fetchMe();
+            set({ user });
+          } catch (e) {
+            console.error('Fetch user error:', e);
+            set({ user: null, accessToken: null });
+
+            throw e;
+          } finally {
+            set({ loading: false });
+            fetchMePromise = null;
+          }
+        })();
+
+        return fetchMePromise;
       },
 
       // Refresh the access token using the refresh token stored in cookies

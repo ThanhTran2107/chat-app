@@ -11,6 +11,8 @@ import { ChatService } from '@/utils/services/chat.service';
 import { useAuthStore } from './use-auth-store';
 import { useSocketStore } from './use-socket-store';
 
+let fetchConversationsPromise: Promise<void> | null = null;
+
 export const useChatStore = create<ChatState>()(
   persist(
     (set, get) => ({
@@ -31,15 +33,23 @@ export const useChatStore = create<ChatState>()(
           messageLoading: false,
         }),
       fetchConversations: async () => {
-        try {
-          set({ convoLoading: true });
-          const { conversations } = await ChatService.fetchConversations();
+        if (fetchConversationsPromise) return fetchConversationsPromise;
 
-          set({ conversations, convoLoading: false });
-        } catch (e) {
-          console.error('Fetch conversations error:', e);
-          set({ convoLoading: false });
-        }
+        fetchConversationsPromise = (async () => {
+          try {
+            set({ convoLoading: true });
+            const { conversations } = await ChatService.fetchConversations();
+
+            set({ conversations, convoLoading: false });
+          } catch (e) {
+            console.error('Fetch conversations error:', e);
+            set({ convoLoading: false });
+          } finally {
+            fetchConversationsPromise = null;
+          }
+        })();
+
+        return fetchConversationsPromise;
       },
       fetchMessages: async conversationId => {
         const { activeConversationId, messages } = get();
