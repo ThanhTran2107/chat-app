@@ -12,8 +12,9 @@ interface RedirectIfAuthenticatedProps {
 // If the user is authenticated (has an access token), redirect to the chat page; otherwise, render the children components (e.g., login or registration forms)
 export const RedirectIfAuthenticated = ({ children }: RedirectIfAuthenticatedProps) => {
   const { accessToken } = useAuthStore();
+  const hasSession = localStorage.getItem('auth-session') === '1';
 
-  if (accessToken) return <Navigate to={ROUTES.CHAT} replace />;
+  if (accessToken || hasSession) return <Navigate to={ROUTES.CHAT} replace />;
 
   return <>{children}</>;
 };

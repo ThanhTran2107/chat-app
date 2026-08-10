@@ -13,6 +13,7 @@ import { ResendVerificationPage } from './pages/resend-verification-page/resend-
 import { ResetPasswordPage } from './pages/reset-password-page/reset-password.page';
 import { VerifyEmailPage } from './pages/verify-email-page/verify-email.page';
 import { ProtectedRoute } from './routes/protected-route';
+import { RedirectIfAuthenticated } from './routes/redirect-if-authenticated';
 import { useAuthStore } from './stores/use-auth-store';
 import { useSocketStore } from './stores/use-socket-store';
 import { useThemeStore } from './stores/use-theme-store';
@@ -20,12 +21,22 @@ import { ROUTES } from './utils/constants';
 
 function App() {
   const { isDark, setTheme } = useThemeStore();
-  const { accessToken } = useAuthStore();
+  const { accessToken, refreshToken } = useAuthStore();
   const { connectSocket, disconnectSocket } = useSocketStore();
 
   useEffect(() => {
     setTheme(isDark);
   }, [isDark]);
+
+  useEffect(() => {
+    const initializeAuth = async () => {
+      const hasSession = localStorage.getItem('auth-session') === '1';
+
+      if (!accessToken && hasSession) await refreshToken();
+    };
+
+    initializeAuth();
+  }, [accessToken, refreshToken]);
 
   useEffect(() => {
     if (accessToken) connectSocket();
@@ -38,9 +49,30 @@ function App() {
       <Toaster richColors />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path={ROUTES.LOGIN} element={<LoginPage />} />
-          <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
+          <Route
+            path="/"
+            element={
+              <RedirectIfAuthenticated>
+                <LandingPage />
+              </RedirectIfAuthenticated>
+            }
+          />
+          <Route
+            path={ROUTES.LOGIN}
+            element={
+              <RedirectIfAuthenticated>
+                <LoginPage />
+              </RedirectIfAuthenticated>
+            }
+          />
+          <Route
+            path={ROUTES.REGISTER}
+            element={
+              <RedirectIfAuthenticated>
+                <RegisterPage />
+              </RedirectIfAuthenticated>
+            }
+          />
           <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPasswordPage />} />
           <Route path={ROUTES.RESET_PASSWORD} element={<ResetPasswordPage />} />
           <Route path={ROUTES.VERIFY_EMAIL} element={<VerifyEmailPage />} />
