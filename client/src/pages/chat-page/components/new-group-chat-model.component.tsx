@@ -1,6 +1,7 @@
 import { useChatStore } from '@/stores/use-chat-store';
 import { useFriendStore } from '@/stores/use-friend-store';
 import { type Friend } from '@/types/user';
+import debounce from 'lodash-es/debounce';
 import filter from 'lodash-es/filter';
 import isEmpty from 'lodash-es/isEmpty';
 import map from 'lodash-es/map';
@@ -8,7 +9,7 @@ import some from 'lodash-es/some';
 import { UserPlus, Users } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Spin } from '@/components/antd/spin.component';
 import { Button } from '@/components/ui/button';
@@ -27,12 +28,15 @@ export const NewGroupChatModel = () => {
   const [invitedUsers, setInvitedUsers] = useState<Friend[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
+  const isOpeningRef = useRef(false);
+  const debouncedGetFriendsRef = useRef<ReturnType<typeof debounce> | null>(null);
+
   const { loading, createConversation } = useChatStore();
   const { friends, getFriendList } = useFriendStore();
 
-  const handleGetFriends = async () => {
-    await getFriendList();
-    setIsOpen(true);
+  const handleGetFriends = () => {
+    debouncedGetFriendsRef.current?.();
+    isOpeningRef.current = true;
   };
 
   const handleSelectFriend = (friend: Friend) => {
@@ -58,6 +62,7 @@ export const NewGroupChatModel = () => {
       setSearch('');
       setInvitedUsers([]);
       setIsOpen(false);
+      isOpeningRef.current = false;
     } catch (e) {
       console.error('Error creating group conversation:', e);
       toast.error(getApiErrorMessage(e, 'Failed to create group conversation. Please try again.'));
@@ -71,8 +76,27 @@ export const NewGroupChatModel = () => {
       !some(invitedUsers, user => user._id === friend._id),
   );
 
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      isOpeningRef.current = false;
+      debouncedGetFriendsRef.current?.cancel?.();
+    }
+
+    setIsOpen(open);
+  };
+
+  useEffect(() => {
+    debouncedGetFriendsRef.current = debounce(async () => {
+      await getFriendList();
+
+      if (isOpeningRef.current) setIsOpen(true);
+    }, 200);
+
+    return () => debouncedGetFriendsRef.current?.cancel?.();
+  }, [getFriendList]);
+
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger
         nativeButton={false}
         render={
