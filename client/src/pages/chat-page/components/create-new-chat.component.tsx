@@ -9,7 +9,7 @@ import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 import { FriendListDialog } from './friends/dialogs/friend-list-dialog.component';
 
 export const CreateNewChat = () => {
-  const { getFriendList } = useFriendStore();
+  const getFriendList = useFriendStore(state => state.getFriendList);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleDialogOpenChange = async (open: boolean) => {

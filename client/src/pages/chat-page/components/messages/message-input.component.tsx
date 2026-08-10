@@ -15,8 +15,9 @@ import { EmojiPicker } from './emoji-picker.component';
 export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation }) => {
   const [value, setValue] = useState('');
 
-  const { user } = useAuthStore();
-  const { sendDirectMessage, sendGroupMessage } = useChatStore();
+  const user = useAuthStore(state => state.user);
+  const sendDirectMessage = useChatStore(state => state.sendDirectMessage);
+  const sendGroupMessage = useChatStore(state => state.sendGroupMessage);
 
   if (!user) return;
 

@@ -5,7 +5,7 @@ import map from 'lodash-es/map';
 import { FriendChatCard } from './friend-chat-card.component';
 
 export const FriendChatList = () => {
-  const { conversations } = useChatStore();
+  const conversations = useChatStore(state => state.conversations);
 
   if (!conversations) return null;
 

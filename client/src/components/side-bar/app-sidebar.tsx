@@ -32,8 +32,9 @@ import { APP_NAME } from '@/utils/constants';
 import { NavUser } from './nav-user.tsx';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { isDark, toggleTheme } = useThemeStore();
-  const { user } = useAuthStore();
+  const isDark = useThemeStore(state => state.isDark);
+  const user = useAuthStore(state => state.user);
+  const toggleTheme = useThemeStore(state => state.toggleTheme);
 
   return (
     <Sidebar variant="inset" {...props}>

@@ -13,9 +13,11 @@ import { GroupChatAvatar } from '../groups/group-chat-avatar.component';
 import { StatusBadge } from '../status-badge.component';
 
 export const ChatWindowHeader = ({ chat }: { chat?: Conversation }) => {
-  const { conversations, activeConversationId } = useChatStore();
-  const { user } = useAuthStore();
-  const { friendPresence, onlineUsers } = useSocketStore();
+  const conversations = useChatStore(state => state.conversations);
+  const activeConversationId = useChatStore(state => state.activeConversationId);
+  const user = useAuthStore(state => state.user);
+  const friendPresence = useSocketStore(state => state.friendPresence);
+  const onlineUsers = useSocketStore(state => state.onlineUsers);
 
   let otherUser;
 
@@ -63,7 +65,7 @@ export const ChatWindowHeader = ({ chat }: { chat?: Conversation }) => {
                       friendPresence[otherUser?._id ?? ''] === 'online' ||
                       (friendPresence[otherUser?._id ?? ''] === undefined &&
                         otherUser?.showOnlineStatus !== false &&
-                        onlineUsers.includes(otherUser._id))
+                        onlineUsers.has(otherUser._id))
                         ? 'online'
                         : 'offline'
                     }

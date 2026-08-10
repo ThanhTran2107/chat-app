@@ -13,8 +13,9 @@ import { Switch } from '@/components/ui/switch';
 import { getApiErrorMessage } from '@/lib/axios';
 
 export const PreferencesForm = () => {
-  const { isDark, toggleTheme } = useThemeStore();
-  const { user } = useAuthStore();
+  const isDark = useThemeStore(state => state.isDark);
+  const toggleTheme = useThemeStore(state => state.toggleTheme);
+  const user = useAuthStore(state => state.user);
   const updateProfile = useUserStore(state => state.updateProfile);
   const [loading, setLoading] = useState(false);
 

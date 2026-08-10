@@ -22,7 +22,7 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<'div'
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const { register } = useAuthStore();
+  const register = useAuthStore(state => state.register);
   const navigate = useNavigate();
 
   const {

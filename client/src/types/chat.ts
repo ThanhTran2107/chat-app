@@ -54,4 +54,5 @@ export interface Message {
   updatedAt?: string | null;
   createdAt: string;
   isOwn?: boolean;
+  isNew?: boolean;
 }

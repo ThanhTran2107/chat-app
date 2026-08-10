@@ -55,7 +55,7 @@ export interface ChatState {
 
 export interface SocketState {
   socket: Socket | null;
-  onlineUsers: string[];
+  onlineUsers: Set<string>;
   friendPresence: Record<string, 'online' | 'offline'>;
   connectSocket: () => void;
   disconnectSocket: () => void;

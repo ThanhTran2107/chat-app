@@ -12,7 +12,10 @@ import { ChatWindowHeader } from '../components/chat-windows/chat-window-header.
 import { MessageInput } from '../components/messages/message-input.component';
 
 export const ChatWindowLayout = () => {
-  const { activeConversationId, conversations, messageLoading: loading, markAsSeen } = useChatStore();
+  const activeConversationId = useChatStore(state => state.activeConversationId);
+  const conversations = useChatStore(state => state.conversations);
+  const loading = useChatStore(state => state.messageLoading);
+  const markAsSeen = useChatStore(state => state.markAsSeen);
 
   const selectedConvo = conversations.find(convo => convo._id === activeConversationId) ?? null;
 

@@ -1,7 +1,8 @@
 import { useChatStore } from '@/stores/use-chat-store';
 import { isEmpty, map } from 'lodash-es';
+import throttle from 'lodash-es/throttle';
 
-import { useLayoutEffect, useRef } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
 import { Spin } from '@/components/antd/spin.component';
@@ -12,8 +13,12 @@ import { ChatWelcomeScreen } from './chat-welcome-screen.component';
 export const ChatWindowBody = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const throttledScrollSaveRef = useRef<ReturnType<typeof throttle> | null>(null);
 
-  const { activeConversationId, messages: allMessages, conversations, fetchMessages } = useChatStore();
+  const activeConversationId = useChatStore(state => state.activeConversationId);
+  const allMessages = useChatStore(state => state.messages);
+  const conversations = useChatStore(state => state.conversations);
+  const fetchMessages = useChatStore(state => state.fetchMessages);
 
   const selectedConvo = conversations.find(conversation => conversation._id === activeConversationId);
   const lastMessageStatus = !isEmpty(selectedConvo?.seenBy ?? []) ? 'seen' : 'delivered';
@@ -22,10 +27,10 @@ export const ChatWindowBody = () => {
     selectedConvo?.type === 'direct' && selectedConvo.participants.some(participant => !participant._id);
 
   const conversationMessages = activeConversationId ? allMessages[activeConversationId] : undefined;
-  const messages = conversationMessages?.items ?? [];
+  const messages = useMemo(() => conversationMessages?.items ?? [], [conversationMessages]);
   const hasMore = conversationMessages?.hasMore ?? false;
 
-  const reversedMessages = [...messages].reverse();
+  const reversedMessages = useMemo(() => [...messages].reverse(), [messages]);
   const latestMessageId = messages[messages.length - 1]?._id;
 
   const key = `chat-scroll-${activeConversationId}`;
@@ -40,7 +45,7 @@ export const ChatWindowBody = () => {
     }
   };
 
-  const handleScrollSave = () => {
+  const handleScrollSave = useCallback(() => {
     const container = containerRef.current;
 
     if (!container || !activeConversationId) return;
@@ -49,7 +54,17 @@ export const ChatWindowBody = () => {
     const scrollTop = Math.max(0, maxScrollTop - container.scrollTop);
 
     sessionStorage.setItem(key, JSON.stringify({ scrollTop, scrollHeight: container.scrollHeight }));
-  };
+  }, [activeConversationId, key]);
+
+  useEffect(() => {
+    throttledScrollSaveRef.current?.cancel?.();
+    throttledScrollSaveRef.current = throttle(handleScrollSave, 150);
+
+    return () => {
+      throttledScrollSaveRef.current?.cancel?.();
+      throttledScrollSaveRef.current = null;
+    };
+  }, [handleScrollSave]);
 
   useLayoutEffect(() => {
     if (!messagesEndRef.current) return;
@@ -97,7 +112,7 @@ export const ChatWindowBody = () => {
       <div
         id="scrollableDiv"
         ref={containerRef}
-        onScroll={handleScrollSave}
+        onScroll={() => throttledScrollSaveRef.current?.()}
         className="beautiful-scrollbar scrollbar-hidden min-h-0 flex-1 flex-col-reverse gap-3 overflow-x-hidden overflow-y-auto pb-5"
       >
         <InfiniteScroll

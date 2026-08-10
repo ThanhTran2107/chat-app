@@ -31,8 +31,10 @@ export const NewGroupChatModel = () => {
   const isOpeningRef = useRef(false);
   const debouncedGetFriendsRef = useRef<ReturnType<typeof debounce> | null>(null);
 
-  const { loading, createConversation } = useChatStore();
-  const { friends, getFriendList } = useFriendStore();
+  const loading = useChatStore(state => state.loading);
+  const createConversation = useChatStore(state => state.createConversation);
+  const friends = useFriendStore(state => state.friends);
+  const getFriendList = useFriendStore(state => state.getFriendList);
 
   const handleGetFriends = () => {
     debouncedGetFriendsRef.current?.();

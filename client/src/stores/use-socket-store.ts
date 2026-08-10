@@ -31,7 +31,7 @@ const baseURL = import.meta.env.VITE_SOCKET_URL;
 
 export const useSocketStore = create<SocketState>((set, get) => ({
   socket: null,
-  onlineUsers: [],
+  onlineUsers: new Set<string>(),
   friendPresence: {},
 
   connectSocket: () => {
@@ -49,7 +49,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 
     socket.on('connect', () => null);
     // online users
-    socket.on('online-users', userIds => set({ onlineUsers: userIds }));
+    socket.on('online-users', userIds => set({ onlineUsers: new Set(userIds) }));
     // friend presence change (online/offline)
     socket.on('friend-presence-changed', ({ userId, status }) => {
       if (!userId || !status) return;

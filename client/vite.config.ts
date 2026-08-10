@@ -19,4 +19,19 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id: string) {
+          if (id.includes('node_modules')) {
+            if (id.includes('antd')) return 'vendor_antd';
+            if (id.includes('socket.io-client')) return 'vendor_socketio';
+            if (id.includes('react-router-dom')) return 'vendor_react_router';
+            if (id.includes('react') || id.includes('react-dom')) return 'vendor_react';
+            return 'vendor';
+          }
+        },
+      },
+    },
+  },
 });

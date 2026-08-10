@@ -3,8 +3,9 @@ import find from 'lodash-es/find';
 import isEmpty from 'lodash-es/isEmpty';
 import map from 'lodash-es/map';
 import some from 'lodash-es/some';
+import throttle from 'lodash-es/throttle';
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { LOCAL_STORAGE_KEYS } from '@/utils/constants';
 import { ChatService } from '@/utils/services/chat.service';
@@ -15,6 +16,16 @@ import { useSocketStore } from './use-socket-store';
 let fetchConversationsPromise: Promise<void> | null = null;
 
 const { CHAT_STORAGE } = LOCAL_STORAGE_KEYS;
+
+const throttledSetItem = throttle((name: string, value: string) => {
+  localStorage.setItem(name, value);
+}, 800);
+
+const throttledStorage = {
+  getItem: (name: string) => localStorage.getItem(name),
+  setItem: (name: string, value: string) => throttledSetItem(name, value),
+  removeItem: (name: string) => localStorage.removeItem(name),
+};
 
 export const useChatStore = create<ChatState>()(
   persist(
@@ -127,6 +138,7 @@ export const useChatStore = create<ChatState>()(
           const { fetchMessages } = get();
 
           message.isOwn = message.senderId === user?._id;
+          message.isNew = true;
 
           const convoId = message.conversationId;
 
@@ -249,6 +261,24 @@ export const useChatStore = create<ChatState>()(
         }
       },
     }),
-    { name: CHAT_STORAGE, partialize: state => ({ conversations: state.conversations }) },
+    {
+      name: CHAT_STORAGE,
+      partialize: state => ({
+        activeConversationId: state.activeConversationId,
+        conversations: state.conversations.map(convo => ({
+          _id: convo._id,
+          type: convo.type,
+          group: convo.group,
+          participants: convo.participants,
+          lastMessage: convo.lastMessage,
+          lastMessageAt: convo.lastMessageAt,
+          unreadCounts: convo.unreadCounts,
+          seenBy: convo.seenBy,
+          createdAt: convo.createdAt,
+          updatedAt: convo.updatedAt,
+        })),
+      }),
+      storage: createJSONStorage(() => throttledStorage),
+    },
   ),
 );

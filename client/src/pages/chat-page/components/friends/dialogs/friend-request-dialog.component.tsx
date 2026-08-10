@@ -15,7 +15,9 @@ interface FriendRequestDialogProps {
 
 export const FriendRequestDialog = ({ open, setOpen }: FriendRequestDialogProps) => {
   const [tab, setTab] = useState('received');
-  const { getAllFriendRequests, receivedList, sentList } = useFriendStore();
+  const getAllFriendRequests = useFriendStore(state => state.getAllFriendRequests);
+  const receivedList = useFriendStore(state => state.receivedList);
+  const sentList = useFriendStore(state => state.sentList);
 
   useEffect(() => {
     const loadRequest = async () => {

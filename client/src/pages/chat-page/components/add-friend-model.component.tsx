@@ -23,7 +23,9 @@ export const AddFriendModel = () => {
   const [searchUser, setSearchUser] = useState<User>();
   const [searchedUsername, setSearchedUsername] = useState('');
 
-  const { loading, searchByUsername, sendFriendRequest } = useFriendStore();
+  const loading = useFriendStore(state => state.loading);
+  const searchByUsername = useFriendStore(state => state.searchByUsername);
+  const sendFriendRequest = useFriendStore(state => state.sendFriendRequest);
 
   const {
     register,

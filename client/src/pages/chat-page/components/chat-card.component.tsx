@@ -1,5 +1,7 @@
 import { MoreHorizontal } from 'lucide-react';
 
+import * as React from 'react';
+
 import { Card } from '@/components/ui/card.tsx';
 
 import { cn, formatOnlineTime } from '@/lib/utils.ts';
@@ -15,7 +17,7 @@ interface ChatCardProps {
   onSelect: (id: string) => void;
 }
 
-export const ChatCard = ({
+const ChatCardComponent = ({
   convoId,
   name,
   timeStamp,
@@ -54,3 +56,6 @@ export const ChatCard = ({
     </Card>
   );
 };
+
+export const ChatCard = React.memo(ChatCardComponent);
+ChatCard.displayName = 'ChatCard';

@@ -13,8 +13,8 @@ import { DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog
 import { Input } from '@/components/ui/input';
 
 export const FriendListDialog = ({ onClose }: { onClose?: () => void }) => {
-  const { friends } = useFriendStore();
-  const { createConversation } = useChatStore();
+  const friends = useFriendStore(state => state.friends);
+  const createConversation = useChatStore(state => state.createConversation);
   const [search, setSearch] = useState('');
 
   const handleAddConversation = async (friendId: string) => {

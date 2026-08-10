@@ -1,6 +1,8 @@
 import type { Conversation, Message, Participant } from '@/types/chat.ts';
 import { Card } from 'antd';
 
+import * as React from 'react';
+
 import { Badge } from '@/components/ui/badge';
 
 import { APP_NAME } from '@/utils/constants';
@@ -17,7 +19,7 @@ interface MessageItemProps {
   lastMessageStatus: 'delivered' | 'seen';
 }
 
-export const MessageItem = ({ message, index, messages, selectedConvo, lastMessageStatus }: MessageItemProps) => {
+const MessageItemComponent = ({ message, index, messages, selectedConvo, lastMessageStatus }: MessageItemProps) => {
   const prev = index + 1 < messages.length ? messages[index + 1] : undefined;
 
   const isShowTime =
@@ -38,7 +40,13 @@ export const MessageItem = ({ message, index, messages, selectedConvo, lastMessa
         </span>
       )}
 
-      <div className={cn('message-bounce flex items-start gap-2', message.isOwn ? 'justify-end' : 'justify-start')}>
+      <div
+        className={cn(
+          'flex items-start gap-2',
+          message.isNew && 'message-bounce',
+          message.isOwn ? 'justify-end' : 'justify-start',
+        )}
+      >
         {/*avatar spacer*/}
         {!message.isOwn && (
           <div className="flex shrink-0 items-start">
@@ -77,3 +85,6 @@ export const MessageItem = ({ message, index, messages, selectedConvo, lastMessa
     </>
   );
 };
+
+export const MessageItem = React.memo(MessageItemComponent);
+MessageItem.displayName = 'MessageItem';

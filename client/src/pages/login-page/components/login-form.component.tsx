@@ -27,7 +27,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
   const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
-  const { logIn } = useAuthStore();
+  const logIn = useAuthStore(state => state.logIn);
 
   const savedEmail = typeof window !== 'undefined' ? (localStorage.getItem(REMEMBERED_EMAIL) ?? '') : '';
 

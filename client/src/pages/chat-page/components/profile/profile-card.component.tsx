@@ -14,13 +14,13 @@ interface ProfileCardProps {
 }
 
 export const ProfileCard = ({ user }: ProfileCardProps) => {
-  const { onlineUsers } = useSocketStore();
+  const onlineUsers = useSocketStore(state => state.onlineUsers);
 
   if (!user) return null;
 
   const bio = user.bio ?? 'No bio available';
 
-  const isOnline = onlineUsers.includes(user._id) ? true : false;
+  const isOnline = onlineUsers.has(user._id) ? true : false;
 
   return (
     <Card className="h-40 overflow-hidden bg-linear-to-r from-indigo-500 via-purple-500 to-pink-500 p-0">

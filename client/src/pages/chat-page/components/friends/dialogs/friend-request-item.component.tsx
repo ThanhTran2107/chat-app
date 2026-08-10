@@ -1,5 +1,6 @@
 import { type FriendRequest } from '@/types/user';
 
+import * as React from 'react';
 import { type ReactNode } from 'react';
 
 import { UserAvatar } from '@/pages/chat-page/components/friends/user-avatar.component';
@@ -10,7 +11,7 @@ interface FriendRequestItemProps {
   type: 'sent' | 'received';
 }
 
-export const FriendRequestItem = ({ requestInfo, actions, type }: FriendRequestItemProps) => {
+const FriendRequestItemComponent = ({ requestInfo, actions, type }: FriendRequestItemProps) => {
   if (!requestInfo) return;
 
   const info = type === 'sent' ? requestInfo.to : requestInfo.from;
@@ -36,3 +37,6 @@ export const FriendRequestItem = ({ requestInfo, actions, type }: FriendRequestI
     </div>
   );
 };
+
+export const FriendRequestItem = React.memo(FriendRequestItemComponent);
+FriendRequestItem.displayName = 'FriendRequestItem';

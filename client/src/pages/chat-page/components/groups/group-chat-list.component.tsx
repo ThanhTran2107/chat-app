@@ -5,7 +5,7 @@ import map from 'lodash-es/map';
 import { GroupChatCard } from './group-chat-card.component';
 
 export const GroupChatList = () => {
-  const { conversations } = useChatStore();
+  const conversations = useChatStore(state => state.conversations);
 
   if (!conversations) return;
 

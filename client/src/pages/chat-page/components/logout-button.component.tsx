@@ -11,7 +11,7 @@ import { ROUTES } from '@/utils/constants';
 import { getApiErrorMessage } from '@/lib/axios';
 
 export const LogoutButton = () => {
-  const { logOut } = useAuthStore();
+  const logOut = useAuthStore(state => state.logOut);
   const navigate = useNavigate();
 
   // Handle the logout process when the button is clicked

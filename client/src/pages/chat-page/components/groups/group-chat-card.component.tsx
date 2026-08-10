@@ -2,13 +2,18 @@ import { useAuthStore } from '@/stores/use-auth-store.ts';
 import { useChatStore } from '@/stores/use-chat-store.ts';
 import { type Conversation } from '@/types/chat.ts';
 
+import * as React from 'react';
+
 import { ChatCard } from '../chat-card.component';
 import { UnreadCountBadge } from '../unread-count-badge.component';
 import { GroupChatAvatar } from './group-chat-avatar.component';
 
-export const GroupChatCard = ({ convo }: { convo: Conversation }) => {
-  const { user } = useAuthStore();
-  const { activeConversationId, setActiveConversation, messages, fetchMessages } = useChatStore();
+const GroupChatCardComponent = ({ convo }: { convo: Conversation }) => {
+  const user = useAuthStore(state => state.user);
+  const activeConversationId = useChatStore(state => state.activeConversationId);
+  const setActiveConversation = useChatStore(state => state.setActiveConversation);
+  const messages = useChatStore(state => state.messages);
+  const fetchMessages = useChatStore(state => state.fetchMessages);
 
   if (!user) return null;
 
@@ -39,3 +44,6 @@ export const GroupChatCard = ({ convo }: { convo: Conversation }) => {
     />
   );
 };
+
+export const GroupChatCard = React.memo(GroupChatCardComponent);
+GroupChatCard.displayName = 'GroupChatCard';

@@ -5,7 +5,7 @@ import map from 'lodash-es/map';
 import { FriendRequestItem } from './friend-request-item.component';
 
 export const SentRequestDialog = () => {
-  const { sentList } = useFriendStore();
+  const sentList = useFriendStore(state => state.sentList);
 
   if (!sentList || isEmpty(sentList))
     return <p className="text-muted-foreground text-sm">You have not sent any friend requests yet.</p>;

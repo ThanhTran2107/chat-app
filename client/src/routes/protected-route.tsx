@@ -14,7 +14,10 @@ export const ProtectedRoute = () => {
   const [starting, setStarting] = useState(true);
 
   // Get the authentication state and actions from the auth store
-  const { accessToken, loading, refreshToken, fetchMe } = useAuthStore();
+  const accessToken = useAuthStore(state => state.accessToken);
+  const loading = useAuthStore(state => state.loading);
+  const refreshToken = useAuthStore(state => state.refreshToken);
+  const fetchMe = useAuthStore(state => state.fetchMe);
 
   useEffect(() => {
     let mounted = true;

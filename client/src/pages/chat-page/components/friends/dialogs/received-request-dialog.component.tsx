@@ -10,7 +10,10 @@ import { getApiErrorMessage } from '@/lib/axios';
 import { FriendRequestItem } from './friend-request-item.component';
 
 export const ReceivedRequestDialog = () => {
-  const { acceptRequest, declineRequest, receivedList, loading } = useFriendStore();
+  const acceptRequest = useFriendStore(state => state.acceptRequest);
+  const declineRequest = useFriendStore(state => state.declineRequest);
+  const receivedList = useFriendStore(state => state.receivedList);
+  const loading = useFriendStore(state => state.loading);
 
   if (!receivedList || isEmpty(receivedList))
     return <p className="text-muted-foreground text-sm">You have no received friend requests.</p>;
