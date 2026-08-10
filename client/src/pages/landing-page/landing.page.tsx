@@ -124,14 +124,14 @@ export function LandingPage() {
                       <div className="rounded-[22px] bg-slate-800/80 p-3 text-sm leading-6 text-slate-100">
                         Enterprise-grade security for every conversation.
                       </div>
-                      <div className="rounded-[22px] bg-linear-to-r from-violet-500/10 via-white/5 to-cyan-500/10 p-3 text-sm leading-6 text-slate-100">
+                      <div className="rounded-[22px] bg-slate-800/80 p-3 text-sm leading-6 text-slate-100">
                         Instant message sync across all devices.
                       </div>
                     </div>
                   </div>
                   <div className="space-y-4 rounded-3xl bg-slate-50 p-4 shadow-[inset_0_1px_0_rgba(15,23,42,0.04)] dark:bg-slate-900/90">
                     <div className="leading-6 text-slate-300">
-                      <p className="text-sm font-semibold text-white">Conversation</p>
+                      <p className="text-sm font-semibold text-slate-950/80 dark:text-white">Conversation</p>
                       <p className="text-xs text-slate-400">Friends & work groups</p>
                     </div>
                     <div className="space-y-3">
