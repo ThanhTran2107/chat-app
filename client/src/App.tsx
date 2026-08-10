@@ -17,7 +17,7 @@ import { RedirectIfAuthenticated } from './routes/redirect-if-authenticated';
 import { useAuthStore } from './stores/use-auth-store';
 import { useSocketStore } from './stores/use-socket-store';
 import { useThemeStore } from './stores/use-theme-store';
-import { ROUTES } from './utils/constants';
+import { ROUTES, LOCAL_STORAGE_KEYS } from './utils/constants';
 
 function App() {
   const { isDark, setTheme } = useThemeStore();
@@ -30,7 +30,7 @@ function App() {
 
   useEffect(() => {
     const initializeAuth = async () => {
-      const hasSession = localStorage.getItem('auth-session') === '1';
+      const hasSession = localStorage.getItem(LOCAL_STORAGE_KEYS.AUTH_SESSION) === '1';
 
       if (!accessToken && hasSession) await refreshToken();
     };

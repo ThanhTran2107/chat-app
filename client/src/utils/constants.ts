@@ -7,6 +7,14 @@ export const PASSWORD_MIN_LENGTH = 8;
 
 export const APP_NAME = 'Tetra';
 
+export const LOCAL_STORAGE_KEYS = Object.freeze({
+  AUTH_STORAGE: 'auth-storage', // zustand persist key cho useAuthStore
+  CHAT_STORAGE: 'chat-storage', // zustand persist key cho useChatStore
+  THEME_STORAGE: 'theme-storage', // zustand persist key cho useThemeStore
+  AUTH_SESSION: 'auth-session', // cờ đánh dấu có session đăng nhập hay không
+  REMEMBERED_EMAIL: 'rememberedEmail', // email được lưu khi chọn "Remember me"
+});
+
 export const API_ENDPOINTS = Object.freeze({
   // Base path for all API endpoints
   BASE: '/tetra',

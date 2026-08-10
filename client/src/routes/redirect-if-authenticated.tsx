@@ -2,7 +2,7 @@ import { useAuthStore } from '@/stores/use-auth-store';
 
 import { Navigate } from 'react-router-dom';
 
-import { ROUTES } from '@/utils/constants';
+import { ROUTES, LOCAL_STORAGE_KEYS } from '@/utils/constants';
 
 // Higher-order component that redirects authenticated users to the chat page, preventing access to login and registration pages
 interface RedirectIfAuthenticatedProps {
@@ -12,7 +12,7 @@ interface RedirectIfAuthenticatedProps {
 // If the user is authenticated (has an access token), redirect to the chat page; otherwise, render the children components (e.g., login or registration forms)
 export const RedirectIfAuthenticated = ({ children }: RedirectIfAuthenticatedProps) => {
   const { accessToken } = useAuthStore();
-  const hasSession = localStorage.getItem('auth-session') === '1';
+  const hasSession = localStorage.getItem(LOCAL_STORAGE_KEYS.AUTH_SESSION) === '1';
 
   if (accessToken || hasSession) return <Navigate to={ROUTES.CHAT} replace />;
 

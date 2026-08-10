@@ -1,6 +1,9 @@
 import { type ThemeState } from '@/types/store';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { LOCAL_STORAGE_KEYS } from '@/utils/constants';
+
+const { THEME_STORAGE } = LOCAL_STORAGE_KEYS;
 
 export const useThemeStore = create<ThemeState>()(
   persist(
@@ -28,6 +31,6 @@ export const useThemeStore = create<ThemeState>()(
         }
       },
     }),
-    { name: 'theme-storage' },
+    { name: THEME_STORAGE },
   ),
 );

@@ -16,10 +16,12 @@ import { Button } from '@/components/ui/button';
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 
-import { APP_NAME, type LoginFormValues, ROUTES, loginSchema } from '@/utils/constants';
+import { APP_NAME, type LoginFormValues, ROUTES, loginSchema, LOCAL_STORAGE_KEYS } from '@/utils/constants';
 
 import { getApiErrorMessage } from '@/lib/axios';
 import { cn } from '@/lib/utils';
+
+const { REMEMBERED_EMAIL } = LOCAL_STORAGE_KEYS;
 
 export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) {
   const [showPassword, setShowPassword] = useState(false);
@@ -27,7 +29,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
   const navigate = useNavigate();
   const { logIn } = useAuthStore();
 
-  const savedEmail = typeof window !== 'undefined' ? (localStorage.getItem('rememberedEmail') ?? '') : '';
+  const savedEmail = typeof window !== 'undefined' ? (localStorage.getItem(REMEMBERED_EMAIL) ?? '') : '';
 
   const {
     register,
@@ -48,9 +50,9 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
       const { email, password, rememberMe } = data;
 
       if (rememberMe) {
-        localStorage.setItem('rememberedEmail', email);
+        localStorage.setItem(REMEMBERED_EMAIL, email);
       } else {
-        localStorage.removeItem('rememberedEmail');
+        localStorage.removeItem(REMEMBERED_EMAIL);
       }
 
       await logIn(email, password);

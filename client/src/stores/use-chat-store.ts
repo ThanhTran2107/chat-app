@@ -10,8 +10,11 @@ import { ChatService } from '@/utils/services/chat.service';
 
 import { useAuthStore } from './use-auth-store';
 import { useSocketStore } from './use-socket-store';
+import { LOCAL_STORAGE_KEYS } from '@/utils/constants';
 
 let fetchConversationsPromise: Promise<void> | null = null;
+
+const { CHAT_STORAGE } = LOCAL_STORAGE_KEYS;
 
 export const useChatStore = create<ChatState>()(
   persist(
@@ -246,6 +249,6 @@ export const useChatStore = create<ChatState>()(
         }
       },
     }),
-    { name: 'chat-storage', partialize: state => ({ conversations: state.conversations }) },
+    { name: CHAT_STORAGE, partialize: state => ({ conversations: state.conversations }) },
   ),
 );

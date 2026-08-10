@@ -3,12 +3,15 @@ import { useSocketStore } from '@/stores/use-socket-store';
 import type { AuthState } from '@/types/store';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { LOCAL_STORAGE_KEYS } from '@/utils/constants';
 
 // Zustand library for state management
 
 import { authService } from '@/utils/services/auth.service';
 
 let fetchMePromise: Promise<void> | null = null;
+
+const { AUTH_STORAGE, CHAT_STORAGE, AUTH_SESSION } = LOCAL_STORAGE_KEYS;
 
 // Zustand store for managing authentication state and actions
 export const useAuthStore = create<AuthState>()(
@@ -24,9 +27,9 @@ export const useAuthStore = create<AuthState>()(
         set({ accessToken: null, user: null, loading: false });
         useChatStore.getState().reset();
         sessionStorage.clear();
-        localStorage.removeItem('auth-storage');
-        localStorage.removeItem('chat-storage');
-        localStorage.removeItem('auth-session');
+        localStorage.removeItem(AUTH_STORAGE);
+        localStorage.removeItem(CHAT_STORAGE);
+        localStorage.removeItem(AUTH_SESSION);
       }, // Reset the authentication state to its initial values
       setAccessToken: token => set({ accessToken: token }), // Update the access token in the state
       setUser: user => set({ user }),
@@ -53,7 +56,7 @@ export const useAuthStore = create<AuthState>()(
 
           const { accessToken } = await authService.logIn(email, password);
           get().setAccessToken(accessToken);
-          localStorage.setItem('auth-session', '1');
+          localStorage.setItem(AUTH_SESSION, '1');
 
           await get().fetchMe();
           await useChatStore.getState().fetchConversations();
@@ -73,7 +76,7 @@ export const useAuthStore = create<AuthState>()(
 
           const { accessToken: token } = await authService.logInWithGoogle(accessToken);
           get().setAccessToken(token);
-          localStorage.setItem('auth-session', '1');
+          localStorage.setItem(AUTH_SESSION, '1');
 
           await get().fetchMe();
           await useChatStore.getState().fetchConversations();
@@ -93,7 +96,7 @@ export const useAuthStore = create<AuthState>()(
 
           const { accessToken: token } = await authService.logInWithFacebook(accessToken);
           get().setAccessToken(token);
-          localStorage.setItem('auth-session', '1');
+          localStorage.setItem(AUTH_SESSION, '1');
 
           await get().fetchMe();
           await useChatStore.getState().fetchConversations();
@@ -153,7 +156,7 @@ export const useAuthStore = create<AuthState>()(
             return null;
           }
 
-          localStorage.setItem('auth-session', '1');
+          localStorage.setItem(AUTH_SESSION, '1');
           setAccessToken(accessToken);
 
           if (!user) await fetchMe();
@@ -169,6 +172,6 @@ export const useAuthStore = create<AuthState>()(
         }
       },
     }),
-    { name: 'auth-storage', partialize: state => ({ user: state.user }) },
+    { name: AUTH_STORAGE, partialize: state => ({ user: state.user }) },
   ),
 );
