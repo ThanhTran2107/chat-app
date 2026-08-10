@@ -32,11 +32,11 @@ function App() {
     const initializeAuth = async () => {
       const hasSession = localStorage.getItem(LOCAL_STORAGE_KEYS.AUTH_SESSION) === '1';
 
-      if (!accessToken && hasSession) await refreshToken();
+      if (hasSession) await refreshToken();
     };
 
     initializeAuth();
-  }, [accessToken, refreshToken]);
+  }, [refreshToken]);
 
   useEffect(() => {
     if (accessToken) connectSocket();

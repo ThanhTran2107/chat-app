@@ -6,11 +6,9 @@ import { Navigate, Outlet } from 'react-router-dom';
 
 import { Spin } from '@/components/antd/spin.component';
 
-import { LOCAL_STORAGE_KEYS, ROUTES } from '@/utils/constants';
+import { ROUTES } from '@/utils/constants';
 
 let protectedRouteInitPromise: Promise<void> | null = null;
-
-const { AUTH_SESSION } = LOCAL_STORAGE_KEYS;
 
 export const ProtectedRoute = () => {
   const [starting, setStarting] = useState(true);
@@ -23,10 +21,6 @@ export const ProtectedRoute = () => {
 
     const initializeAuth = async () => {
       try {
-        const hasSession = localStorage.getItem(AUTH_SESSION) === '1';
-
-        if (!accessToken && hasSession) await refreshToken();
-
         const authState = useAuthStore.getState();
         const currentAccessToken = authState.accessToken;
         const currentUser = authState.user;

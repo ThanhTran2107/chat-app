@@ -10,6 +10,7 @@ import { LOCAL_STORAGE_KEYS } from '@/utils/constants';
 import { authService } from '@/utils/services/auth.service';
 
 let fetchMePromise: Promise<void> | null = null;
+let refreshTokenPromise: Promise<void> | null = null;
 
 const { AUTH_STORAGE, CHAT_STORAGE, AUTH_SESSION } = LOCAL_STORAGE_KEYS;
 
@@ -145,31 +146,30 @@ export const useAuthStore = create<AuthState>()(
 
       // Refresh the access token using the refresh token stored in cookies
       refreshToken: async () => {
-        try {
-          set({ loading: true });
-          const { user, fetchMe, setAccessToken } = get();
-          const accessToken = await authService.refreshToken();
+        if (refreshTokenPromise) return refreshTokenPromise;
 
-          if (!accessToken) {
+        refreshTokenPromise = (async () => {
+          try {
+            set({ loading: true });
+            const { user, fetchMe, setAccessToken } = get();
+            const accessToken = await authService.refreshToken();
+
+            if (!accessToken) return get().clearState();
+
+            localStorage.setItem(AUTH_SESSION, '1');
+            setAccessToken(accessToken);
+
+            if (!user) await fetchMe();
+          } catch (e) {
+            console.warn('Refresh token failed:', e);
             get().clearState();
-
-            return null;
+          } finally {
+            set({ loading: false });
+            refreshTokenPromise = null;
           }
+        })();
 
-          localStorage.setItem(AUTH_SESSION, '1');
-          setAccessToken(accessToken);
-
-          if (!user) await fetchMe();
-
-          return accessToken;
-        } catch (e) {
-          console.warn('Refresh token failed:', e);
-          get().clearState();
-
-          return null;
-        } finally {
-          set({ loading: false });
-        }
+        return refreshTokenPromise;
       },
     }),
     { name: AUTH_STORAGE, partialize: state => ({ user: state.user }) },
