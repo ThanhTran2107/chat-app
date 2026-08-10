@@ -60,6 +60,7 @@ export const ROUTES = Object.freeze({
   VERIFY_EMAIL: '/verify-email',
   RESEND_VERIFICATION: '/resend-verification',
   CHAT: '/chat',
+  LANDING: '/',
 });
 
 export const AUTH_ID = Object.freeze({

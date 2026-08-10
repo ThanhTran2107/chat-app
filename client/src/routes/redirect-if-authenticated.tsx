@@ -2,7 +2,7 @@ import { useAuthStore } from '@/stores/use-auth-store';
 
 import { Navigate } from 'react-router-dom';
 
-import { ROUTES, LOCAL_STORAGE_KEYS } from '@/utils/constants';
+import { LOCAL_STORAGE_KEYS, ROUTES } from '@/utils/constants';
 
 // Higher-order component that redirects authenticated users to the chat page, preventing access to login and registration pages
 interface RedirectIfAuthenticatedProps {

@@ -2,7 +2,7 @@ import { Mail } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { Spin } from '@/components/antd/spin.component';
 import { AuthIllustration } from '@/components/ui/auth-illustration.component';
@@ -58,15 +58,17 @@ export const ResendVerificationPage = () => {
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(124,58,237,0.12),transparent_40%)] dark:bg-[radial-gradient(circle_at_top_left,rgba(214,140,255,0.15),transparent_40%)]" />
             <div className="relative">
               <div className="mb-5 flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center overflow-hidden">
-                  <img src="/main-logo.png" alt={`${APP_NAME} logo`} className="h-full w-full object-contain" />
-                </div>
-                <div>
-                  <p className="text-base font-semibold tracking-[0.24em] text-slate-900 uppercase dark:text-white">
-                    {APP_NAME}
-                  </p>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400">Verify access</p>
-                </div>
+                <Link to={ROUTES.LANDING} className="flex items-center gap-3 transition hover:opacity-80">
+                  <div className="flex h-11 w-11 items-center justify-center overflow-hidden">
+                    <img src="/main-logo.png" alt={`${APP_NAME} logo`} className="h-full w-full object-contain" />
+                  </div>
+                  <div>
+                    <p className="text-base font-semibold tracking-[0.24em] text-slate-900 uppercase dark:text-white">
+                      {APP_NAME}
+                    </p>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">Verify access</p>
+                  </div>
+                </Link>
               </div>
 
               <div className="mb-4">

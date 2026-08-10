@@ -6,7 +6,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 
 import { Spin } from '@/components/antd/spin.component';
 
-import { ROUTES, LOCAL_STORAGE_KEYS } from '@/utils/constants';
+import { LOCAL_STORAGE_KEYS, ROUTES } from '@/utils/constants';
 
 let protectedRouteInitPromise: Promise<void> | null = null;
 

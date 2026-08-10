@@ -17,7 +17,7 @@ import { RedirectIfAuthenticated } from './routes/redirect-if-authenticated';
 import { useAuthStore } from './stores/use-auth-store';
 import { useSocketStore } from './stores/use-socket-store';
 import { useThemeStore } from './stores/use-theme-store';
-import { ROUTES, LOCAL_STORAGE_KEYS } from './utils/constants';
+import { LOCAL_STORAGE_KEYS, ROUTES } from './utils/constants';
 
 function App() {
   const { isDark, setTheme } = useThemeStore();

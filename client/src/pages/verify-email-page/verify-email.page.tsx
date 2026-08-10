@@ -1,7 +1,7 @@
 import { CheckCircle2, CircleAlert } from 'lucide-react';
 
 import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 
 import { AuthIllustration } from '@/components/ui/auth-illustration.component';
 import { Button } from '@/components/ui/button';
@@ -63,15 +63,17 @@ export const VerifyEmailPage = () => {
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(124,58,237,0.12),transparent_40%)] dark:bg-[radial-gradient(circle_at_top_left,rgba(214,140,255,0.15),transparent_40%)]" />
             <div className="relative flex flex-col gap-5">
               <div className="mb-2 flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center overflow-hidden">
-                  <img src="/main-logo.png" alt="Tetra logo" className="h-full w-full object-contain" />
-                </div>
-                <div>
-                  <p className="text-base font-semibold tracking-[0.24em] text-slate-900 uppercase dark:text-white">
-                    {APP_NAME}
-                  </p>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400">Email verification</p>
-                </div>
+                <Link to={ROUTES.LANDING} className="flex items-center gap-3 transition hover:opacity-80">
+                  <div className="flex h-11 w-11 items-center justify-center overflow-hidden">
+                    <img src="/main-logo.png" alt="Tetra logo" className="h-full w-full object-contain" />
+                  </div>
+                  <div>
+                    <p className="text-base font-semibold tracking-[0.24em] text-slate-900 uppercase dark:text-white">
+                      {APP_NAME}
+                    </p>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">Email verification</p>
+                  </div>
+                </Link>
               </div>
 
               <div className="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-inner shadow-slate-900/5 dark:border-white/10 dark:bg-[#071424]/70 dark:shadow-black/20">

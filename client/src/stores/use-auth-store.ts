@@ -3,8 +3,8 @@ import { useSocketStore } from '@/stores/use-socket-store';
 import type { AuthState } from '@/types/store';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { LOCAL_STORAGE_KEYS } from '@/utils/constants';
 
+import { LOCAL_STORAGE_KEYS } from '@/utils/constants';
 // Zustand library for state management
 
 import { authService } from '@/utils/services/auth.service';

@@ -6,11 +6,11 @@ import some from 'lodash-es/some';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+import { LOCAL_STORAGE_KEYS } from '@/utils/constants';
 import { ChatService } from '@/utils/services/chat.service';
 
 import { useAuthStore } from './use-auth-store';
 import { useSocketStore } from './use-socket-store';
-import { LOCAL_STORAGE_KEYS } from '@/utils/constants';
 
 let fetchConversationsPromise: Promise<void> | null = null;
 
