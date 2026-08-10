@@ -64,8 +64,8 @@ export const ROUTES = Object.freeze({
 });
 
 export const AUTH_ID = Object.freeze({
-  GOOGLE_CLIENT_ID: '631241229433-9eumlhji2vg8aimnv50qgrjaj3bb3u2p.apps.googleusercontent.com',
-  FACEBOOK_APP_ID: '554442523971007',
+  GOOGLE_CLIENT_ID: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+  FACEBOOK_APP_ID: import.meta.env.VITE_FACEBOOK_APP_ID,
 });
 
 const passwordValidationSchema = z
