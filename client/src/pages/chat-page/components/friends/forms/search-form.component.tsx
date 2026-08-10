@@ -6,7 +6,7 @@ import type { IFormValues } from '@/pages/chat-page/components/add-friend-model.
 
 import { Spin } from '@/components/antd/spin.component';
 import { Button } from '@/components/ui/button';
-import { DialogClose, DialogFooter } from '@/components/ui/dialog';
+import { DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -18,7 +18,6 @@ interface SearchFormProps {
   isFound: boolean | null;
   searchedUsername: string;
   onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void;
-  onCancel: () => void;
 }
 
 export const SearchForm = ({
@@ -29,7 +28,6 @@ export const SearchForm = ({
   isFound,
   searchedUsername,
   onSubmit,
-  onCancel,
 }: SearchFormProps) => {
   const usernameValue = useWatch({ control, name: 'username' });
 
@@ -58,16 +56,6 @@ export const SearchForm = ({
       </div>
 
       <DialogFooter>
-        <DialogClose
-          nativeButton={false}
-          render={
-            <div className="glass hover:text-destructive border-input border-border/50 flex-1 cursor-pointer rounded-full border px-4 py-2 text-center text-sm" />
-          }
-          onClick={onCancel}
-        >
-          Cancel
-        </DialogClose>
-
         <Button
           type="submit"
           disabled={loading || !usernameValue?.trim()}

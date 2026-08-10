@@ -61,12 +61,6 @@ export const AddFriendModel = () => {
     }
   });
 
-  const handleCancel = () => {
-    reset();
-    setSearchedUsername('');
-    setIsFound(null);
-  };
-
   const handleSendRequest = handleSubmit(async data => {
     if (!searchUser) return;
 
@@ -74,10 +68,12 @@ export const AddFriendModel = () => {
       const message = await sendFriendRequest(searchUser._id, data.message.trim());
       toast.success(message);
 
-      handleCancel();
+      reset();
+      setSearchedUsername('');
+      setIsFound(null);
     } catch (e) {
       toast.error(getApiErrorMessage(e, 'Failed to send friend request. Please try again.'));
-      console.error('Error sending friend request:', e);
+      console.error('Error sending friend request:');
     }
   });
 
@@ -107,7 +103,6 @@ export const AddFriendModel = () => {
             isFound={isFound}
             searchedUsername={searchedUsername}
             onSubmit={handleSearch}
-            onCancel={handleCancel}
           />
         ) : (
           <SendFriendRequestForm
