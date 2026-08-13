@@ -81,7 +81,10 @@ export const useChatStore = create<ChatState>()(
         set({ messageLoading: true });
 
         try {
-          const { messages: fetched, cursor } = await ChatService.fetchMessages(convoId, nextCursor);
+          const { messages: fetched, cursor } = await ChatService.fetchMessages(
+            convoId,
+            nextCursor === '' ? undefined : nextCursor,
+          );
 
           const processed = map(fetched, message => ({ ...message, isOwn: message.senderId === user?._id }));
 
@@ -194,7 +197,6 @@ export const useChatStore = create<ChatState>()(
           })),
         }));
       },
-
       markAsSeen: async () => {
         try {
           const { user } = useAuthStore.getState();
@@ -233,7 +235,6 @@ export const useChatStore = create<ChatState>()(
           };
         });
       },
-
       addConversationIfMissing: convo => {
         set(state => {
           const exists = some(state.conversations, c => c._id.toString() === convo._id.toString());
@@ -243,7 +244,6 @@ export const useChatStore = create<ChatState>()(
           };
         });
       },
-
       createConversation: async (type, memberIds, name) => {
         try {
           set({ loading: true });

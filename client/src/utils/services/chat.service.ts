@@ -20,7 +20,9 @@ export const ChatService = {
 
   async fetchMessages(id: string, cursor?: string): Promise<FetchMessageProps> {
     const endpoint = API_ENDPOINTS.CONVERSATION_MESSAGES.replace('{id}', id);
-    const res = await api.get(`${endpoint}?limit=${pageLimit}&cursor=${cursor}`);
+    const url = `${endpoint}?limit=${pageLimit}&cursor=${cursor ?? ''}`;
+
+    const res = await api.get(url);
 
     return { messages: res.data.messages, cursor: res.data.nextCursor };
   },
