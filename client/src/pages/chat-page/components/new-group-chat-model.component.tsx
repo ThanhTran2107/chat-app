@@ -3,6 +3,7 @@ import { useFriendStore } from '@/stores/use-friend-store';
 import { type Friend } from '@/types/user';
 import debounce from 'lodash-es/debounce';
 import filter from 'lodash-es/filter';
+import includes from 'lodash-es/includes';
 import isEmpty from 'lodash-es/isEmpty';
 import map from 'lodash-es/map';
 import some from 'lodash-es/some';
@@ -74,7 +75,7 @@ export const NewGroupChatModel = () => {
   const filteredFriends = filter(
     friends,
     friend =>
-      friend.displayName.toLowerCase().includes(search.toLowerCase()) &&
+      includes(friend.displayName.toLowerCase(), search.toLowerCase()) &&
       !some(invitedUsers, user => user._id === friend._id),
   );
 

@@ -58,3 +58,17 @@ export const formatMessageTime = (date: Date) => {
     return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} ${timeStr}`; // ví dụ: "15/12/2023 18:40"
   }
 };
+
+export const formatFileSize = (size: number) => {
+  if (size < 1024) return `${size} B`;
+
+  const kb = size / 1024;
+  if (kb < 1024) return `${kb.toFixed(1)} KB`;
+
+  const mb = kb / 1024;
+  if (mb < 1024) return `${mb.toFixed(1)} MB`;
+
+  const gb = mb / 1024;
+  
+  return `${gb.toFixed(1)} GB`;
+};

@@ -1,4 +1,5 @@
 import { useChatStore } from '@/stores/use-chat-store';
+import find from 'lodash-es/find';
 
 import { useEffect } from 'react';
 
@@ -17,7 +18,7 @@ export const ChatWindowLayout = () => {
   const loading = useChatStore(state => state.messageLoading);
   const markAsSeen = useChatStore(state => state.markAsSeen);
 
-  const selectedConvo = conversations.find(convo => convo._id === activeConversationId) ?? null;
+  const selectedConvo = find(conversations, convo => convo._id === activeConversationId) ?? null;
 
   useEffect(() => {
     if (!selectedConvo) return;

@@ -1,6 +1,7 @@
 import { useChatStore } from '@/stores/use-chat-store';
 import { useFriendStore } from '@/stores/use-friend-store';
 import filter from 'lodash-es/filter';
+import includes from 'lodash-es/includes';
 import isEmpty from 'lodash-es/isEmpty';
 import map from 'lodash-es/map';
 import { Users } from 'lucide-react';
@@ -27,7 +28,7 @@ export const FriendListDialog = ({ onClose }: { onClose?: () => void }) => {
 
     if (!query) return true;
 
-    return friend.displayName.toLowerCase().includes(query) || friend.username.toLowerCase().includes(query);
+    return includes(friend.displayName.toLowerCase(), query) || includes(friend.username.toLowerCase(), query);
   });
 
   return (

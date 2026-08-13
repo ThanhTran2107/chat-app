@@ -1,3 +1,11 @@
+const getMessagePreview = (message) => {
+  if (message.content) return message.content;
+  if (message.imgUrl) return "📷 Image";
+  if (message.fileUrl) return `📎 ${message.fileName ?? "Attachment"}`;
+
+  return "";
+};
+
 export const updateConversationAfterCreateMessage = (
   conversation,
   message,
@@ -8,7 +16,7 @@ export const updateConversationAfterCreateMessage = (
     lastMessageAt: message.createdAt,
     lastMessage: {
       _id: message._id,
-      content: message.content,
+      content: getMessagePreview(message),
       senderId,
       createdAt: message.createdAt,
     },
@@ -67,7 +75,5 @@ export const emitNewMessage = ({ io, conversation, message }) => {
   };
 
   // emit only to user-specific rooms to avoid duplicate delivery when a socket is also in the conversation room
-  recipients.forEach((userId) => {
-    io.to(userId).emit("new-message", payload);
-  });
+  recipients.forEach((userId) => io.to(userId).emit("new-message", payload));
 };

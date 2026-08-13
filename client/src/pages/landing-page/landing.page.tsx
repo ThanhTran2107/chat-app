@@ -1,3 +1,4 @@
+import map from 'lodash-es/map';
 import { Cloud, MessageSquare, Rocket, ShieldCheck, Smartphone, Zap } from 'lucide-react';
 
 import { Link } from 'react-router-dom';
@@ -81,19 +82,22 @@ export function LandingPage() {
             </div>
 
             <div className="grid gap-4 sm:grid-cols-3">
-              {[
-                ['50ms', 'Ultra-low latency'],
-                ['End-to-end', 'Encrypt every conversation'],
-                ['Multi-device', 'Available everywhere'],
-              ].map(([label, description]) => (
-                <div
-                  key={String(label)}
-                  className="rounded-3xl border border-slate-200/70 bg-white/80 px-5 py-4 text-sm text-slate-700 shadow-[0_20px_120px_rgba(0,0,0,0.1)] backdrop-blur-xl dark:border-white/10 dark:bg-white/5 dark:text-slate-300"
-                >
-                  <p className="font-semibold text-slate-950 dark:text-white">{label}</p>
-                  <p className="mt-2 text-xs text-slate-400 dark:text-slate-400">{description}</p>
-                </div>
-              ))}
+              {map(
+                [
+                  ['50ms', 'Ultra-low latency'],
+                  ['End-to-end', 'Encrypt every conversation'],
+                  ['Multi-device', 'Available everywhere'],
+                ],
+                ([label, description]: [string, string]) => (
+                  <div
+                    key={String(label)}
+                    className="rounded-3xl border border-slate-200/70 bg-white/80 px-5 py-4 text-sm text-slate-700 shadow-[0_20px_120px_rgba(0,0,0,0.1)] backdrop-blur-xl dark:border-white/10 dark:bg-white/5 dark:text-slate-300"
+                  >
+                    <p className="font-semibold text-slate-950 dark:text-white">{label}</p>
+                    <p className="mt-2 text-xs text-slate-400 dark:text-slate-400">{description}</p>
+                  </div>
+                ),
+              )}
             </div>
           </div>
 
@@ -178,34 +182,37 @@ export function LandingPage() {
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
-            {[
-              {
-                title: 'Blazing speed',
-                description: 'Instant sync and instant replies, no device limits.',
-                icon: <MessageSquare className="h-6 w-6" />,
-              },
-              {
-                title: 'End-to-end security',
-                description: 'Data is encrypted on-device, visible only to the sender and receiver.',
-                icon: <ShieldCheck className="h-6 w-6" />,
-              },
-              {
-                title: 'Cross-platform',
-                description: 'Web, mobile, and desktop work seamlessly with one account.',
-                icon: <Smartphone className="h-6 w-6" />,
-              },
-            ].map(feature => (
-              <div
-                key={feature.title}
-                className="group rounded-[28px] border border-slate-200/70 bg-white/90 p-6 text-slate-950 transition duration-300 hover:-translate-y-1 hover:border-violet-400/30 hover:bg-slate-100 dark:border-white/10 dark:bg-slate-950/80 dark:text-white dark:hover:bg-slate-900/90"
-              >
-                <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-violet-500/10 text-violet-300 transition group-hover:bg-violet-500/15">
-                  {feature.icon}
+            {map(
+              [
+                {
+                  title: 'Blazing speed',
+                  description: 'Instant sync and instant replies, no device limits.',
+                  icon: <MessageSquare className="h-6 w-6" />,
+                },
+                {
+                  title: 'End-to-end security',
+                  description: 'Data is encrypted on-device, visible only to the sender and receiver.',
+                  icon: <ShieldCheck className="h-6 w-6" />,
+                },
+                {
+                  title: 'Cross-platform',
+                  description: 'Web, mobile, and desktop work seamlessly with one account.',
+                  icon: <Smartphone className="h-6 w-6" />,
+                },
+              ],
+              feature => (
+                <div
+                  key={feature.title}
+                  className="group rounded-[28px] border border-slate-200/70 bg-white/90 p-6 text-slate-950 transition duration-300 hover:-translate-y-1 hover:border-violet-400/30 hover:bg-slate-100 dark:border-white/10 dark:bg-slate-950/80 dark:text-white dark:hover:bg-slate-900/90"
+                >
+                  <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-violet-500/10 text-violet-300 transition group-hover:bg-violet-500/15">
+                    {feature.icon}
+                  </div>
+                  <h3 className="mb-3 text-xl font-semibold text-slate-950 dark:text-white">{feature.title}</h3>
+                  <p className="text-sm leading-7 text-slate-700 dark:text-slate-300">{feature.description}</p>
                 </div>
-                <h3 className="mb-3 text-xl font-semibold text-slate-950 dark:text-white">{feature.title}</h3>
-                <p className="text-sm leading-7 text-slate-700 dark:text-slate-300">{feature.description}</p>
-              </div>
-            ))}
+              ),
+            )}
           </div>
         </section>
 
@@ -243,23 +250,26 @@ export function LandingPage() {
             </div>
 
             <div className="mt-12 grid gap-4 sm:grid-cols-2">
-              {[
-                { name: 'Cyber', icon: <Cloud className="h-4 w-4" /> },
-                { name: 'Astro', icon: <Rocket className="h-4 w-4" /> },
-                { name: 'Nebula', icon: <ShieldCheck className="h-4 w-4" /> },
-                { name: 'Safeco', icon: <Zap className="h-4 w-4" /> },
-              ].map(brand => (
-                <div
-                  key={brand.name}
-                  className="group rounded-4xl border border-slate-200/70 bg-white/90 px-6 py-6 transition duration-300 hover:-translate-y-1 hover:border-violet-400/30 hover:bg-slate-100 dark:border-white/10 dark:bg-slate-950/80 dark:hover:bg-slate-900/90"
-                >
-                  <div className="mb-4 inline-flex items-center justify-center gap-2 rounded-3xl bg-slate-100 px-4 py-3 text-slate-700 transition group-hover:bg-violet-500/10 group-hover:text-white dark:bg-slate-900/70 dark:text-slate-300">
-                    {brand.icon}
-                    <span className="text-sm tracking-[0.24em] uppercase">{brand.name}</span>
+              {map(
+                [
+                  { name: 'Cyber', icon: <Cloud className="h-4 w-4" /> },
+                  { name: 'Astro', icon: <Rocket className="h-4 w-4" /> },
+                  { name: 'Nebula', icon: <ShieldCheck className="h-4 w-4" /> },
+                  { name: 'Safeco', icon: <Zap className="h-4 w-4" /> },
+                ],
+                brand => (
+                  <div
+                    key={brand.name}
+                    className="group rounded-4xl border border-slate-200/70 bg-white/90 px-6 py-6 transition duration-300 hover:-translate-y-1 hover:border-violet-400/30 hover:bg-slate-100 dark:border-white/10 dark:bg-slate-950/80 dark:hover:bg-slate-900/90"
+                  >
+                    <div className="mb-4 inline-flex items-center justify-center gap-2 rounded-3xl bg-slate-100 px-4 py-3 text-slate-700 transition group-hover:bg-violet-500/10 group-hover:text-white dark:bg-slate-900/70 dark:text-slate-300">
+                      {brand.icon}
+                      <span className="text-sm tracking-[0.24em] uppercase">{brand.name}</span>
+                    </div>
+                    <div className="h-1 rounded-full bg-linear-to-r from-violet-500/20 via-white/15 to-cyan-400/20" />
                   </div>
-                  <div className="h-1 rounded-full bg-linear-to-r from-violet-500/20 via-white/15 to-cyan-400/20" />
-                </div>
-              ))}
+                ),
+              )}
             </div>
           </div>
         </section>

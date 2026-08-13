@@ -25,22 +25,44 @@ export const ChatService = {
     return { messages: res.data.messages, cursor: res.data.nextCursor };
   },
 
-  async sendDirectMessage(recipientId: string, content: string = '', imgUrl?: string, conversationId?: string) {
+  async sendDirectMessage(recipientId: string, content: string = '', file?: File, conversationId?: string) {
+    if (file) {
+      const formData = new FormData();
+      formData.append('recipientId', recipientId);
+      formData.append('content', content ?? '');
+
+      if (conversationId) formData.append('conversationId', conversationId);
+
+      formData.append('file', file);
+      const res = await api.post(API_ENDPOINTS.DIRECT_MESSAGE, formData);
+
+      return res.data.message;
+    }
+
     const res = await api.post(API_ENDPOINTS.DIRECT_MESSAGE, {
       recipientId,
       content,
-      imgUrl,
       conversationId,
     });
 
     return res.data.message;
   },
 
-  async sendGroupMessage(conversationId: string, content: string = '', imgUrl?: string) {
+  async sendGroupMessage(conversationId: string, content: string = '', file?: File) {
+    if (file) {
+      const formData = new FormData();
+      formData.append('conversationId', conversationId);
+      formData.append('content', content ?? '');
+      formData.append('file', file);
+
+      const res = await api.post(API_ENDPOINTS.GROUP_MESSAGE, formData);
+
+      return res.data.message;
+    }
+
     const res = await api.post(API_ENDPOINTS.GROUP_MESSAGE, {
       conversationId,
       content,
-      imgUrl,
     });
 
     return res.data.message;

@@ -753,6 +753,18 @@
                 "content": "Hello bro",
                 "conversationId": "6a17f2028bd7b240ad21ba2e"
               }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "recipientId": { "type": "string" },
+                  "content": { "type": "string" },
+                  "conversationId": { "type": "string", "nullable": true },
+                  "file": { "type": "string", "format": "binary" }
+                },
+                "required": ["recipientId"]
+              }
             }
           }
         },
@@ -790,6 +802,17 @@
                 "conversationId": "6a17f2028bd7b240ad21ba2e",
                 "content": "Hello group"
               }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "conversationId": { "type": "string" },
+                  "content": { "type": "string" },
+                  "file": { "type": "string", "format": "binary" }
+                },
+                "required": ["conversationId"]
+              }
             }
           }
         },
@@ -804,6 +827,56 @@
           },
           "400": {
             "description": "Missing content or invalid payload",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/message/download/{messageId}": {
+      "get": {
+        "summary": "Download a message attachment",
+        "tags": ["Message"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "ID of the message containing the attachment"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Attachment content",
+            "content": {
+              "application/octet-stream": {
+                "schema": { "type": "string", "format": "binary" }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "404": {
+            "description": "Attachment not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "502": {
+            "description": "Unable to download attachment",
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/ErrorResponse" }
@@ -1128,8 +1201,12 @@
           "_id": { "type": "string" },
           "conversationId": { "type": "string" },
           "senderId": { "type": "string" },
-          "content": { "type": "string" },
+          "content": { "type": ["string", "null"] },
           "imgUrl": { "type": ["string", "null"] },
+          "fileUrl": { "type": ["string", "null"] },
+          "fileName": { "type": ["string", "null"] },
+          "fileType": { "type": ["string", "null"] },
+          "fileSize": { "type": ["integer", "null"] },
           "createdAt": { "type": "string", "format": "date-time" },
           "updatedAt": { "type": "string", "format": "date-time" }
         }
@@ -1255,7 +1332,7 @@
       },
       "DirectMessageCreate": {
         "type": "object",
-        "required": ["recipientId", "content"],
+        "required": ["recipientId"],
         "properties": {
           "recipientId": { "type": "string" },
           "content": { "type": "string" },
@@ -1264,7 +1341,7 @@
       },
       "GroupMessageCreate": {
         "type": "object",
-        "required": ["conversationId", "content"],
+        "required": ["conversationId"],
         "properties": {
           "conversationId": { "type": "string" },
           "content": { "type": "string" }

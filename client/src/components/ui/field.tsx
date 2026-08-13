@@ -1,4 +1,5 @@
 import { type VariantProps, cva } from 'class-variance-authority';
+import map from 'lodash-es/map';
 
 import { useMemo } from 'react';
 
@@ -175,7 +176,7 @@ function FieldError({
       return null;
     }
 
-    const uniqueErrors = [...new Map(errors.map(error => [error?.message, error])).values()];
+    const uniqueErrors = [...new Map(map(errors, error => [error?.message, error])).values()];
 
     if (uniqueErrors?.length == 1) {
       return uniqueErrors[0]?.message;
@@ -183,7 +184,7 @@ function FieldError({
 
     return (
       <ul className="ml-4 flex list-disc flex-col gap-1">
-        {uniqueErrors.map((error, index) => error?.message && <li key={index}>{error.message}</li>)}
+        {map(uniqueErrors, (error, index) => error?.message && <li key={index}>{error.message}</li>)}
       </ul>
     );
   }, [children, errors]);

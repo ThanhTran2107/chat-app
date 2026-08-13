@@ -1,3 +1,5 @@
+import map from 'lodash-es/map';
+
 import * as React from 'react';
 
 import {
@@ -22,7 +24,7 @@ export function NavSecondary({
     <SidebarGroup {...props}>
       <SidebarGroupContent>
         <SidebarMenu>
-          {items.map(item => (
+          {map(items, item => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton size="sm" render={<a href={item.url} />}>
                 {item.icon}

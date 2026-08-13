@@ -3,6 +3,7 @@ import { useChatStore } from '@/stores/use-chat-store';
 import { useSocketStore } from '@/stores/use-socket-store';
 import type { Conversation } from '@/types/chat';
 import filter from 'lodash-es/filter';
+import find from 'lodash-es/find';
 import isEmpty from 'lodash-es/isEmpty';
 
 import { Separator } from '@/components/ui/separator';
@@ -21,7 +22,7 @@ export const ChatWindowHeader = ({ chat }: { chat?: Conversation }) => {
 
   let otherUser;
 
-  chat = chat ?? conversations.find(conversation => conversation._id === activeConversationId);
+  chat = chat ?? find(conversations, conversation => conversation._id === activeConversationId);
 
   if (!chat)
     return (

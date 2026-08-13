@@ -1,4 +1,5 @@
 import { isAxiosError } from 'axios';
+import includes from 'lodash-es/includes';
 
 import { API_ENDPOINTS } from '@/utils/constants';
 
@@ -86,7 +87,7 @@ export const authService = {
 
       return res.data.accessToken;
     } catch (error) {
-      if (isAxiosError(error) && [401, 403].includes(error.response?.status ?? 0)) return null;
+      if (isAxiosError(error) && includes([401, 403], error.response?.status ?? 0)) return null;
 
       throw error;
     }

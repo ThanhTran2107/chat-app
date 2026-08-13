@@ -22,9 +22,13 @@ export const AvatarUploader = () => {
 
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select a valid image file.');
+    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+    const extension = file.name.toLowerCase().slice(file.name.lastIndexOf('.'));
+
+    if (!file.type.startsWith('image/') || !allowedExtensions.includes(extension)) {
+      toast.error('Please select a valid image file (.jpg, .jpeg, .png, .gif, .webp).');
       e.target.value = '';
+
       return;
     }
 

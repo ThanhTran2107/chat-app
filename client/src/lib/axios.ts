@@ -1,5 +1,6 @@
 import { useAuthStore } from '@/stores/use-auth-store';
 import axios, { isAxiosError } from 'axios';
+import includes from 'lodash-es/includes';
 
 import { API_ENDPOINTS } from '@/utils/constants';
 import { ROUTES } from '@/utils/constants';
@@ -8,9 +9,6 @@ import { ROUTES } from '@/utils/constants';
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL, // Base URL for the API, defined in constants
   withCredentials: true, // Include cookies in requests for authentication
-  headers: {
-    'Content-Type': 'application/json',
-  }, // You can add other default headers here if needed
 });
 
 // Request interceptor to add the Authorization header with the access token for authenticated requests
@@ -30,13 +28,13 @@ api.interceptors.response.use(
 
     // If the error is related to authentication endpoints, do not attempt to refresh and reject immediately
     if (
-      originalRequest.url.includes(API_ENDPOINTS.AUTH_LOGIN) ||
-      originalRequest.url.includes(API_ENDPOINTS.AUTH_REFRESH) ||
-      originalRequest.url.includes(API_ENDPOINTS.AUTH_REGISTER) ||
-      originalRequest.url.includes(API_ENDPOINTS.AUTH_LOGOUT)
+      includes(originalRequest.url, API_ENDPOINTS.AUTH_LOGIN) ||
+      includes(originalRequest.url, API_ENDPOINTS.AUTH_REFRESH) ||
+      includes(originalRequest.url, API_ENDPOINTS.AUTH_REGISTER) ||
+      includes(originalRequest.url, API_ENDPOINTS.AUTH_LOGOUT)
     ) {
       // If refresh token endpoint returns 401, force redirect to login
-      if (originalRequest.url.includes(API_ENDPOINTS.AUTH_REFRESH) && error.response?.status === 401) {
+      if (includes(originalRequest.url, API_ENDPOINTS.AUTH_REFRESH) && error.response?.status === 401) {
         useAuthStore.getState().clearState();
         window.location.replace(ROUTES.LOGIN);
       }
@@ -48,9 +46,9 @@ api.interceptors.response.use(
 
     const isAuthError =
       error.response?.status === 401 ||
-      responseMessage.toLowerCase().includes('jwt expired') ||
-      responseMessage.toLowerCase().includes('token expired') ||
-      responseMessage.toLowerCase().includes('invalid token');
+      includes(responseMessage.toLowerCase(), 'jwt expired') ||
+      includes(responseMessage.toLowerCase(), 'token expired') ||
+      includes(responseMessage.toLowerCase(), 'invalid token');
 
     originalRequest._retryCount = originalRequest._retryCount || 0;
 
@@ -58,10 +56,10 @@ api.interceptors.response.use(
     if (
       isAuthError &&
       originalRequest._retryCount < 1 &&
-      !originalRequest.url.includes(API_ENDPOINTS.AUTH_LOGIN) &&
-      !originalRequest.url.includes(API_ENDPOINTS.AUTH_REFRESH) &&
-      !originalRequest.url.includes(API_ENDPOINTS.AUTH_REGISTER) &&
-      !originalRequest.url.includes(API_ENDPOINTS.AUTH_LOGOUT)
+      !includes(originalRequest.url, API_ENDPOINTS.AUTH_LOGIN) &&
+      !includes(originalRequest.url, API_ENDPOINTS.AUTH_REFRESH) &&
+      !includes(originalRequest.url, API_ENDPOINTS.AUTH_REGISTER) &&
+      !includes(originalRequest.url, API_ENDPOINTS.AUTH_LOGOUT)
     ) {
       originalRequest._retryCount += 1;
 

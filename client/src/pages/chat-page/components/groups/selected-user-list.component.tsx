@@ -1,4 +1,5 @@
 import type { Friend } from '@/types/user';
+import map from 'lodash-es/map';
 import { X } from 'lucide-react';
 
 import { UserAvatar } from '../friends/user-avatar.component';
@@ -12,7 +13,7 @@ export const SelectedUserList = ({ invitedUsers, onRemove }: SelectedUserListPro
   return (
     <div className="border-border/50 bg-muted/20 rounded-xl border p-3">
       <div className="flex flex-wrap gap-2">
-        {invitedUsers.map(user => (
+        {map(invitedUsers, user => (
           <div key={user._id} className="bg-muted flex items-center gap-1 rounded-full px-3 py-1 text-sm">
             <UserAvatar type="chat" name={user.displayName} avatarUrl={user.avatarUrl} />
             <span>{user.displayName}</span>

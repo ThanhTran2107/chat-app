@@ -1,8 +1,7 @@
 import { useChatStore } from '@/stores/use-chat-store';
-import { isEmpty, map } from 'lodash-es';
-import throttle from 'lodash-es/throttle';
+import { find, isEmpty, map, some } from 'lodash-es';
 
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import { useLayoutEffect, useMemo, useRef } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
 import { Spin } from '@/components/antd/spin.component';
@@ -11,20 +10,17 @@ import { MessageItem } from '../messages/message-item.component';
 import { ChatWelcomeScreen } from './chat-welcome-screen.component';
 
 export const ChatWindowBody = () => {
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const throttledScrollSaveRef = useRef<ReturnType<typeof throttle> | null>(null);
-
   const activeConversationId = useChatStore(state => state.activeConversationId);
   const allMessages = useChatStore(state => state.messages);
   const conversations = useChatStore(state => state.conversations);
   const fetchMessages = useChatStore(state => state.fetchMessages);
 
-  const selectedConvo = conversations.find(conversation => conversation._id === activeConversationId);
+  const selectedConvo = find(conversations, conversation => conversation._id === activeConversationId);
   const lastMessageStatus = !isEmpty(selectedConvo?.seenBy ?? []) ? 'seen' : 'delivered';
 
   const isUnavailableConversation =
-    selectedConvo?.type === 'direct' && selectedConvo.participants.some(participant => !participant._id);
+    selectedConvo?.type === 'direct' && some(selectedConvo.participants, participant => !participant._id);
 
   const conversationMessages = activeConversationId ? allMessages[activeConversationId] : undefined;
   const messages = useMemo(() => conversationMessages?.items ?? [], [conversationMessages]);
@@ -32,8 +28,6 @@ export const ChatWindowBody = () => {
 
   const reversedMessages = useMemo(() => [...messages].reverse(), [messages]);
   const latestMessageId = messages[messages.length - 1]?._id;
-
-  const key = `chat-scroll-${activeConversationId}`;
 
   const handleFetchMoreMessages = async () => {
     if (!activeConversationId) return;
@@ -45,48 +39,17 @@ export const ChatWindowBody = () => {
     }
   };
 
-  const handleScrollSave = useCallback(() => {
-    const container = containerRef.current;
-
-    if (!container || !activeConversationId) return;
-
-    const maxScrollTop = container.scrollHeight - container.clientHeight;
-    const scrollTop = Math.max(0, maxScrollTop - container.scrollTop);
-
-    sessionStorage.setItem(key, JSON.stringify({ scrollTop, scrollHeight: container.scrollHeight }));
-  }, [activeConversationId, key]);
-
-  useEffect(() => {
-    throttledScrollSaveRef.current?.cancel?.();
-    throttledScrollSaveRef.current = throttle(handleScrollSave, 150);
-
-    return () => {
-      throttledScrollSaveRef.current?.cancel?.();
-      throttledScrollSaveRef.current = null;
-    };
-  }, [handleScrollSave]);
-
-  useLayoutEffect(() => {
-    if (!messagesEndRef.current) return;
-
-    messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
-  }, [activeConversationId, latestMessageId]);
-
-  useLayoutEffect(() => {
+  const scrollToBottom = () => {
     const container = containerRef.current;
 
     if (!container) return;
 
-    const item = sessionStorage.getItem(key);
+    container.scrollTop = container.scrollHeight;
+  };
 
-    if (item) {
-      const { scrollTop: savedFromBottom } = JSON.parse(item);
-      const maxScrollTop = container.scrollHeight - container.clientHeight;
-      const scrollTop = Math.max(0, maxScrollTop - savedFromBottom);
-
-      requestAnimationFrame(() => (container.scrollTop = scrollTop));
-    }
-  }, [key]);
+  useLayoutEffect(() => {
+    scrollToBottom();
+  }, [latestMessageId, activeConversationId]);
 
   if (!selectedConvo) return <ChatWelcomeScreen />;
 
@@ -112,7 +75,6 @@ export const ChatWindowBody = () => {
       <div
         id="scrollableDiv"
         ref={containerRef}
-        onScroll={() => throttledScrollSaveRef.current?.()}
         className="beautiful-scrollbar scrollbar-hidden min-h-0 flex-1 flex-col-reverse gap-3 overflow-x-hidden overflow-y-auto pb-5"
       >
         <InfiniteScroll
@@ -140,8 +102,6 @@ export const ChatWindowBody = () => {
             </div>
           ))}
         </InfiniteScroll>
-
-        <div ref={messagesEndRef} />
       </div>
     </div>
   );

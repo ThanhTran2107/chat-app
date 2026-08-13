@@ -181,7 +181,7 @@ export const useChatStore = create<ChatState>()(
         set(state => ({
           conversations: map(state.conversations, convo => ({
             ...convo,
-            participants: convo.participants.map(participant =>
+            participants: map(convo.participants, participant =>
               participant._id === userId
                 ? {
                     ...participant,
@@ -264,8 +264,7 @@ export const useChatStore = create<ChatState>()(
     {
       name: CHAT_STORAGE,
       partialize: state => ({
-        activeConversationId: state.activeConversationId,
-        conversations: state.conversations.map(convo => ({
+        conversations: map(state.conversations, convo => ({
           _id: convo._id,
           type: convo.type,
           group: convo.group,

@@ -1,5 +1,6 @@
 'use client';
 
+import map from 'lodash-es/map';
 import { FolderIcon, MoreHorizontalIcon, ShareIcon, Trash2Icon } from 'lucide-react';
 
 import { useSidebar } from '@/components/ui/contexts/sidebar-context';
@@ -33,7 +34,7 @@ export function NavProjects({
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>Projects</SidebarGroupLabel>
       <SidebarMenu>
-        {projects.map(item => (
+        {map(projects, item => (
           <SidebarMenuItem key={item.name}>
             <SidebarMenuButton render={<a href={item.url} />}>
               {item.icon}

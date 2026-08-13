@@ -1,3 +1,4 @@
+import map from 'lodash-es/map';
 import { ChevronRightIcon } from 'lucide-react';
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -31,7 +32,7 @@ export function NavMain({
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
       <SidebarMenu>
-        {items.map(item => (
+        {map(items, item => (
           <Collapsible key={item.title} defaultOpen={item.isActive} render={<SidebarMenuItem />}>
             <SidebarMenuButton tooltip={item.title} render={<a href={item.url} />}>
               {item.icon}
@@ -45,7 +46,7 @@ export function NavMain({
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <SidebarMenuSub>
-                    {item.items?.map(subItem => (
+                    {map(item.items, subItem => (
                       <SidebarMenuSubItem key={subItem.title}>
                         <SidebarMenuSubButton render={<a href={subItem.url} />}>
                           <span>{subItem.title}</span>

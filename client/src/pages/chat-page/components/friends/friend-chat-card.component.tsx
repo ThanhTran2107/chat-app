@@ -2,6 +2,7 @@ import { useAuthStore } from '@/stores/use-auth-store.ts';
 import { useChatStore } from '@/stores/use-chat-store.ts';
 import { useSocketStore } from '@/stores/use-socket-store';
 import { type Conversation } from '@/types/chat.ts';
+import find from 'lodash-es/find';
 
 import * as React from 'react';
 
@@ -23,7 +24,7 @@ const FriendChatCardComponent = ({ convo }: { convo: Conversation }) => {
 
   if (!user) return null;
 
-  const otherUser = convo.participants.find(participant => participant._id !== user._id);
+  const otherUser = find(convo.participants, participant => participant._id !== user._id);
   const isDeleted = !otherUser?._id;
   const otherUserName = otherUser?.displayName ?? 'Deleted account';
   const isOnline =
