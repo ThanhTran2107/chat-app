@@ -6,7 +6,7 @@ import includes from 'lodash-es/includes';
 import { ImagePlus, Send, X } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { useEffect, useRef, useState } from 'react';
+import React, { Suspense, useEffect, useRef, useState } from 'react';
 
 import { Spin } from '@/components/antd/spin.component';
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,13 @@ import { Input } from '@/components/ui/input';
 
 import { formatFileSize } from '@/lib/utils';
 
-import { EmojiPicker } from './emoji-picker.component';
+const EmojiPicker = React.lazy(() => import('./emoji-picker.component').then(m => ({ default: m.EmojiPicker })));
+
+const emojiPickerFallback = (
+  <Button variant="ghost" size="icon" className="hover:bg-primary/10 transition-smooth cursor-pointer" disabled>
+    <span className="size-4" />
+  </Button>
+);
 
 export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation }) => {
   const [value, setValue] = useState('');
@@ -22,6 +28,7 @@ export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation })
   const [filePreviewUrl, setFilePreviewUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const user = useAuthStore(state => state.user);
   const sendDirectMessage = useChatStore(state => state.sendDirectMessage);
@@ -32,6 +39,10 @@ export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation })
       if (filePreviewUrl) URL.revokeObjectURL(filePreviewUrl);
     };
   }, [filePreviewUrl]);
+
+  useEffect(() => {
+    if (!isUploading) inputRef.current?.focus();
+  }, [isUploading]);
 
   if (!user) return null;
 
@@ -177,7 +188,6 @@ export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation })
     let iconName = 'default';
 
     if (type.includes('pdf') || name.endsWith('.pdf')) iconName = 'pdf';
-    
     else if (
       type.includes('word') ||
       type.includes('wordprocessingml.document') ||
@@ -268,6 +278,7 @@ export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation })
 
         <div className="relative flex-1">
           <Input
+            ref={inputRef}
             onKeyDown={handleKeyPress}
             value={value}
             onChange={e => setValue(e.target.value)}
@@ -281,12 +292,14 @@ export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation })
               (isConversationUnavailable || isUploading ? 'pointer-events-none opacity-50' : '')
             }
           >
-            <EmojiPicker
-              onChange={(emoji: string) => {
-                if (isConversationUnavailable || isUploading) return;
-                setValue(`${value}${emoji}`);
-              }}
-            />
+            <Suspense fallback={emojiPickerFallback}>
+              <EmojiPicker
+                onChange={(emoji: string) => {
+                  if (isConversationUnavailable || isUploading) return;
+                  setValue(`${value}${emoji}`);
+                }}
+              />
+            </Suspense>
           </div>
         </div>
 

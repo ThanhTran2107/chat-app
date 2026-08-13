@@ -98,7 +98,7 @@ const MessageItemComponent = ({ message, index, messages, selectedConvo, lastMes
       });
       const fileUrl = URL.createObjectURL(blob);
       const anchor = document.createElement('a');
-      
+
       anchor.href = fileUrl;
       anchor.download = fileName;
       document.body.appendChild(anchor);
@@ -151,6 +151,8 @@ const MessageItemComponent = ({ message, index, messages, selectedConvo, lastMes
                 src={message.imgUrl ?? undefined}
                 alt={message.content ?? 'Image message'}
                 className="max-h-80 w-full cursor-pointer object-contain"
+                loading="lazy"
+                decoding="async"
                 onClick={() => window.open(message.imgUrl ?? undefined, '_blank')}
               />
             </div>
@@ -162,6 +164,8 @@ const MessageItemComponent = ({ message, index, messages, selectedConvo, lastMes
                 src={message.imgUrl ?? undefined}
                 alt={message.content ?? 'Image message'}
                 className="max-h-80 w-full cursor-pointer object-contain"
+                loading="lazy"
+                decoding="async"
                 onClick={() => window.open(message.imgUrl ?? undefined, '_blank')}
               />
               <div

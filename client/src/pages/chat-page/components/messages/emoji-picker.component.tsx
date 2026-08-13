@@ -9,7 +9,7 @@ interface EmojiPickerProps {
   onChange: (value: string) => void;
 }
 
-export const EmojiPicker = ({ onChange }: EmojiPickerProps) => {
+const EmojiPickerComponent = ({ onChange }: EmojiPickerProps) => {
   const { isDark } = useThemeStore();
 
   return (
@@ -33,3 +33,6 @@ export const EmojiPicker = ({ onChange }: EmojiPickerProps) => {
     </Popover>
   );
 };
+
+export const EmojiPicker = EmojiPickerComponent;
+export default EmojiPicker;

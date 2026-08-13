@@ -103,7 +103,8 @@ export const getConversations = async (req, res) => {
       .populate({
         path: "lastMessage.senderId",
         select: "displayName avatarUrl",
-      });
+      })
+      .lean();
 
     const formatted = conversations.map((conver) => {
       const participants = (conver.participants || []).map((p) => ({
@@ -115,7 +116,7 @@ export const getConversations = async (req, res) => {
       }));
 
       return {
-        ...conver.toObject(),
+        ...conver,
         unreadCounts: conver.unreadCounts || {},
         participants,
       };
@@ -139,7 +140,8 @@ export const getMessages = async (req, res) => {
 
     let messages = await Message.find(query)
       .sort({ createdAt: -1 })
-      .limit(Number(limit) + 1);
+      .limit(Number(limit) + 1)
+      .lean();
 
     let nextCursor = null;
 
