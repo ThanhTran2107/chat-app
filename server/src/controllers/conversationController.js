@@ -1,6 +1,7 @@
 import { Conversation } from "../models/Conversation.js";
 import { Message } from "../models/Message.js";
 import { io } from "../sockets/index.js";
+import { formatConversationParticipants } from "../utils/messageHelper.js";
 
 export const createConversation = async (req, res) => {
   try {
@@ -62,13 +63,7 @@ export const createConversation = async (req, res) => {
       { path: "lastMessage.senderId", select: "displayName avatarUrl" },
     ]);
 
-    const participants = (conversation.participants || []).map((p) => ({
-      _id: p.userId?._id,
-      displayName: p.userId?.displayName,
-      avatarUrl: p.userId?.avatarUrl ?? null,
-      showOnlineStatus: p.userId?.showOnlineStatus,
-      joinedAt: p.joinedAt,
-    }));
+    const participants = formatConversationParticipants(conversation.participants);
 
     const formatted = { ...conversation.toObject(), participants };
 
@@ -107,13 +102,7 @@ export const getConversations = async (req, res) => {
       .lean();
 
     const formatted = conversations.map((conver) => {
-      const participants = (conver.participants || []).map((p) => ({
-        _id: p.userId?._id,
-        displayName: p.userId?.displayName,
-        avatarUrl: p.userId?.avatarUrl ?? null,
-        showOnlineStatus: p.userId?.showOnlineStatus,
-        joinedAt: p.joinedAt,
-      }));
+      const participants = formatConversationParticipants(conver.participants);
 
       return {
         ...conver,

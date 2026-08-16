@@ -3,6 +3,12 @@ import { FriendRequest } from "../models/FriendRequest.js";
 import { Friend } from "../models/Friend.js";
 import { io, onlineUsers } from "../sockets/index.js";
 
+const emitToUserIfOnline = (userId, event, payload) => {
+  const socketId = onlineUsers.get(userId.toString());
+
+  if (socketId) io.to(socketId).emit(event, payload);
+};
+
 export const sendFriendRequest = async (req, res) => {
   try {
     const { to, message } = req.body;
@@ -44,9 +50,7 @@ export const sendFriendRequest = async (req, res) => {
     await request.populate("from", "_id username displayName avatarUrl");
     await request.populate("to", "_id username displayName avatarUrl");
 
-    const recipientSocketId = onlineUsers.get(to.toString());
-    if (recipientSocketId)
-      io.to(recipientSocketId).emit("friend-request-received", request);
+    emitToUserIfOnline(to, "friend-request-received", request);
 
     return res
       .status(200)
@@ -81,18 +85,15 @@ export const acceptFriendRequest = async (req, res) => {
       .select("_id displayName avatarUrl")
       .lean();
 
-    const senderSocketId = onlineUsers.get(request.from.toString());
-
-    if (senderSocketId)
-      io.to(senderSocketId).emit("friend-request-accepted", {
-        requestId,
-        acceptedBy: userId.toString(),
-        newFriend: {
-          _id: from?._id,
-          displayName: from?.displayName,
-          avatarUrl: from?.avatarUrl,
-        },
-      });
+    emitToUserIfOnline(request.from, "friend-request-accepted", {
+      requestId,
+      acceptedBy: userId.toString(),
+      newFriend: {
+        _id: from?._id,
+        displayName: from?.displayName,
+        avatarUrl: from?.avatarUrl,
+      },
+    });
 
     return res.status(200).json({
       message: "Friend request accepted successfully",
@@ -123,13 +124,10 @@ export const declineFriendRequest = async (req, res) => {
 
     await FriendRequest.findByIdAndDelete(requestId);
 
-    const senderSocketId = onlineUsers.get(request.from.toString());
-
-    if (senderSocketId)
-      io.to(senderSocketId).emit("friend-request-declined", {
-        requestId,
-        declinedBy: userId.toString(),
-      });
+    emitToUserIfOnline(request.from, "friend-request-declined", {
+      requestId,
+      declinedBy: userId.toString(),
+    });
 
     return res
       .status(204)

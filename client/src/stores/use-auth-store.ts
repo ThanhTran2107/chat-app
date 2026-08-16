@@ -1,6 +1,6 @@
 import { useChatStore } from '@/stores/use-chat-store';
 import { useSocketStore } from '@/stores/use-socket-store';
-import type { AuthState } from '@/types/store';
+import type { AuthState } from '@/types/store.type';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -17,7 +17,16 @@ const { AUTH_STORAGE, CHAT_STORAGE, AUTH_SESSION } = LOCAL_STORAGE_KEYS;
 // Zustand store for managing authentication state and actions
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set, get) => ({
+    (set, get) => {
+      const finalizeLogin = async (accessToken: string) => {
+        get().setAccessToken(accessToken);
+        localStorage.setItem(AUTH_SESSION, '1');
+
+        await get().fetchMe();
+        await useChatStore.getState().fetchConversations();
+      };
+
+      return {
       // Initial state values for authentication
       accessToken: null,
       user: null,
@@ -56,11 +65,7 @@ export const useAuthStore = create<AuthState>()(
           set({ loading: true });
 
           const { accessToken } = await authService.logIn(email, password);
-          get().setAccessToken(accessToken);
-          localStorage.setItem(AUTH_SESSION, '1');
-
-          await get().fetchMe();
-          await useChatStore.getState().fetchConversations();
+          await finalizeLogin(accessToken);
         } catch (e) {
           console.error('Login error:', e);
           throw e;
@@ -76,11 +81,7 @@ export const useAuthStore = create<AuthState>()(
           set({ loading: true });
 
           const { accessToken: token } = await authService.logInWithGoogle(accessToken);
-          get().setAccessToken(token);
-          localStorage.setItem(AUTH_SESSION, '1');
-
-          await get().fetchMe();
-          await useChatStore.getState().fetchConversations();
+          await finalizeLogin(token);
         } catch (e) {
           console.error('Google login error:', e);
           throw e;
@@ -96,11 +97,7 @@ export const useAuthStore = create<AuthState>()(
           set({ loading: true });
 
           const { accessToken: token } = await authService.logInWithFacebook(accessToken);
-          get().setAccessToken(token);
-          localStorage.setItem(AUTH_SESSION, '1');
-
-          await get().fetchMe();
-          await useChatStore.getState().fetchConversations();
+          await finalizeLogin(token);
         } catch (e) {
           console.error('Facebook login error:', e);
           throw e;
@@ -171,7 +168,7 @@ export const useAuthStore = create<AuthState>()(
 
         return refreshTokenPromise;
       },
-    }),
+    }; },
     { name: AUTH_STORAGE, partialize: state => ({ user: state.user }) },
   ),
 );

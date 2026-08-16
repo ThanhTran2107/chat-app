@@ -3,7 +3,7 @@ import { create } from 'zustand';
 
 import { FriendService } from '@/utils/services/friend.service';
 
-import type { FriendState } from '../types/store';
+import type { FriendState } from '../types/store.type';
 
 let getAllFriendRequestsPromise: Promise<void> | null = null;
 

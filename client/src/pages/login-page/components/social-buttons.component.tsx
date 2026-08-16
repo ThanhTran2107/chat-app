@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
 import { ROUTES } from '@/utils/constants';
-import { useFacebookLogin } from '@/utils/hooks/use-facebook-login';
-import { useGoogleLogin } from '@/utils/hooks/use-google-login';
+import { useFacebookLogin } from '@/utils/hooks/use-facebook-login.hook';
+import { useGoogleLogin } from '@/utils/hooks/use-google-login.hook';
 
 export function SocialButtons() {
   const navigate = useNavigate();

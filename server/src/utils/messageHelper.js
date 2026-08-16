@@ -35,6 +35,15 @@ export const updateConversationAfterCreateMessage = (
   });
 };
 
+export const formatConversationParticipants = (participants) =>
+  (participants || []).map((p) => ({
+    _id: p.userId?._id,
+    displayName: p.userId?.displayName,
+    avatarUrl: p.userId?.avatarUrl ?? null,
+    showOnlineStatus: p.userId?.showOnlineStatus,
+    joinedAt: p.joinedAt,
+  }));
+
 const formatConversationForSocket = (conversation) => ({
   _id: conversation._id,
   type: conversation.type,

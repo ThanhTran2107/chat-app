@@ -1,7 +1,7 @@
 import { useAuthStore } from '@/stores/use-auth-store.ts';
 import { useChatStore } from '@/stores/use-chat-store.ts';
 import { useSocketStore } from '@/stores/use-socket-store';
-import { type Conversation } from '@/types/chat.ts';
+import { type Conversation } from '@/types/chat.type';
 import find from 'lodash-es/find';
 
 import * as React from 'react';

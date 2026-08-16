@@ -1,4 +1,4 @@
-import { type Participant } from '@/types/chat.ts';
+import { type Participant } from '@/types/chat.type';
 import { Ellipsis } from 'lucide-react';
 
 import { APP_NAME } from '@/utils/constants';

@@ -7,7 +7,13 @@ import {
   sendPasswordResetEmail,
   sendVerificationEmail,
 } from "../libs/mailer.js";
-import { validatePassword } from "../utils/validation.js";
+import {
+  buildPasswordResetUrl,
+  buildVerificationUrl,
+  hashToken,
+  normalizeEmail,
+  validatePassword,
+} from "../utils/validation.js";
 import {
   createSessionForUser,
   createSocialUser,
@@ -32,7 +38,7 @@ export const register = async (req, res) => {
     // check if the username or email already exists
     const duplicateUsername = await User.findOne({ username });
     const duplicateEmail = await User.findOne({
-      email: email.toLowerCase().trim(),
+      email: normalizeEmail(email),
     });
 
     if (duplicateUsername)
@@ -52,15 +58,14 @@ export const register = async (req, res) => {
       username,
       hashedPassword,
       authProvider: "local",
-      email: email.toLowerCase().trim(),
+      email: normalizeEmail(email),
       displayName: `${lastName} ${firstName}`,
       emailVerified: false,
     });
 
     const verificationToken = await createEmailVerificationToken(user);
 
-    const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
-    const verifyUrl = `${clientUrl}${process.env.EMAIL_VERIFY_PATH || "/verify-email"}?token=${verificationToken}`;
+    const verifyUrl = buildVerificationUrl(verificationToken);
 
     await sendVerificationEmail({
       to: user.email,
@@ -88,7 +93,7 @@ export const logIn = async (req, res) => {
         .json({ message: "Email and password are required" });
 
     // get hashedPassword from the database to compare with the input password
-    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    const user = await User.findOne({ email: normalizeEmail(email) });
 
     if (!user) return res.status(401).json({ message: "Invalid credentials" });
 
@@ -231,7 +236,7 @@ export const forgotPassword = async (req, res) => {
 
     if (!email) return res.status(400).json({ message: "Email is required" });
 
-    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    const user = await User.findOne({ email: normalizeEmail(email) });
 
     if (!user) return res.status(404).json({ message: "Email does not exist" });
 
@@ -243,18 +248,14 @@ export const forgotPassword = async (req, res) => {
       });
 
     const resetToken = crypto.randomBytes(32).toString("hex");
-    const resetTokenHash = crypto
-      .createHash("sha256")
-      .update(resetToken)
-      .digest("hex");
+    const resetTokenHash = hashToken(resetToken);
     const resetTokenExpiry = new Date(Date.now() + RESET_TOKEN_TTL);
 
     user.passwordResetToken = resetTokenHash;
     user.passwordResetExpires = resetTokenExpiry;
     await user.save();
 
-    const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
-    const resetUrl = `${clientUrl}${process.env.PASSWORD_RESET_PATH || "/reset-password"}?token=${resetToken}`;
+    const resetUrl = buildPasswordResetUrl(resetToken);
 
     await sendPasswordResetEmail({
       to: user.email,
@@ -279,10 +280,7 @@ export const verifyEmail = async (req, res) => {
         .status(400)
         .json({ message: "Verification token is required" });
 
-    const verificationTokenHash = crypto
-      .createHash("sha256")
-      .update(token)
-      .digest("hex");
+    const verificationTokenHash = hashToken(token);
 
     const user = await User.findOne({
       emailVerificationToken: verificationTokenHash,
@@ -312,7 +310,7 @@ export const resendVerificationEmail = async (req, res) => {
 
     if (!email) return res.status(400).json({ message: "Email is required" });
 
-    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    const user = await User.findOne({ email: normalizeEmail(email) });
 
     if (!user)
       return res.status(200).json({
@@ -329,8 +327,7 @@ export const resendVerificationEmail = async (req, res) => {
       return res.status(200).json({ message: "Email is already verified." });
 
     const verificationToken = await createEmailVerificationToken(user);
-    const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
-    const verifyUrl = `${clientUrl}${process.env.EMAIL_VERIFY_PATH || "/verify-email"}?token=${verificationToken}`;
+    const verifyUrl = buildVerificationUrl(verificationToken);
 
     await sendVerificationEmail({
       to: user.email,
@@ -358,10 +355,7 @@ export const resetPassword = async (req, res) => {
     const passwordError = validatePassword(password);
     if (passwordError) return res.status(400).json({ message: passwordError });
 
-    const resetTokenHash = crypto
-      .createHash("sha256")
-      .update(token)
-      .digest("hex");
+    const resetTokenHash = hashToken(token);
 
     const user = await User.findOne({
       passwordResetToken: resetTokenHash,

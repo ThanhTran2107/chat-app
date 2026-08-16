@@ -1,4 +1,4 @@
-import { type FriendRequest } from '@/types/user';
+import { type FriendRequest } from '@/types/user.type';
 
 import * as React from 'react';
 import { type ReactNode } from 'react';

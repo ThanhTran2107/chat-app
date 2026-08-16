@@ -1,8 +1,7 @@
-import { type ChatState } from '@/types/store';
+import { type ChatState } from '@/types/store.type';
 import find from 'lodash-es/find';
 import isEmpty from 'lodash-es/isEmpty';
 import map from 'lodash-es/map';
-import some from 'lodash-es/some';
 import throttle from 'lodash-es/throttle';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
@@ -12,6 +11,13 @@ import { ChatService } from '@/utils/services/chat.service';
 
 import { useAuthStore } from './use-auth-store';
 import { useSocketStore } from './use-socket-store';
+import {
+  attachOwnership,
+  clearSeenByForActiveConversation,
+  conversationExists,
+  isMessageDuplicate,
+  serializeConversationForStorage,
+} from './utils/chat-store.util';
 
 let fetchConversationsPromise: Promise<void> | null = null;
 
@@ -86,7 +92,7 @@ export const useChatStore = create<ChatState>()(
             nextCursor === '' ? undefined : nextCursor,
           );
 
-          const processed = map(fetched, message => ({ ...message, isOwn: message.senderId === user?._id }));
+          const processed = map(fetched, message => attachOwnership(message, user?._id));
 
           set(state => {
             const prev = state.messages[convoId]?.items ?? [];
@@ -111,9 +117,7 @@ export const useChatStore = create<ChatState>()(
           await ChatService.sendDirectMessage(recipientId, content, imgUrl, activeConversationId || undefined);
 
           set(state => ({
-            conversations: map(state.conversations, convo =>
-              convo._id === activeConversationId ? { ...convo, seenBy: [] } : convo,
-            ),
+            conversations: clearSeenByForActiveConversation(state.conversations, activeConversationId),
           }));
         } catch (e) {
           console.error('Send direct message error:', e);
@@ -126,9 +130,7 @@ export const useChatStore = create<ChatState>()(
           await ChatService.sendGroupMessage(conversationId, content, imgUrl);
 
           set(state => ({
-            conversations: map(state.conversations, convo =>
-              convo._id === activeConversationId ? { ...convo, seenBy: [] } : convo,
-            ),
+            conversations: clearSeenByForActiveConversation(state.conversations, activeConversationId),
           }));
         } catch (e) {
           console.error('Send group message error:', e);
@@ -140,8 +142,7 @@ export const useChatStore = create<ChatState>()(
           const { user } = useAuthStore.getState();
           const { fetchMessages } = get();
 
-          message.isOwn = message.senderId === user?._id;
-          message.isNew = true;
+          message = { ...attachOwnership(message, user?._id), isNew: true };
 
           const convoId = message.conversationId;
 
@@ -154,7 +155,7 @@ export const useChatStore = create<ChatState>()(
           }
 
           set(state => {
-            if (some(prevItems, m => m._id === message._id)) return state;
+            if (isMessageDuplicate(prevItems, message._id)) return state;
 
             return {
               messages: {
@@ -227,7 +228,7 @@ export const useChatStore = create<ChatState>()(
 
       addConvo: convo => {
         set(state => {
-          const exists = some(state.conversations, c => c._id.toString() === convo._id.toString());
+          const exists = conversationExists(state.conversations, convo._id);
 
           return {
             conversations: exists ? state.conversations : [convo, ...state.conversations],
@@ -237,7 +238,7 @@ export const useChatStore = create<ChatState>()(
       },
       addConversationIfMissing: convo => {
         set(state => {
-          const exists = some(state.conversations, c => c._id.toString() === convo._id.toString());
+          const exists = conversationExists(state.conversations, convo._id);
 
           return {
             conversations: exists ? state.conversations : [convo, ...state.conversations],
@@ -264,18 +265,7 @@ export const useChatStore = create<ChatState>()(
     {
       name: CHAT_STORAGE,
       partialize: state => ({
-        conversations: map(state.conversations, convo => ({
-          _id: convo._id,
-          type: convo.type,
-          group: convo.group,
-          participants: convo.participants,
-          lastMessage: convo.lastMessage,
-          lastMessageAt: convo.lastMessageAt,
-          unreadCounts: convo.unreadCounts,
-          seenBy: convo.seenBy,
-          createdAt: convo.createdAt,
-          updatedAt: convo.updatedAt,
-        })),
+        conversations: map(state.conversations, serializeConversationForStorage),
       }),
       storage: createJSONStorage(() => throttledStorage),
     },

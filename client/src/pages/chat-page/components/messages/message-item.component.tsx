@@ -1,4 +1,4 @@
-import type { Conversation, Message, Participant } from '@/types/chat.ts';
+import type { Conversation, Message, Participant } from '@/types/chat.type';
 import { Card } from 'antd';
 import find from 'lodash-es/find';
 import { toast } from 'sonner';

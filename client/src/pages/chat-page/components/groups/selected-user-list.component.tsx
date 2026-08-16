@@ -1,4 +1,4 @@
-import type { Friend } from '@/types/user';
+import type { Friend } from '@/types/user.type';
 import map from 'lodash-es/map';
 import { X } from 'lucide-react';
 

@@ -1,4 +1,4 @@
-import { type ThemeState } from '@/types/store';
+import { type ThemeState } from '@/types/store.type';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 

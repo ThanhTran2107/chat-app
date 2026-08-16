@@ -3,17 +3,12 @@ import { Conversation } from "../models/Conversation.js";
 import { Message } from "../models/Message.js";
 import { updateConversationAfterCreateMessage } from "../utils/messageHelper.js";
 import { emitNewMessage } from "../utils/messageHelper.js";
-import { uploadChatAttachmentFromBuffer } from "../middlewares/chatUploadMiddleware.js";
+import { uploadAttachmentIfPresent } from "../utils/messageAttachment.js";
+import {
+  createMessageOrCleanupAttachment,
+  saveConversationOrRollbackMessage,
+} from "../utils/messagePersistence.js";
 import { io } from "../sockets/index.js";
-import { v2 as cloudinary } from "cloudinary";
-
-const normalizeFileName = (originalName) => {
-  if (!originalName) return originalName;
-
-  const decoded = Buffer.from(originalName, "latin1").toString("utf8");
-
-  return decoded.includes("�") ? originalName : decoded;
-};
 
 export const sendDirectMessage = async (req, res) => {
   try {
@@ -50,81 +45,28 @@ export const sendDirectMessage = async (req, res) => {
       content: trimmedContent || undefined,
     };
 
-    let uploadResult = null;
-    let uploadedPublicId = null;
-    let uploadedResourceType = null;
+    const { attachmentFields, uploadedPublicId, uploadedResourceType } =
+      await uploadAttachmentIfPresent(file);
 
-    if (file) {
-      uploadResult = await uploadChatAttachmentFromBuffer(
-        file.buffer,
-        file.mimetype,
-        file.originalname,
-      );
+    Object.assign(messageData, attachmentFields);
 
-      uploadedPublicId = uploadResult.public_id;
-      uploadedResourceType = uploadResult.resource_type;
-
-      if (uploadResult.resource_type === "image") {
-        messageData.imgUrl = uploadResult.secure_url || uploadResult.url;
-      } else {
-        messageData.fileUrl = uploadResult.secure_url || uploadResult.url;
-        messageData.fileName = normalizeFileName(file.originalname);
-        messageData.fileType = file.mimetype;
-        messageData.fileSize = file.size;
-      }
-    }
-
-    let message;
-    try {
-      message = await Message.create(messageData);
-    } catch (err) {
-      if (uploadedPublicId) {
-        try {
-          await cloudinary.uploader.destroy(uploadedPublicId, {
-            resource_type: uploadedResourceType === "image" ? "image" : "raw",
-          });
-        } catch (destroyError) {
-          console.error("Failed to cleanup uploaded attachment:", destroyError);
-        }
-      }
-
-      throw err;
-    }
+    const message = await createMessageOrCleanupAttachment(
+      messageData,
+      uploadedPublicId,
+      uploadedResourceType,
+    );
 
     updateConversationAfterCreateMessage(conversation, message, senderId);
     await conversation.populate([
       { path: "participants.userId", select: "displayName avatarUrl" },
     ]);
 
-    try {
-      await conversation.save();
-    } catch (saveError) {
-      if (message?._id) {
-        try {
-          await Message.findByIdAndDelete(message._id);
-        } catch (deleteError) {
-          console.error(
-            "Failed to delete message after conversation save error:",
-            deleteError,
-          );
-        }
-      }
-
-      if (uploadedPublicId) {
-        try {
-          await cloudinary.uploader.destroy(uploadedPublicId, {
-            resource_type: uploadedResourceType === "image" ? "image" : "raw",
-          });
-        } catch (destroyError) {
-          console.error(
-            "Failed to cleanup uploaded attachment after conversation save error:",
-            destroyError,
-          );
-        }
-      }
-
-      throw saveError;
-    }
+    await saveConversationOrRollbackMessage(
+      conversation,
+      message,
+      uploadedPublicId,
+      uploadedResourceType,
+    );
 
     emitNewMessage({ io, conversation, message });
 
@@ -231,78 +173,25 @@ export const sendGroupMessage = async (req, res) => {
       content: trimmedContent || undefined,
     };
 
-    let uploadResult = null;
-    let uploadedPublicId = null;
-    let uploadedResourceType = null;
+    const { attachmentFields, uploadedPublicId, uploadedResourceType } =
+      await uploadAttachmentIfPresent(file);
 
-    if (file) {
-      uploadResult = await uploadChatAttachmentFromBuffer(
-        file.buffer,
-        file.mimetype,
-        file.originalname,
-      );
+    Object.assign(messageData, attachmentFields);
 
-      uploadedPublicId = uploadResult.public_id;
-      uploadedResourceType = uploadResult.resource_type;
-
-      if (uploadResult.resource_type === "image") {
-        messageData.imgUrl = uploadResult.secure_url || uploadResult.url;
-      } else {
-        messageData.fileUrl = uploadResult.secure_url || uploadResult.url;
-        messageData.fileName = normalizeFileName(file.originalname);
-        messageData.fileType = file.mimetype;
-        messageData.fileSize = file.size;
-      }
-    }
-
-    let message;
-    try {
-      message = await Message.create(messageData);
-    } catch (err) {
-      if (uploadedPublicId) {
-        try {
-          await cloudinary.uploader.destroy(uploadedPublicId, {
-            resource_type: uploadedResourceType === "image" ? "image" : "raw",
-          });
-        } catch (destroyError) {
-          console.error("Failed to cleanup uploaded attachment:", destroyError);
-        }
-      }
-
-      throw err;
-    }
+    const message = await createMessageOrCleanupAttachment(
+      messageData,
+      uploadedPublicId,
+      uploadedResourceType,
+    );
 
     updateConversationAfterCreateMessage(conversation, message, senderId);
 
-    try {
-      await conversation.save();
-    } catch (saveError) {
-      if (message?._id) {
-        try {
-          await Message.findByIdAndDelete(message._id);
-        } catch (deleteError) {
-          console.error(
-            "Failed to delete message after conversation save error:",
-            deleteError,
-          );
-        }
-      }
-
-      if (uploadedPublicId) {
-        try {
-          await cloudinary.uploader.destroy(uploadedPublicId, {
-            resource_type: uploadedResourceType === "image" ? "image" : "raw",
-          });
-        } catch (destroyError) {
-          console.error(
-            "Failed to cleanup uploaded attachment after conversation save error:",
-            destroyError,
-          );
-        }
-      }
-      
-      throw saveError;
-    }
+    await saveConversationOrRollbackMessage(
+      conversation,
+      message,
+      uploadedPublicId,
+      uploadedResourceType,
+    );
 
     emitNewMessage({ io, conversation, message });
 

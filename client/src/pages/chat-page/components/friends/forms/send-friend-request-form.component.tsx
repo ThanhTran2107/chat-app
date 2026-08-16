@@ -1,4 +1,4 @@
-import type { User } from '@/types/user';
+import type { User } from '@/types/user.type';
 import TextArea from 'antd/es/input/TextArea';
 import { UserPlus } from 'lucide-react';
 

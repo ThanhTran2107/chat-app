@@ -1,6 +1,6 @@
 import { useChatStore } from '@/stores/use-chat-store';
 import { useFriendStore } from '@/stores/use-friend-store';
-import { type Friend } from '@/types/user';
+import { type Friend } from '@/types/user.type';
 import debounce from 'lodash-es/debounce';
 import filter from 'lodash-es/filter';
 import includes from 'lodash-es/includes';

@@ -1,4 +1,4 @@
-import type { Friend } from '@/types/user';
+import type { Friend } from '@/types/user.type';
 import isEmpty from 'lodash-es/isEmpty';
 import map from 'lodash-es/map';
 

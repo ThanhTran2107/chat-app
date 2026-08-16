@@ -1,6 +1,6 @@
 import { useAuthStore } from '@/stores/use-auth-store';
 import { useChatStore } from '@/stores/use-chat-store';
-import type { Conversation } from '@/types/chat';
+import type { Conversation } from '@/types/chat.type';
 import filter from 'lodash-es/filter';
 import includes from 'lodash-es/includes';
 import { ImagePlus, Send, X } from 'lucide-react';

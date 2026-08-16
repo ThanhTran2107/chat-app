@@ -1,4 +1,4 @@
-import type { ConversationResponse, Message } from '@/types/chat.ts';
+import type { ConversationResponse, Message } from '@/types/chat.type';
 
 import { api } from '@/lib/axios.ts';
 

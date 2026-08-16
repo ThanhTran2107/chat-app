@@ -1,8 +1,8 @@
 import type { Socket } from 'socket.io-client';
 
-import type { Conversation } from './chat.ts';
-import type { Message } from './chat.ts';
-import type { FriendRequest, User } from './user.ts';
+import type { Conversation } from './chat.type.ts';
+import type { Message } from './chat.type.ts';
+import type { FriendRequest, User } from './user.type.ts';
 
 // Types for the authentication state managed by Zustand
 export interface AuthState {
