@@ -7,117 +7,121 @@ import type { FriendState } from '../types/store.type';
 
 let getAllFriendRequestsPromise: Promise<void> | null = null;
 
-export const useFriendStore = create<FriendState>((set, get) => ({
-  loading: false,
-  receivedList: [],
-  sentList: [],
-  friends: [],
-  searchByUsername: async username => {
-    try {
-      set({ loading: true });
-
-      const user = await FriendService.searchByUsername(username);
-
-      return user;
-    } catch (e) {
-      console.error('Error searching user:', e);
-      return null;
-    } finally {
-      set({ loading: false });
+export const useFriendStore = create<FriendState>((set, get) => {
+  const handleFriendRequestAction = async (actionType: 'accept' | 'decline', requestId: string) => {
+    if (actionType === 'accept') {
+      await FriendService.acceptRequest(requestId);
+    } else {
+      await FriendService.declineRequest(requestId);
     }
-  },
-  sendFriendRequest: async (to, message) => {
-    try {
-      set({ loading: true });
 
-      const result = await FriendService.sendFriendRequest(to, message);
+    set(state => ({
+      receivedList: filter(state.receivedList, request => request._id !== requestId),
+    }));
 
-      if (result?.request)
-        set(state => ({
-          sentList: [...(state.sentList ?? []), result.request],
-        }));
+    await get().getAllFriendRequests();
+  };
 
-      return result?.message ?? '';
-    } catch (e) {
-      console.error('Error sending friend request:', e);
-      throw e;
-    } finally {
-      set({ loading: false });
-    }
-  },
-  getAllFriendRequests: async () => {
-    if (getAllFriendRequestsPromise) return getAllFriendRequestsPromise;
-
-    getAllFriendRequestsPromise = (async () => {
+  return {
+    loading: false,
+    receivedList: [],
+    sentList: [],
+    friends: [],
+    searchByUsername: async username => {
       try {
         set({ loading: true });
 
-        const result = await FriendService.getAllFriendRequests();
+        const user = await FriendService.searchByUsername(username);
 
-        if (!result) return;
-
-        const { sent, received } = result;
-        set({ sentList: sent, receivedList: received });
+        return user;
       } catch (e) {
-        console.error('Error fetching friend requests:', e);
+        console.error('Error searching user:', e);
+        return null;
+      } finally {
+        set({ loading: false });
+      }
+    },
+    sendFriendRequest: async (to, message) => {
+      try {
+        set({ loading: true });
+
+        const result = await FriendService.sendFriendRequest(to, message);
+
+        if (result?.request)
+          set(state => ({
+            sentList: [...(state.sentList ?? []), result.request],
+          }));
+
+        return result?.message ?? '';
+      } catch (e) {
+        console.error('Error sending friend request:', e);
         throw e;
       } finally {
         set({ loading: false });
-        getAllFriendRequestsPromise = null;
       }
-    })();
+    },
+    getAllFriendRequests: async () => {
+      if (getAllFriendRequestsPromise) return getAllFriendRequestsPromise;
 
-    return getAllFriendRequestsPromise;
-  },
-  acceptRequest: async requestId => {
-    try {
-      set({ loading: true });
+      getAllFriendRequestsPromise = (async () => {
+        try {
+          set({ loading: true });
 
-      await FriendService.acceptRequest(requestId);
+          const result = await FriendService.getAllFriendRequests();
 
-      set(state => ({
-        receivedList: filter(state.receivedList, request => request._id !== requestId),
-      }));
+          if (!result) return;
 
-      await get().getAllFriendRequests();
-    } catch (e) {
-      console.error('Error accepting friend request:', e);
-      throw e;
-    } finally {
-      set({ loading: false });
-    }
-  },
-  declineRequest: async requestId => {
-    try {
-      set({ loading: true });
+          const { sent, received } = result;
+          set({ sentList: sent, receivedList: received });
+        } catch (e) {
+          console.error('Error fetching friend requests:', e);
+          throw e;
+        } finally {
+          set({ loading: false });
+          getAllFriendRequestsPromise = null;
+        }
+      })();
 
-      await FriendService.declineRequest(requestId);
+      return getAllFriendRequestsPromise;
+    },
+    acceptRequest: async requestId => {
+      try {
+        set({ loading: true });
 
-      set(state => ({
-        receivedList: filter(state.receivedList, request => request._id !== requestId),
-      }));
+        await handleFriendRequestAction('accept', requestId);
+      } catch (e) {
+        console.error('Error accepting friend request:', e);
+        throw e;
+      } finally {
+        set({ loading: false });
+      }
+    },
+    declineRequest: async requestId => {
+      try {
+        set({ loading: true });
 
-      await get().getAllFriendRequests();
-    } catch (e) {
-      console.error('Error declining friend request:', e);
-      throw e;
-    } finally {
-      set({ loading: false });
-    }
-  },
-  getFriendList: async () => {
-    try {
-      set({ loading: true });
+        await handleFriendRequestAction('decline', requestId);
+      } catch (e) {
+        console.error('Error declining friend request:', e);
+        throw e;
+      } finally {
+        set({ loading: false });
+      }
+    },
+    getFriendList: async () => {
+      try {
+        set({ loading: true });
 
-      const friends = await FriendService.getFriendList();
+        const friends = await FriendService.getFriendList();
 
-      set({ friends: friends });
-    } catch (e) {
-      console.error('Error fetching friend list:', e);
-      set({ friends: [] });
-      throw e;
-    } finally {
-      set({ loading: false });
-    }
-  },
-}));
+        set({ friends: friends });
+      } catch (e) {
+        console.error('Error fetching friend list:', e);
+        set({ friends: [] });
+        throw e;
+      } finally {
+        set({ loading: false });
+      }
+    },
+  };
+});
