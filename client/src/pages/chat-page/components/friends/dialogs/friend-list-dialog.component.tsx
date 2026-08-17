@@ -13,13 +13,15 @@ import { UserAvatar } from '@/pages/chat-page/components/friends/user-avatar.com
 import { DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 
+import { CONVERSATION_TYPES } from '@/utils/constants';
+
 export const FriendListDialog = ({ onClose }: { onClose?: () => void }) => {
   const friends = useFriendStore(state => state.friends);
   const createConversation = useChatStore(state => state.createConversation);
   const [search, setSearch] = useState('');
 
   const handleAddConversation = async (friendId: string) => {
-    await createConversation('direct', [friendId], '');
+    await createConversation(CONVERSATION_TYPES.DIRECT, [friendId], '');
     onClose?.();
   };
 

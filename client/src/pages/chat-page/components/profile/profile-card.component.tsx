@@ -4,6 +4,8 @@ import type { User } from '@/types/user.type';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 
+import { PRESENCE_STATUS } from '@/utils/constants';
+
 import { cn } from '@/lib/utils';
 
 import { UserAvatar } from '../friends/user-avatar.component';
@@ -48,7 +50,7 @@ export const ProfileCard = ({ user }: ProfileCardProps) => {
           )}
         >
           <div className={cn('size-2 animate-pulse rounded-full', isOnline ? 'bg-green-500' : 'bg-slate-500')} />
-          {isOnline ? 'online' : 'offline'}
+          {isOnline ? PRESENCE_STATUS.ONLINE : PRESENCE_STATUS.OFFLINE}
         </Badge>
       </CardContent>
     </Card>

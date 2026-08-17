@@ -6,6 +6,8 @@ import find from 'lodash-es/find';
 
 import * as React from 'react';
 
+import { DELETED_ACCOUNT_LABEL, PRESENCE_STATUS } from '@/utils/constants';
+
 import { cn } from '@/lib/utils';
 
 import { ChatCard } from '../chat-card.component';
@@ -26,10 +28,10 @@ const FriendChatCardComponent = ({ convo }: { convo: Conversation }) => {
 
   const otherUser = find(convo.participants, participant => participant._id !== user._id);
   const isDeleted = !otherUser?._id;
-  const otherUserName = otherUser?.displayName ?? 'Deleted account';
+  const otherUserName = otherUser?.displayName ?? DELETED_ACCOUNT_LABEL;
   const isOnline =
     !isDeleted &&
-    (friendPresence[otherUser?._id ?? ''] === 'online' ||
+    (friendPresence[otherUser?._id ?? ''] === PRESENCE_STATUS.ONLINE ||
       (friendPresence[otherUser?._id ?? ''] === undefined &&
         otherUser?.showOnlineStatus !== false &&
         onlineUsers.has(otherUser?._id ?? '')));
@@ -58,7 +60,7 @@ const FriendChatCardComponent = ({ convo }: { convo: Conversation }) => {
             avatarUrl={otherUser?.avatarUrl ?? undefined}
             className={isDeleted ? 'bg-slate-400' : undefined}
           />
-          <StatusBadge status={isOnline ? 'online' : 'offline'} />
+          <StatusBadge status={isOnline ? PRESENCE_STATUS.ONLINE : PRESENCE_STATUS.OFFLINE} />
           {unreadCount > 0 && <UnreadCountBadge unreadCount={unreadCount} />}
         </>
       }

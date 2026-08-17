@@ -6,7 +6,7 @@ import throttle from 'lodash-es/throttle';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-import { LOCAL_STORAGE_KEYS } from '@/utils/constants';
+import { DELETED_ACCOUNT_LABEL, LOCAL_STORAGE_KEYS, SOCKET_EVENTS } from '@/utils/constants';
 import { ChatService } from '@/utils/services/chat.service';
 
 import { useAuthStore } from './use-auth-store';
@@ -190,7 +190,7 @@ export const useChatStore = create<ChatState>()(
                 ? {
                     ...participant,
                     _id: undefined,
-                    displayName: 'Deleted account',
+                    displayName: DELETED_ACCOUNT_LABEL,
                     avatarUrl: null,
                   }
                 : participant,
@@ -273,7 +273,7 @@ export const useChatStore = create<ChatState>()(
 
           get().addConvo(conversation);
 
-          useSocketStore.getState().socket?.emit('join-conversation', conversation._id);
+          useSocketStore.getState().socket?.emit(SOCKET_EVENTS.JOIN_CONVERSATION, conversation._id);
         } catch (e) {
           console.error('Create conversation error:', e);
           throw e;

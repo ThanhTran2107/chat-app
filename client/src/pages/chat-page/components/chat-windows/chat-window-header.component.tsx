@@ -9,6 +9,8 @@ import isEmpty from 'lodash-es/isEmpty';
 import { Separator } from '@/components/ui/separator';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 
+import { CONVERSATION_TYPES, DELETED_ACCOUNT_LABEL, PRESENCE_STATUS } from '@/utils/constants';
+
 import { UserAvatar } from '../friends/user-avatar.component';
 import { GroupChatAvatar } from '../groups/group-chat-avatar.component';
 import { StatusBadge } from '../status-badge.component';
@@ -31,7 +33,7 @@ export const ChatWindowHeader = ({ chat }: { chat?: Conversation }) => {
       </header>
     );
 
-  if (chat.type === 'direct') {
+  if (chat.type === CONVERSATION_TYPES.DIRECT) {
     const otherUsers = filter(chat.participants, participant => participant._id !== user?._id);
 
     otherUser = !isEmpty(otherUsers) ? otherUsers[0] : null;
@@ -52,23 +54,23 @@ export const ChatWindowHeader = ({ chat }: { chat?: Conversation }) => {
         <div className="flex w-full items-center gap-3 p-2">
           {/* Avatar and name section */}
           <div className="relative">
-            {chat.type === 'direct' ? (
+            {chat.type === CONVERSATION_TYPES.DIRECT ? (
               <>
                 <UserAvatar
                   type={'sidebar'}
-                  name={otherUser?.displayName ?? 'Deleted account'}
+                  name={otherUser?.displayName ?? DELETED_ACCOUNT_LABEL}
                   avatarUrl={otherUser?.avatarUrl || undefined}
                   className={!otherUser?._id ? 'bg-slate-400' : undefined}
                 />
                 {!otherUser?._id ? null : (
                   <StatusBadge
                     status={
-                      friendPresence[otherUser?._id ?? ''] === 'online' ||
+                      friendPresence[otherUser?._id ?? ''] === PRESENCE_STATUS.ONLINE ||
                       (friendPresence[otherUser?._id ?? ''] === undefined &&
                         otherUser?.showOnlineStatus !== false &&
                         onlineUsers.has(otherUser._id))
-                        ? 'online'
-                        : 'offline'
+                        ? PRESENCE_STATUS.ONLINE
+                        : PRESENCE_STATUS.OFFLINE
                     }
                   />
                 )}
@@ -80,7 +82,7 @@ export const ChatWindowHeader = ({ chat }: { chat?: Conversation }) => {
 
           {/* Name and status section */}
           <h2 className="text-foreground! font-semibold">
-            {chat.type === 'direct' ? (otherUser?.displayName ?? 'Deleted account') : groupName}
+            {chat.type === CONVERSATION_TYPES.DIRECT ? (otherUser?.displayName ?? DELETED_ACCOUNT_LABEL) : groupName}
           </h2>
         </div>
       </div>

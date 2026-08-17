@@ -7,6 +7,8 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { Spin } from '@/components/antd/spin.component';
 import { Button } from '@/components/ui/button';
 
+import { CONVERSATION_TYPES } from '@/utils/constants';
+
 import { MessageItem } from '../messages/message-item.component';
 import { ChatWelcomeScreen } from './chat-welcome-screen.component';
 import { useChatWindowScroll } from './hooks/use-chat-window-scroll.hook';
@@ -36,7 +38,8 @@ export const ChatWindowBody = () => {
   const lastMessageStatus = selectedConvo && isEmpty(selectedConvo.seenBy ?? []) ? 'delivered' : 'seen';
 
   const isUnavailableConversation =
-    selectedConvo?.type === 'direct' && some(selectedConvo.participants, participant => !participant._id);
+    selectedConvo?.type === CONVERSATION_TYPES.DIRECT &&
+    some(selectedConvo.participants, participant => !participant._id);
 
   const reversedMessages = useMemo(() => [...messages].reverse(), [messages]);
   const latestMessageId = messages[messages.length - 1]?._id;

@@ -8,11 +8,13 @@ import some from 'lodash-es/some';
 import { type Socket, io } from 'socket.io-client';
 import { create } from 'zustand';
 
+import { CONVERSATION_TYPES, PRESENCE_STATUS, SOCKET_EVENTS, STATIC_ASSETS } from '@/utils/constants';
+
 import { useChatStore } from './use-chat-store';
 import { useFriendStore } from './use-friend-store.ts';
 
 const notificationSound = new Howl({
-  src: ['/notify-1s.wav?v=3'],
+  src: [STATIC_ASSETS.NOTIFICATION_SOUND],
   volume: 0.4,
   html5: true,
   preload: true,
@@ -143,7 +145,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 
     const joinAllConversations = () => {
       const conversationIds = useChatStore.getState().conversations.map(c => c._id);
-      conversationIds.forEach(id => socket.emit('join-conversation', id));
+      conversationIds.forEach(id => socket.emit(SOCKET_EVENTS.JOIN_CONVERSATION, id));
     };
 
     const handleConnect = async () => {
@@ -160,7 +162,13 @@ export const useSocketStore = create<SocketState>((set, get) => ({
       set({ onlineUsers: new Set(userIds) });
     };
 
-    const handleFriendPresenceChanged = ({ userId, status }: { userId: string; status: 'online' | 'offline' }) => {
+    const handleFriendPresenceChanged = ({
+      userId,
+      status,
+    }: {
+      userId: string;
+      status: typeof PRESENCE_STATUS.ONLINE | typeof PRESENCE_STATUS.OFFLINE;
+    }) => {
       if (!userId || !status) return;
 
       set(state => ({
@@ -193,7 +201,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
         useChatStore.getState().updateConversation(updatedConversation);
       } else {
         useChatStore.getState().addConversationIfMissing(updatedConversation as Conversation);
-        useSocketStore.getState().socket?.emit('join-conversation', conversation._id);
+        useSocketStore.getState().socket?.emit(SOCKET_EVENTS.JOIN_CONVERSATION, conversation._id);
       }
     };
 
@@ -232,7 +240,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 
         useChatStore
           .getState()
-          .createConversation('direct', [newFriend._id], '')
+          .createConversation(CONVERSATION_TYPES.DIRECT, [newFriend._id], '')
           .catch(error => {
             console.error('Error creating direct conversation after friend request accepted:', error);
           });
@@ -269,21 +277,21 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 
     const handleNewGroup = (conversation: Conversation) => {
       useChatStore.getState().addConvo(conversation);
-      socket.emit('join-conversation', conversation._id);
+      socket.emit(SOCKET_EVENTS.JOIN_CONVERSATION, conversation._id);
     };
 
-    socket.on('connect', handleConnect);
-    socket.on('online-users', handleOnlineUsers);
-    socket.on('friend-presence-changed', handleFriendPresenceChanged);
-    socket.on('new-message', handleNewMessage);
-    socket.on('read-message', handleReadMessage);
-    socket.on('friend-request-received', handleFriendRequestReceived);
-    socket.on('friend-request-accepted', handleFriendRequestAccepted);
-    socket.on('friend-account-deleted', handleFriendAccountDeleted);
-    socket.on('friend-avatar-updated', handleFriendAvatarUpdated);
-    socket.on('friend-profile-updated', handleFriendProfileUpdated);
-    socket.on('friend-request-declined', handleFriendRequestDeclined);
-    socket.on('new-group', handleNewGroup);
+    socket.on(SOCKET_EVENTS.CONNECT, handleConnect);
+    socket.on(SOCKET_EVENTS.ONLINE_USERS, handleOnlineUsers);
+    socket.on(SOCKET_EVENTS.FRIEND_PRESENCE_CHANGED, handleFriendPresenceChanged);
+    socket.on(SOCKET_EVENTS.NEW_MESSAGE, handleNewMessage);
+    socket.on(SOCKET_EVENTS.READ_MESSAGE, handleReadMessage);
+    socket.on(SOCKET_EVENTS.FRIEND_REQUEST_RECEIVED, handleFriendRequestReceived);
+    socket.on(SOCKET_EVENTS.FRIEND_REQUEST_ACCEPTED, handleFriendRequestAccepted);
+    socket.on(SOCKET_EVENTS.FRIEND_ACCOUNT_DELETED, handleFriendAccountDeleted);
+    socket.on(SOCKET_EVENTS.FRIEND_AVATAR_UPDATED, handleFriendAvatarUpdated);
+    socket.on(SOCKET_EVENTS.FRIEND_PROFILE_UPDATED, handleFriendProfileUpdated);
+    socket.on(SOCKET_EVENTS.FRIEND_REQUEST_DECLINED, handleFriendRequestDeclined);
+    socket.on(SOCKET_EVENTS.NEW_GROUP, handleNewGroup);
   },
 
   disconnectSocket: () => {

@@ -2,6 +2,8 @@ import { useChatStore } from '@/stores/use-chat-store';
 import filter from 'lodash-es/filter';
 import map from 'lodash-es/map';
 
+import { CONVERSATION_TYPES } from '@/utils/constants';
+
 import { FriendChatCard } from './friend-chat-card.component';
 
 export const FriendChatList = () => {
@@ -9,7 +11,7 @@ export const FriendChatList = () => {
 
   if (!conversations) return null;
 
-  const friendConversations = filter(conversations, convo => convo.type === 'direct');
+  const friendConversations = filter(conversations, convo => convo.type === CONVERSATION_TYPES.DIRECT);
 
   return (
     <div className="beautiful-scrollbar flex-1 space-y-3 overflow-y-auto p-2 px-2">

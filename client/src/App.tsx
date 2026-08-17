@@ -11,7 +11,7 @@ import { RedirectIfAuthenticated } from './routes/redirect-if-authenticated';
 import { useAuthStore } from './stores/use-auth-store';
 import { useSocketStore } from './stores/use-socket-store';
 import { useThemeStore } from './stores/use-theme-store';
-import { LOCAL_STORAGE_KEYS, ROUTES } from './utils/constants';
+import { AUTH_SESSION_VALUE, LOCAL_STORAGE_KEYS, ROUTES } from './utils/constants';
 
 const ChatPage = lazy(() => import('./pages/chat-page/chat.page').then(m => ({ default: m.ChatPage })));
 const ForgotPasswordPage = lazy(() =>
@@ -46,7 +46,7 @@ function App() {
 
   useEffect(() => {
     const initializeAuth = async () => {
-      const hasSession = localStorage.getItem(LOCAL_STORAGE_KEYS.AUTH_SESSION) === '1';
+      const hasSession = localStorage.getItem(LOCAL_STORAGE_KEYS.AUTH_SESSION) === AUTH_SESSION_VALUE;
 
       if (hasSession) {
         const { refreshToken } = useAuthStore.getState();

@@ -12,6 +12,8 @@ import { Spin } from '@/components/antd/spin.component';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
+import { CONVERSATION_TYPES } from '@/utils/constants';
+
 import { formatFileSize } from '@/lib/utils';
 
 const EmojiPicker = React.lazy(() => import('./emoji-picker.component').then(m => ({ default: m.EmojiPicker })));
@@ -47,11 +49,11 @@ export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation })
   if (!user) return null;
 
   const otherUser =
-    selectedConvo.type === 'direct'
+    selectedConvo.type === CONVERSATION_TYPES.DIRECT
       ? filter(selectedConvo.participants, participant => participant._id !== user._id)[0]
       : undefined;
 
-  const isConversationUnavailable = selectedConvo.type === 'direct' && !otherUser?._id;
+  const isConversationUnavailable = selectedConvo.type === CONVERSATION_TYPES.DIRECT && !otherUser?._id;
 
   const acceptMimeTypes = [
     'image/jpeg',
@@ -157,7 +159,7 @@ export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation })
     setIsUploading(true);
 
     try {
-      if (selectedConvo.type === 'direct') {
+      if (selectedConvo.type === CONVERSATION_TYPES.DIRECT) {
         await sendDirectMessage(otherUser?._id ?? '', value, selectedFile ?? undefined);
       } else {
         await sendGroupMessage(selectedConvo._id, value, selectedFile ?? undefined);

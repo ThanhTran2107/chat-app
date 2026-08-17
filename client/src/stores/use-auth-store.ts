@@ -5,7 +5,7 @@ import type { AuthState } from '@/types/store.type';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-import { LOCAL_STORAGE_KEYS } from '@/utils/constants';
+import { AUTH_SESSION_VALUE, LOCAL_STORAGE_KEYS } from '@/utils/constants';
 // Zustand library for state management
 
 import { authService } from '@/utils/services/auth.service';
@@ -22,7 +22,7 @@ export const useAuthStore = create<AuthState>()(
     (set, get) => {
       const finalizeLogin = async (accessToken: string) => {
         get().setAccessToken(accessToken);
-        localStorage.setItem(AUTH_SESSION, '1');
+        localStorage.setItem(AUTH_SESSION, AUTH_SESSION_VALUE);
 
         await get().fetchMe();
         await useChatStore.getState().fetchConversations();
@@ -158,7 +158,7 @@ export const useAuthStore = create<AuthState>()(
 
               if (!accessToken) return get().clearState();
 
-              localStorage.setItem(AUTH_SESSION, '1');
+              localStorage.setItem(AUTH_SESSION, AUTH_SESSION_VALUE);
               setAccessToken(accessToken);
 
               if (!user) await fetchMe();

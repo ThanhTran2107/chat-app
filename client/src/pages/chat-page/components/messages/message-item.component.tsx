@@ -8,7 +8,7 @@ import * as React from 'react';
 import { Spin } from '@/components/antd/spin.component';
 import { Badge } from '@/components/ui/badge';
 
-import { APP_NAME } from '@/utils/constants';
+import { API_ENDPOINTS, APP_NAME } from '@/utils/constants';
 
 import { api, getApiErrorMessage } from '@/lib/axios';
 import { cn, formatFileSize, formatMessageTime } from '@/lib/utils';
@@ -87,7 +87,7 @@ const MessageItemComponent = ({ message, index, messages, selectedConvo, lastMes
 
     try {
       const fileName = message.fileName ?? 'attachment';
-      const response = await api.get(`/message/download/${message._id}`, {
+      const response = await api.get(API_ENDPOINTS.MESSAGE_DOWNLOAD.replace('{messageId}', message._id), {
         responseType: 'blob',
       });
 

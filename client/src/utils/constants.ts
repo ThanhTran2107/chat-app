@@ -8,18 +8,18 @@ export const PASSWORD_MIN_LENGTH = 8;
 export const APP_NAME = 'Tetra';
 
 export const LOCAL_STORAGE_KEYS = Object.freeze({
-  AUTH_STORAGE: 'auth-storage', // zustand persist key cho useAuthStore
-  CHAT_STORAGE: 'chat-storage', // zustand persist key cho useChatStore
-  THEME_STORAGE: 'theme-storage', // zustand persist key cho useThemeStore
-  AUTH_SESSION: 'auth-session', // cờ đánh dấu có session đăng nhập hay không
-  REMEMBERED_EMAIL: 'rememberedEmail', // email được lưu khi chọn "Remember me"
+  AUTH_STORAGE: 'auth-storage',
+  CHAT_STORAGE: 'chat-storage',
+  THEME_STORAGE: 'theme-storage',
+  AUTH_SESSION: 'auth-session',
+  REMEMBERED_EMAIL: 'rememberedEmail',
 });
 
+export const AUTH_SESSION_VALUE = '1';
+
 export const API_ENDPOINTS = Object.freeze({
-  // Base path for all API endpoints
   BASE: '/tetra',
 
-  // Authentication endpoints
   AUTH_REGISTER: 'auth/register',
   AUTH_LOGIN: 'auth/login',
   AUTH_GOOGLE: 'auth/google',
@@ -31,23 +31,20 @@ export const API_ENDPOINTS = Object.freeze({
   AUTH_VERIFY_EMAIL: 'auth/verify-email',
   AUTH_RESEND_VERIFICATION: 'auth/resend-verification',
 
-  // User-related endpoints
   USER_ME: 'user/me',
   USER_SEARCH: (username: string) => `user/search?username=${username}`,
   USER_UPLOAD_AVATAR: 'user/uploadAvatar',
 
-  // Friend-related endpoints
   FRIEND_REQUEST: 'friend/request',
   FRIEND_REQUEST_ACCEPT: (requestId: string) => `friend/request/${requestId}/accept`,
   FRIEND_REQUEST_DECLINE: (requestId: string) => `friend/request/${requestId}/decline`,
   FRIEND_REQUESTS: 'friend/requests',
   FRIEND_LIST: 'friend/get-all',
 
-  // Conversation and messaging endpoints
   CONVERSATION: '/conversation',
   CONVERSATION_MESSAGES: '/conversation/{id}/messages',
+  MESSAGE_DOWNLOAD: '/message/download/{messageId}',
 
-  // Message endpoints
   DIRECT_MESSAGE: '/message/direct',
   GROUP_MESSAGE: '/message/group',
 });
@@ -67,6 +64,41 @@ export const AUTH_ID = Object.freeze({
   GOOGLE_CLIENT_ID: import.meta.env.VITE_GOOGLE_CLIENT_ID,
   FACEBOOK_APP_ID: import.meta.env.VITE_FACEBOOK_APP_ID,
 });
+
+export const CONVERSATION_TYPES = Object.freeze({
+  DIRECT: 'direct',
+  GROUP: 'group',
+});
+
+export const PRESENCE_STATUS = Object.freeze({
+  ONLINE: 'online',
+  OFFLINE: 'offline',
+});
+
+export const SOCKET_EVENTS = Object.freeze({
+  CONNECT: 'connect',
+  ONLINE_USERS: 'online-users',
+  FRIEND_PRESENCE_CHANGED: 'friend-presence-changed',
+  NEW_MESSAGE: 'new-message',
+  READ_MESSAGE: 'read-message',
+  FRIEND_REQUEST_RECEIVED: 'friend-request-received',
+  FRIEND_REQUEST_ACCEPTED: 'friend-request-accepted',
+  FRIEND_REQUEST_DECLINED: 'friend-request-declined',
+  FRIEND_ACCOUNT_DELETED: 'friend-account-deleted',
+  FRIEND_AVATAR_UPDATED: 'friend-avatar-updated',
+  FRIEND_PROFILE_UPDATED: 'friend-profile-updated',
+  NEW_GROUP: 'new-group',
+  JOIN_CONVERSATION: 'join-conversation',
+});
+
+export const STATIC_ASSETS = Object.freeze({
+  MAIN_LOGO: '/main-logo.png',
+  NOTIFICATION_SOUND: '/notify-1s.wav?v=3',
+});
+
+export const DELETED_ACCOUNT_LABEL = 'Deleted account';
+
+export const MESSAGE_PAGE_LIMIT = 50;
 
 const passwordValidationSchema = z
   .string()
@@ -89,7 +121,6 @@ const passwordValidationSchema = z
     message: 'Password cannot contain spaces',
   });
 
-// Validation schemas
 export const registerSchema = z
   .object({
     firstName: z.string().min(1, { message: 'First name is required' }),
@@ -106,7 +137,6 @@ export const registerSchema = z
     path: ['confirmPassword'],
   });
 
-// Login schema is simpler since it only requires email and password
 export const loginSchema = z.object({
   email: z.email({ message: 'Invalid email address' }),
   password: z.string().min(PASSWORD_MIN_LENGTH, {
@@ -133,7 +163,6 @@ export const resetPasswordSchema = z
     path: ['confirmPassword'],
   });
 
-// Types for form values
 export type RegisterFormValues = z.infer<typeof registerSchema>;
 export type LoginFormValues = z.infer<typeof loginSchema>;
 export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;

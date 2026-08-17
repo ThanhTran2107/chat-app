@@ -18,6 +18,8 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
+import { CONVERSATION_TYPES } from '@/utils/constants';
+
 import { getApiErrorMessage } from '@/lib/axios';
 
 import { InviteSuggestionList } from './groups/invite-suggestion-list.component';
@@ -56,7 +58,7 @@ export const NewGroupChatModel = () => {
       if (isEmpty(invitedUsers)) return toast.warning('Please invite at least one friend to create a group chat.');
 
       await createConversation(
-        'group',
+        CONVERSATION_TYPES.GROUP,
         map(invitedUsers, user => user._id),
         groupName,
       );

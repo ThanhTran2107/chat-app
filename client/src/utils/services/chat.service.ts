@@ -2,14 +2,14 @@ import type { ConversationResponse, Message } from '@/types/chat.type';
 
 import { api } from '@/lib/axios.ts';
 
-import { API_ENDPOINTS } from '../constants';
+import { API_ENDPOINTS, MESSAGE_PAGE_LIMIT } from '../constants';
 
 interface FetchMessageProps {
   messages: Message[];
   cursor?: string;
 }
 
-const pageLimit = 50;
+const pageLimit = MESSAGE_PAGE_LIMIT;
 
 export const ChatService = {
   async fetchConversations(): Promise<ConversationResponse> {
