@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/stores/use-auth-store';
+import { appSessionInitPromise, useAuthStore } from '@/stores/use-auth-store';
 import { useChatStore } from '@/stores/use-chat-store';
 
 import { useEffect, useState } from 'react';
@@ -8,16 +8,11 @@ import { Spin } from '@/components/antd/spin.component';
 
 import { ROUTES } from '@/utils/constants';
 
-let protectedRouteInitPromise: Promise<void> | null = null;
-
 export const ProtectedRoute = () => {
   const [starting, setStarting] = useState(true);
 
-  // Get the authentication state and actions from the auth store
   const accessToken = useAuthStore(state => state.accessToken);
   const loading = useAuthStore(state => state.loading);
-  const refreshToken = useAuthStore(state => state.refreshToken);
-  const fetchMe = useAuthStore(state => state.fetchMe);
 
   useEffect(() => {
     let mounted = true;
@@ -29,9 +24,13 @@ export const ProtectedRoute = () => {
         const currentUser = authState.user;
         const chatState = useChatStore.getState();
 
-        if (currentAccessToken && !currentUser) await fetchMe();
-        if (currentAccessToken && !chatState.convoLoading && chatState.conversations.length === 0)
-          await chatState.fetchConversations();
+        if (appSessionInitPromise) await appSessionInitPromise;
+
+        if (!currentAccessToken) return;
+
+        if (!currentUser) await authState.fetchMe();
+
+        if (!chatState.conversations.length && !chatState.convoLoading) await chatState.fetchConversations();
       } catch (e) {
         console.warn('ProtectedRoute initialization warning:', e);
       } finally {
@@ -39,20 +38,13 @@ export const ProtectedRoute = () => {
       }
     };
 
-    if (!protectedRouteInitPromise) {
-      protectedRouteInitPromise = initializeAuth();
-    } else {
-      protectedRouteInitPromise.finally(() => {
-        if (mounted) setStarting(false);
-      });
-    }
+    initializeAuth();
 
     return () => {
       mounted = false;
     };
-  }, [accessToken, fetchMe, refreshToken]);
+  }, [accessToken]);
 
-  // While loading or starting, show a loading spinner. If there's no access token after the checks, redirect to the login page. Otherwise, render the child routes (protected content).
   if (loading || starting)
     return (
       <div className="flex h-screen items-center justify-center">
@@ -60,9 +52,7 @@ export const ProtectedRoute = () => {
       </div>
     );
 
-  // If there's no access token, redirect to the login page
   if (!accessToken) return <Navigate to={ROUTES.LOGIN} replace />;
 
-  // If there's an access token, render the child routes (protected content)
   return <Outlet />;
 };

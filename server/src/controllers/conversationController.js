@@ -197,7 +197,7 @@ export const markAsSeen = async (req, res) => {
       {
         returnDocument: "after",
       },
-    );
+    ).populate("lastMessage.senderId", "displayName avatarUrl");
 
     if (!updated)
       return res
@@ -222,6 +222,8 @@ export const markAsSeen = async (req, res) => {
         createdAt: updated.lastMessage?.createdAt,
         sender: {
           _id: updated.lastMessage?.senderId,
+          displayName: updated.lastMessage?.senderId?.displayName,
+          avatarUrl: updated.lastMessage?.senderId?.avatarUrl,
         },
       },
     };

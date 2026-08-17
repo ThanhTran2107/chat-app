@@ -82,7 +82,7 @@ export const acceptFriendRequest = async (req, res) => {
     await FriendRequest.findByIdAndDelete(requestId);
 
     const from = await User.findById(request.from)
-      .select("_id displayName avatarUrl")
+      .select("_id username displayName avatarUrl")
       .lean();
 
     emitToUserIfOnline(request.from, "friend-request-accepted", {
@@ -90,6 +90,7 @@ export const acceptFriendRequest = async (req, res) => {
       acceptedBy: userId.toString(),
       newFriend: {
         _id: from?._id,
+        username: from?.username,
         displayName: from?.displayName,
         avatarUrl: from?.avatarUrl,
       },
@@ -99,6 +100,7 @@ export const acceptFriendRequest = async (req, res) => {
       message: "Friend request accepted successfully",
       newFriend: {
         _id: from?._id,
+        username: from?.username,
         displayName: from?.displayName,
         avatarUrl: from?.avatarUrl,
       },

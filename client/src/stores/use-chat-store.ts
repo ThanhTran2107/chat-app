@@ -198,6 +198,26 @@ export const useChatStore = create<ChatState>()(
           })),
         }));
       },
+      updateParticipantsAvatar: (userId, avatarUrl) => {
+        set(state => ({
+          conversations: map(state.conversations, convo => ({
+            ...convo,
+            participants: map(convo.participants, participant =>
+              participant._id === userId ? { ...participant, avatarUrl } : participant,
+            ),
+          })),
+        }));
+      },
+      updateParticipantsProfile: (userId, profileUpdates) => {
+        set(state => ({
+          conversations: map(state.conversations, convo => ({
+            ...convo,
+            participants: map(convo.participants, participant =>
+              participant._id === userId ? { ...participant, ...profileUpdates } : participant,
+            ),
+          })),
+        }));
+      },
       markAsSeen: async () => {
         try {
           const { user } = useAuthStore.getState();

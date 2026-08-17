@@ -5,11 +5,13 @@ import { api } from '@/lib/axios';
 export const FriendService = {
   async searchByUsername(username: string) {
     const response = await api.get(API_ENDPOINTS.USER_SEARCH(username));
+
     return response.data.users;
   },
 
   async sendFriendRequest(to: string, message?: string) {
     const response = await api.post(API_ENDPOINTS.FRIEND_REQUEST, { to, message });
+
     return response.data;
   },
 
@@ -28,7 +30,8 @@ export const FriendService = {
   async acceptRequest(requestId: string) {
     try {
       const response = await api.post(API_ENDPOINTS.FRIEND_REQUEST_ACCEPT(requestId));
-      return response.data.requestAcceptedBy;
+
+      return response.data;
     } catch (e) {
       console.error('Error accepting friend request:', e);
       throw e;
@@ -46,6 +49,7 @@ export const FriendService = {
 
   async getFriendList() {
     const res = await api.get(API_ENDPOINTS.FRIEND_LIST);
+
     return res.data.friends;
   },
 };

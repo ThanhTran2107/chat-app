@@ -7,6 +7,8 @@ import { Message } from "../models/Message.js";
 import {
   notifyFriendsOfUserPresence,
   notifyFriendsOfDeletedAccount,
+  notifyFriendsOfAvatarUpdate,
+  notifyFriendsOfProfileUpdate,
   onlineUsers,
 } from "../sockets/index.js";
 import { uploadImageFromBuffer } from "../middlewares/uploadMiddleware.js";
@@ -94,6 +96,13 @@ export const updateProfile = async (req, res) => {
       await notifyFriendsOfUserPresence(userId, userStatus);
     }
 
+    const profileUpdates = (({ showOnlineStatus, email, ...rest }) => rest)(
+      updates,
+    );
+
+    if (Object.keys(profileUpdates).length > 0)
+      await notifyFriendsOfProfileUpdate(userId, profileUpdates);
+
     return res.status(200).json({ user: updatedUser });
   } catch (e) {
     console.error("Update profile error:", e);
@@ -121,6 +130,8 @@ export const uploadAvatar = async (req, res) => {
 
     if (!updatedUser.avatarUrl)
       return res.status(400).json({ message: "Failed to update user avatar" });
+
+    await notifyFriendsOfAvatarUpdate(userId, updatedUser.avatarUrl);
 
     return res.status(200).json({ avatarUrl: updatedUser.avatarUrl });
   } catch (e) {

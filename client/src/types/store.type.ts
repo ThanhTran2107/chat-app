@@ -4,6 +4,14 @@ import type { Conversation } from './chat.type.ts';
 import type { Message } from './chat.type.ts';
 import type { FriendRequest, User } from './user.type.ts';
 
+export interface FriendProfileUpdatedPayload {
+  userId: string;
+  displayName?: string;
+  username?: string;
+  bio?: string;
+  phoneNumber?: string;
+}
+
 // Types for the authentication state managed by Zustand
 export interface AuthState {
   accessToken: string | null; // JWT access token for authenticated requests, null when not logged in
@@ -51,6 +59,8 @@ export interface ChatState {
   addConvo: (convo: Conversation) => void; // Function to add a new conversation to the state
   addConversationIfMissing: (convo: Conversation) => void; // Add a conversation only when it does not already exist
   createConversation: (type: 'direct' | 'group', memberIds: string[], name: string) => Promise<void>; // Function to create a new conversation
+  updateParticipantsAvatar: (userId: string, avatarUrl: string) => void;
+  updateParticipantsProfile: (userId: string, profileUpdates: FriendProfileUpdatedPayload) => void;
 }
 
 export interface SocketState {
@@ -72,6 +82,10 @@ export interface FriendState {
   acceptRequest: (requestId: string) => Promise<void>; // Function to accept a friend request by its ID
   declineRequest: (requestId: string) => Promise<void>; // Function to decline a friend request by its ID
   getFriendList: () => Promise<void>; // Function to fetch the list of friends
+  addFriend: (friend: User) => void;
+  updateFriendAvatar: (userId: string, avatarUrl: string) => void;
+  updateFriendProfile: (userId: string, profileUpdates: FriendProfileUpdatedPayload) => void;
+  reset: () => void;
 }
 
 export interface UserState {

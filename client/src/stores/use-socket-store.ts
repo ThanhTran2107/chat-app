@@ -1,7 +1,7 @@
 import { useAuthStore } from '@/stores/use-auth-store.ts';
 import type { Conversation, Message } from '@/types/chat.type.ts';
 import type { SocketState } from '@/types/store.type.ts';
-import type { FriendRequest } from '@/types/user.type.ts';
+import type { FriendRequest, User } from '@/types/user.type.ts';
 import { Howl } from 'howler';
 import filter from 'lodash-es/filter';
 import some from 'lodash-es/some';
@@ -70,10 +70,29 @@ interface ReadMessagePayload {
 
 interface FriendRequestAcceptedPayload {
   requestId?: string;
+  newFriend?: {
+    _id?: string;
+    displayName?: string;
+    avatarUrl?: string;
+    username?: string;
+  };
 }
 
 interface FriendAccountDeletedPayload {
   userId?: string;
+}
+
+interface FriendAvatarUpdatedPayload {
+  userId: string;
+  avatarUrl: string;
+}
+
+interface FriendProfileUpdatedPayload {
+  userId: string;
+  displayName?: string;
+  username?: string;
+  bio?: string;
+  phoneNumber?: string;
 }
 
 interface FriendRequestDeclinedPayload {
@@ -119,6 +138,23 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     });
 
     set({ socket });
+
+    let isFirstConnect = true;
+
+    const joinAllConversations = () => {
+      const conversationIds = useChatStore.getState().conversations.map(c => c._id);
+      conversationIds.forEach(id => socket.emit('join-conversation', id));
+    };
+
+    const handleConnect = async () => {
+      if (isFirstConnect) {
+        isFirstConnect = false;
+        return;
+      }
+
+      joinAllConversations();
+      await useChatStore.getState().fetchConversations();
+    };
 
     const handleOnlineUsers = (userIds: string[]) => {
       set({ onlineUsers: new Set(userIds) });
@@ -188,12 +224,39 @@ export const useSocketStore = create<SocketState>((set, get) => ({
       useFriendStore.setState(state => ({
         sentList: filter(state.sentList, request => request._id !== payload.requestId) ?? [],
       }));
+
+      const { newFriend } = payload;
+
+      if (newFriend?._id) {
+        useFriendStore.getState().addFriend(newFriend as User);
+
+        useChatStore
+          .getState()
+          .createConversation('direct', [newFriend._id], '')
+          .catch(error => {
+            console.error('Error creating direct conversation after friend request accepted:', error);
+          });
+      }
     };
 
     const handleFriendAccountDeleted = (payload: FriendAccountDeletedPayload) => {
       if (!payload?.userId) return;
 
       useChatStore.getState().markUserAsDeleted(payload.userId);
+    };
+
+    const handleFriendAvatarUpdated = (payload: FriendAvatarUpdatedPayload) => {
+      if (!payload?.userId || !payload?.avatarUrl) return;
+
+      useChatStore.getState().updateParticipantsAvatar(payload.userId, payload.avatarUrl);
+      useFriendStore.getState().updateFriendAvatar(payload.userId, payload.avatarUrl);
+    };
+
+    const handleFriendProfileUpdated = (payload: FriendProfileUpdatedPayload) => {
+      if (!payload?.userId) return;
+
+      useChatStore.getState().updateParticipantsProfile(payload.userId, payload);
+      useFriendStore.getState().updateFriendProfile(payload.userId, payload);
     };
 
     const handleFriendRequestDeclined = (payload: FriendRequestDeclinedPayload) => {
@@ -209,7 +272,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
       socket.emit('join-conversation', conversation._id);
     };
 
-    socket.on('connect', () => null);
+    socket.on('connect', handleConnect);
     socket.on('online-users', handleOnlineUsers);
     socket.on('friend-presence-changed', handleFriendPresenceChanged);
     socket.on('new-message', handleNewMessage);
@@ -217,6 +280,8 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     socket.on('friend-request-received', handleFriendRequestReceived);
     socket.on('friend-request-accepted', handleFriendRequestAccepted);
     socket.on('friend-account-deleted', handleFriendAccountDeleted);
+    socket.on('friend-avatar-updated', handleFriendAvatarUpdated);
+    socket.on('friend-profile-updated', handleFriendProfileUpdated);
     socket.on('friend-request-declined', handleFriendRequestDeclined);
     socket.on('new-group', handleNewGroup);
   },

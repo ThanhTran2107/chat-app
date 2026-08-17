@@ -48,7 +48,10 @@ function App() {
     const initializeAuth = async () => {
       const hasSession = localStorage.getItem(LOCAL_STORAGE_KEYS.AUTH_SESSION) === '1';
 
-      if (hasSession) await refreshToken();
+      if (hasSession) {
+        const { refreshToken } = useAuthStore.getState();
+        refreshToken();
+      }
     };
 
     initializeAuth();

@@ -12,7 +12,7 @@ export const httpServer = http.createServer(app);
 
 export const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
     credentials: true,
   },
 });
@@ -60,6 +60,42 @@ export const notifyFriendsOfDeletedAccount = async (userId) => {
     io.to(friendSocketId).emit("friend-account-deleted", {
       userId,
     });
+  }
+};
+
+export const notifyFriendsOfAvatarUpdate = async (userId, avatarUrl) => {
+  const friendIds = await getFriendIds(userId);
+
+  if (!friendIds.length) return;
+
+  for (const friendId of friendIds) {
+    const friendSocketId = onlineUsers.get(friendId);
+
+    if (!friendSocketId) continue;
+
+    io.to(friendSocketId).emit("friend-avatar-updated", {
+      userId,
+      avatarUrl,
+    });
+  }
+};
+
+export const notifyFriendsOfProfileUpdate = async (userId, profileUpdates) => {
+  const friendIds = await getFriendIds(userId);
+
+  if (!friendIds.length) return;
+
+  const payload = {
+    userId,
+    ...profileUpdates,
+  };
+
+  for (const friendId of friendIds) {
+    const friendSocketId = onlineUsers.get(friendId);
+
+    if (!friendSocketId) continue;
+
+    io.to(friendSocketId).emit("friend-profile-updated", payload);
   }
 };
 
