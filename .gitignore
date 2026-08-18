@@ -26,7 +26,8 @@ coverage/
 
 # Environment files
 .env
-.env.*
+.env.local
+.env.*.local
 server/.env
 client/.env
 
