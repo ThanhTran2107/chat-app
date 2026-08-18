@@ -3,13 +3,12 @@ import find from 'lodash-es/find';
 
 import { useEffect, useMemo } from 'react';
 
-import { Spin } from '@/components/antd/spin.component';
-// import { ChatWindowSkeleton } from '../components/chat-windows/chat-window-skeleton.component';
 import { SidebarInset } from '@/components/ui/sidebar';
 
 import { ChatWelcomeScreen } from '../components/chat-windows/chat-welcome-screen.component';
 import { ChatWindowBody } from '../components/chat-windows/chat-window-body.component';
 import { ChatWindowHeader } from '../components/chat-windows/chat-window-header.component';
+import { ChatWindowSkeleton } from '../components/chat-windows/chat-window-skeleton.component';
 import { MessageInput } from '../components/messages/message-input.component';
 
 export const ChatWindowLayout = () => {
@@ -44,7 +43,7 @@ export const ChatWindowLayout = () => {
 
   if (!selectedConvo) return <ChatWelcomeScreen />;
 
-  if (loading && conversationMessages.length === 0) return <Spin />;
+  if (loading && conversationMessages.length === 0) return <ChatWindowSkeleton />;
 
   return (
     <SidebarInset className="flex h-full min-h-0 flex-1 flex-col overflow-hidden rounded-sm shadow-md">

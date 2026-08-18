@@ -4,7 +4,7 @@ import { find, isEmpty, map, some } from 'lodash-es';
 import { useMemo, useRef } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
-import { Spin } from '@/components/antd/spin.component';
+import { Skeleton } from '@/components/antd/skeleton.component';
 import { Button } from '@/components/ui/button';
 
 import { CONVERSATION_TYPES } from '@/utils/constants';
@@ -84,8 +84,18 @@ export const ChatWindowBody = () => {
           next={handleFetchMoreMessages}
           hasMore={hasMore}
           loader={
-            <div className="py-2 text-center">
-              <Spin size="small" />
+            <div className="flex flex-col gap-3 py-2">
+              <div className="flex items-start gap-2">
+                <Skeleton.Avatar active size={32} />
+                <Skeleton active className="bg-muted! h-14 w-full max-w-xs rounded-2xl lg:max-w-md" />
+              </div>
+              <div className="flex items-start justify-end gap-2">
+                <Skeleton active className="bg-muted! h-12 w-full max-w-xs rounded-2xl lg:max-w-md" />
+              </div>
+              <div className="flex items-start gap-2">
+                <div className="size-8" />
+                <Skeleton active className="bg-muted! h-12 w-full max-w-xs rounded-2xl lg:max-w-md" />
+              </div>
             </div>
           }
           scrollableTarget="scrollableDiv"
