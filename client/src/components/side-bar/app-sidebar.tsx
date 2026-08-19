@@ -1,7 +1,7 @@
 'use client';
 
-import { useAuthStore } from '@/stores/use-auth-store';
-import { useThemeStore } from '@/stores/use-theme-store';
+import { useAuthStore } from '@/stores/use-auth.store.ts';
+import { useThemeStore } from '@/stores/use-theme.store.ts';
 import { Moon, Sun } from 'lucide-react';
 
 import * as React from 'react';

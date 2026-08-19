@@ -2,13 +2,13 @@ import express from "express";
 import {
   checkFriendship,
   checkGroupMemberShip,
-} from "../middlewares/friendMiddleware.js";
-import { uploadChatAttachmentSingle } from "../middlewares/chatUploadMiddleware.js";
+} from "../middlewares/friend.middleware.js";
+import { uploadChatAttachmentSingle } from "../middlewares/chat-upload.middleware.js";
 import {
   sendDirectMessage,
   sendGroupMessage,
   downloadMessageAttachment,
-} from "../controllers/messageController.js";
+} from "../controllers/message.controller.js";
 
 export const messageRoute = express.Router();
 

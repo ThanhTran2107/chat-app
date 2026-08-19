@@ -1,4 +1,4 @@
-import { useFriendStore } from '@/stores/use-friend-store';
+import { useFriendStore } from '@/stores/use-friend.store';
 import { MessageCircle } from 'lucide-react';
 
 import { useState } from 'react';

@@ -1,7 +1,7 @@
-import { useUserStore } from '@/stores/use-user-store';
+import { useUserStore } from '@/stores/use-user.store';
 import type { User } from '@/types/user.type';
-import { Spin } from 'antd';
 import map from 'lodash-es/map';
+import { Spin } from '@/components/antd/spin.component';
 import { Heart } from 'lucide-react';
 import { toast } from 'sonner';
 

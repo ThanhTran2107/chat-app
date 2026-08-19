@@ -1,18 +1,18 @@
 import mongoose from "mongoose";
 import { Conversation } from "../models/Conversation.js";
 import { Message } from "../models/Message.js";
-import { updateConversationAfterCreateMessage } from "../utils/messageHelper.js";
-import { emitNewMessage } from "../utils/messageHelper.js";
-import { uploadAttachmentIfPresent } from "../utils/messageAttachment.js";
+import { updateConversationAfterCreateMessage } from "../utils/message-helper.js";
+import { emitNewMessage } from "../utils/message-helper.js";
+import { uploadAttachmentIfPresent } from "../utils/message-attachment.js";
 import {
   createMessageOrCleanupAttachment,
   saveConversationOrRollbackMessage,
-} from "../utils/messagePersistence.js";
+} from "../utils/message-persistence.js";
 import { io } from "../sockets/index.js";
 
 export const sendDirectMessage = async (req, res) => {
   try {
-    const { recipientId, content = "", conversationId } = req.body;
+    const { recipientId, content = "", conversationId, clientMessageId } = req.body;
     const senderId = req.user._id;
     const file = req.file;
 
@@ -43,6 +43,7 @@ export const sendDirectMessage = async (req, res) => {
       conversationId: conversation._id,
       senderId,
       content: trimmedContent || undefined,
+      clientMessageId: clientMessageId || undefined,
     };
 
     const { attachmentFields, uploadedPublicId, uploadedResourceType } =
@@ -156,7 +157,7 @@ export const downloadMessageAttachment = async (req, res) => {
 
 export const sendGroupMessage = async (req, res) => {
   try {
-    const { conversationId, content = "" } = req.body;
+    const { conversationId, content = "", clientMessageId } = req.body;
     const senderId = req.user._id;
     const conversation = req.conversation;
     const file = req.file;
@@ -171,6 +172,7 @@ export const sendGroupMessage = async (req, res) => {
       conversationId,
       senderId,
       content: trimmedContent || undefined,
+      clientMessageId: clientMessageId || undefined,
     };
 
     const { attachmentFields, uploadedPublicId, uploadedResourceType } =

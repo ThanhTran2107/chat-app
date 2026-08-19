@@ -1,4 +1,4 @@
-import { useUserStore } from '@/stores/use-user-store';
+import { useUserStore } from '@/stores/use-user.store';
 import { Camera } from 'lucide-react';
 import { toast } from 'sonner';
 

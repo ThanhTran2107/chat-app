@@ -1,4 +1,4 @@
-import { useChatStore } from '@/stores/use-chat-store';
+import { useChatStore } from '@/stores/use-chat.store';
 import { find, isEmpty, map, some } from 'lodash-es';
 
 import { useMemo, useRef } from 'react';
@@ -103,7 +103,7 @@ export const ChatWindowBody = () => {
           style={{ display: 'flex', flexDirection: 'column-reverse', overflow: 'visible' }}
         >
           {map(reversedMessages, (message, index) => (
-            <div key={message._id} className="text-foreground px-3 py-2 wrap-break-word">
+            <div key={message.clientMessageId || message._id} className="text-foreground px-3 py-2 wrap-break-word">
               <MessageItem
                 message={message}
                 index={index}

@@ -45,13 +45,14 @@ export interface ChatState {
   activeConversationId: string | null; // The ID of the currently active conversation, null if none is active
   convoLoading: boolean; // Indicates if conversations are currently being loaded
   messageLoading: boolean; // Indicates if messages are currently being loaded
+  messageLoaded: Record<string, boolean>; // Tracks whether messages for a conversation have been initially loaded
   loading: boolean; // General loading state for chat-related operations
   reset: () => void; // Function to reset the chat state to its initial values
   setActiveConversation: (id: string | null) => void; // Function to set the active conversation
   fetchConversations: () => Promise<void>; // Function to fetch the list of conversations
   fetchMessages: (conversationId: string) => Promise<void>; // Function to fetch messages for a specific conversation, with optional pagination cursor
-  sendDirectMessage: (recipientId: string, content: string, file?: File) => Promise<void>; // Function to send a direct message
-  sendGroupMessage: (conversationId: string, content: string, file?: File) => Promise<void>; // Function to send a group message
+  sendDirectMessage: (recipientId: string, content: string, file?: File, clientMessageId?: string) => Promise<void>; // Function to send a direct message
+  sendGroupMessage: (conversationId: string, content: string, file?: File, clientMessageId?: string) => Promise<void>; // Function to send a group message
   addMessage: (message: Message) => Promise<void>; // Function to add a new message to the state, used for real-time updates
   updateConversation: (conversation: Partial<Conversation>) => void; // Function to update a conversation in the state, used for real-time updates
   markUserAsDeleted: (userId: string) => void;
@@ -61,6 +62,14 @@ export interface ChatState {
   createConversation: (type: 'direct' | 'group', memberIds: string[], name: string) => Promise<void>; // Function to create a new conversation
   updateParticipantsAvatar: (userId: string, avatarUrl: string) => void;
   updateParticipantsProfile: (userId: string, profileUpdates: FriendProfileUpdatedPayload) => void;
+  retryMessage: (
+    conversationId: string,
+    clientMessageId: string,
+    recipientId: string,
+    content: string,
+    file?: File,
+    type?: 'direct' | 'group',
+  ) => Promise<void>;
 }
 
 export interface SocketState {

@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/stores/use-auth-store';
+import { useAuthStore } from '@/stores/use-auth.store';
 
 import type { Dispatch, SetStateAction } from 'react';
 

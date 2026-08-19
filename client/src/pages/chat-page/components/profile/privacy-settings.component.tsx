@@ -1,6 +1,6 @@
-import { useAuthStore } from '@/stores/use-auth-store';
-import { Spin } from 'antd';
+import { useAuthStore } from '@/stores/use-auth.store';
 import { Bell, Shield, ShieldBan } from 'lucide-react';
+import { Spin } from '@/components/antd/spin.component';
 import { toast } from 'sonner';
 
 import { useState } from 'react';

@@ -1,6 +1,6 @@
 'use client';
 
-import { useFriendStore } from '@/stores/use-friend-store';
+import { useFriendStore } from '@/stores/use-friend.store';
 import { type User } from '@/types/user.type';
 import { Bell, ChevronsUpDownIcon, UserIcon } from 'lucide-react';
 

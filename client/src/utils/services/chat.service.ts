@@ -27,11 +27,12 @@ export const ChatService = {
     return { messages: res.data.messages, cursor: res.data.nextCursor };
   },
 
-  async sendDirectMessage(recipientId: string, content: string = '', file?: File, conversationId?: string) {
+  async sendDirectMessage(recipientId: string, content: string = '', file?: File, conversationId?: string, clientMessageId?: string) {
     if (file) {
       const formData = new FormData();
       formData.append('recipientId', recipientId);
       formData.append('content', content ?? '');
+      formData.append('clientMessageId', clientMessageId ?? '');
 
       if (conversationId) formData.append('conversationId', conversationId);
 
@@ -45,16 +46,18 @@ export const ChatService = {
       recipientId,
       content,
       conversationId,
+      clientMessageId,
     });
 
     return res.data.message;
   },
 
-  async sendGroupMessage(conversationId: string, content: string = '', file?: File) {
+  async sendGroupMessage(conversationId: string, content: string = '', file?: File, clientMessageId?: string) {
     if (file) {
       const formData = new FormData();
       formData.append('conversationId', conversationId);
       formData.append('content', content ?? '');
+      formData.append('clientMessageId', clientMessageId ?? '');
       formData.append('file', file);
 
       const res = await api.post(API_ENDPOINTS.GROUP_MESSAGE, formData);
@@ -65,6 +68,7 @@ export const ChatService = {
     const res = await api.post(API_ENDPOINTS.GROUP_MESSAGE, {
       conversationId,
       content,
+      clientMessageId,
     });
 
     return res.data.message;
@@ -78,6 +82,7 @@ export const ChatService = {
 
   async createConversation(type: 'direct' | 'group', memberIds: string[], name: string) {
     const res = await api.post(API_ENDPOINTS.CONVERSATION, { type, name, memberIds });
+    
     return res.data.conversation;
   },
 };

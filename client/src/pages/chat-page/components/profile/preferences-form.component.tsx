@@ -1,6 +1,6 @@
-import { useAuthStore } from '@/stores/use-auth-store';
-import { useThemeStore } from '@/stores/use-theme-store';
-import { useUserStore } from '@/stores/use-user-store';
+import { useAuthStore } from '@/stores/use-auth.store';
+import { useThemeStore } from '@/stores/use-theme.store';
+import { useUserStore } from '@/stores/use-user.store';
 import { Moon, Sun } from 'lucide-react';
 import { toast } from 'sonner';
 

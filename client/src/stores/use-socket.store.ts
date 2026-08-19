@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/stores/use-auth-store.ts';
+import { useAuthStore } from '@/stores/use-auth.store.ts';
 import type { Conversation, Message } from '@/types/chat.type.ts';
 import type { SocketState } from '@/types/store.type.ts';
 import type { FriendRequest, User } from '@/types/user.type.ts';
@@ -10,8 +10,8 @@ import { create } from 'zustand';
 
 import { CONVERSATION_TYPES, PRESENCE_STATUS, SOCKET_EVENTS, STATIC_ASSETS } from '@/utils/constants';
 
-import { useChatStore } from './use-chat-store';
-import { useFriendStore } from './use-friend-store.ts';
+import { useChatStore } from './use-chat.store.ts';
+import { useFriendStore } from './use-friend.store.ts';
 
 const notificationSound = new Howl({
   src: [STATIC_ASSETS.NOTIFICATION_SOUND],

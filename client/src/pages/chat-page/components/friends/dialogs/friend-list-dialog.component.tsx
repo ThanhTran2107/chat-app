@@ -1,5 +1,5 @@
-import { useChatStore } from '@/stores/use-chat-store';
-import { useFriendStore } from '@/stores/use-friend-store';
+import { useChatStore } from '@/stores/use-chat.store';
+import { useFriendStore } from '@/stores/use-friend.store';
 import filter from 'lodash-es/filter';
 import includes from 'lodash-es/includes';
 import isEmpty from 'lodash-es/isEmpty';

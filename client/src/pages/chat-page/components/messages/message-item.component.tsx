@@ -1,12 +1,17 @@
+import { useChatStore } from '@/stores/use-chat.store';
 import type { Conversation, Message, Participant } from '@/types/chat.type';
-import { Card } from 'antd';
 import find from 'lodash-es/find';
+import { RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
+import { Card } from '@/components/antd/card.component';
+import { Image } from '@/components/antd/image.component';
 
 import * as React from 'react';
 
 import { Spin } from '@/components/antd/spin.component';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 import { API_ENDPOINTS, APP_NAME } from '@/utils/constants';
 
@@ -80,6 +85,8 @@ const MessageItemComponent = ({ message, index, messages, selectedConvo, lastMes
   const [isDownloading, setIsDownloading] = React.useState(false);
   const FileIconElement = renderFileIcon(message.fileType, message.fileName);
 
+  const retryMessage = useChatStore(state => state.retryMessage);
+
   const handleDownloadAttachment = async () => {
     if (isDownloading) return;
 
@@ -111,6 +118,215 @@ const MessageItemComponent = ({ message, index, messages, selectedConvo, lastMes
       setIsDownloading(false);
     }
   };
+
+  const handleRetry = async () => {
+    if (!message.clientMessageId || !message.content) return;
+
+    const type = selectedConvo.type === 'direct' ? 'direct' : 'group';
+
+    try {
+      if (type === 'direct') {
+        const otherParticipant = selectedConvo.participants.find(p => p._id && p._id !== message.senderId);
+        const recipientId = otherParticipant?._id ?? '';
+
+        await retryMessage(
+          message.conversationId,
+          message.clientMessageId,
+          recipientId,
+          message.content,
+          message.file,
+          type,
+        );
+      } else {
+        await retryMessage(message.conversationId, message.clientMessageId, '', message.content, message.file, type);
+      }
+    } catch (e) {
+      console.error('Retry message error:', e);
+      toast.error('Failed to retry message.');
+    }
+  };
+
+  const showStatus =
+    message.isOwn &&
+    (message.status === 'sending' || message.status === 'failed' || message._id === selectedConvo.lastMessage?._id);
+
+  const messageBubbles = (
+    <>
+      {message.imgUrl && !message.content ? (
+        <div className="border-border/50 overflow-hidden rounded-xl border bg-slate-100">
+          <Image
+            src={message.imgUrl ?? undefined}
+            alt={message.content ?? 'Image message'}
+            style={{ maxHeight: '20rem', width: '100%', objectFit: 'contain' }}
+            preview={message.imgUrl ? { src: message.imgUrl } : false}
+          />
+        </div>
+      ) : null}
+
+      {message.imgUrl && message.content ? (
+        <div className="border-border/50 overflow-hidden rounded-2xl border bg-white dark:border-white/10 dark:bg-slate-950/90">
+          <Image
+            src={message.imgUrl ?? undefined}
+            alt={message.content ?? 'Image message'}
+            style={{ maxHeight: '20rem', width: '100%', objectFit: 'contain' }}
+            preview={message.imgUrl ? { src: message.imgUrl } : false}
+          />
+          <div
+            className={cn('rounded-b-2xl border-0 p-3', message.isOwn ? 'chat-bubble-sent' : 'chat-bubble-received')}
+          >
+            <p className="text-sm leading-relaxed wrap-break-word">{message.content}</p>
+          </div>
+        </div>
+      ) : null}
+
+      {message.fileUrl && message.content ? (
+        <div className="border-border/50 overflow-hidden rounded-2xl border bg-white dark:border-white/10 dark:bg-slate-950/90">
+          <button
+            type="button"
+            onClick={handleDownloadAttachment}
+            disabled={isDownloading}
+            className="border-border/50 flex w-full items-center gap-3 border-b bg-white p-3 text-left transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-slate-950/80 dark:hover:bg-slate-900/90"
+          >
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-50 shadow-sm dark:bg-slate-900/70">
+              {FileIconElement}
+            </div>
+
+            <div className="min-w-0 flex-1">
+              {isDownloading ? (
+                <div className="flex items-center gap-2 text-sm font-medium text-slate-950 dark:text-white">
+                  <Spin className="size-4" />
+                  <span>Downloading...</span>
+                </div>
+              ) : (
+                <>
+                  <p className="truncate text-sm font-medium text-slate-950 dark:text-white">
+                    {message.fileName ?? 'Attachment'}
+                  </p>
+
+                  <p className="text-muted-foreground text-xs dark:text-slate-400">
+                    {message.fileType ?? 'File'} •{' '}
+                    {message.fileSize ? formatFileSize(message.fileSize) : 'Size unknown'}
+                  </p>
+                </>
+              )}
+            </div>
+          </button>
+
+          <div
+            className={cn('rounded-b-2xl border-0 p-3', message.isOwn ? 'chat-bubble-sent' : 'chat-bubble-received')}
+          >
+            <p className="text-sm leading-relaxed wrap-break-word">{message.content}</p>
+          </div>
+        </div>
+      ) : null}
+
+      {!message.content && message.fileUrl ? (
+        <button
+          type="button"
+          onClick={handleDownloadAttachment}
+          disabled={isDownloading}
+          className="border-border/50 mb-2 flex w-full items-center gap-3 overflow-hidden rounded-2xl border bg-slate-50 p-3 text-left transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-70 dark:border-white/10 dark:bg-slate-950/90 dark:hover:bg-slate-900/90"
+        >
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-white shadow-sm dark:bg-slate-900/80">
+            {FileIconElement}
+          </div>
+
+          <div className="min-w-0 flex-1">
+            {isDownloading ? (
+              <div className="flex items-center gap-2 text-sm font-medium text-slate-950 dark:text-white">
+                <Spin className="size-4" />
+                <span>Downloading...</span>
+              </div>
+            ) : (
+              <>
+                <p className="truncate text-sm font-medium text-slate-950 dark:text-white">
+                  {message.fileName ?? 'Attachment'}
+                </p>
+                <p className="text-muted-foreground text-xs dark:text-slate-400">
+                  {message.fileType ?? 'File'} • {message.fileSize ? formatFileSize(message.fileSize) : 'Size unknown'}
+                </p>
+              </>
+            )}
+          </div>
+        </button>
+      ) : null}
+
+      {message.fileName && !message.fileUrl && message.content ? (
+        <div className="border-border/50 overflow-hidden rounded-2xl border bg-white dark:border-white/10 dark:bg-slate-950/90">
+          <div className="border-border/50 flex w-full items-center gap-3 border-b bg-white p-3 text-left transition hover:bg-slate-50 dark:bg-slate-950/80 dark:hover:bg-slate-900/90">
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-50 shadow-sm dark:bg-slate-900/70">
+              {FileIconElement}
+            </div>
+
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium text-slate-950 dark:text-white">
+                {message.fileName ?? 'Attachment'}
+              </p>
+
+              <p className="text-muted-foreground text-xs dark:text-slate-400">
+                {message.fileType ?? 'File'} • {message.fileSize ? formatFileSize(message.fileSize) : 'Size unknown'}
+              </p>
+            </div>
+          </div>
+
+          <div
+            className={cn('rounded-b-2xl border-0 p-3', message.isOwn ? 'chat-bubble-sent' : 'chat-bubble-received')}
+          >
+            <p className="text-sm leading-relaxed wrap-break-word">{message.content}</p>
+          </div>
+        </div>
+      ) : null}
+
+      {message.fileName && !message.fileUrl && !message.content ? (
+        <div className="border-border/50 mb-2 flex w-full items-center gap-3 overflow-hidden rounded-2xl border bg-slate-50 p-3 text-left transition hover:bg-slate-100 dark:border-white/10 dark:bg-slate-950/90 dark:hover:bg-slate-900/90">
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-white shadow-sm dark:bg-slate-900/80">
+            {FileIconElement}
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-medium text-slate-950 dark:text-white">
+              {message.fileName ?? 'Attachment'}
+            </p>
+            <p className="text-muted-foreground text-xs dark:text-slate-400">
+              {message.fileType ?? 'File'} • {message.fileSize ? formatFileSize(message.fileSize) : 'Size unknown'}
+            </p>
+          </div>
+        </div>
+      ) : null}
+
+      {message.content && !message.fileUrl && !message.imgUrl ? (
+        <Card className={cn('p-3', message.isOwn ? 'chat-bubble-sent border-0' : 'chat-bubble-received')}>
+          <p className="text-sm leading-relaxed wrap-break-word">{message.content}</p>
+        </Card>
+      ) : null}
+    </>
+  );
+
+  const messageStatusRow = showStatus && (
+    <div className="flex items-center gap-1">
+      {message.status === 'sending' && message.isOwn ? (
+        <Badge variant="outline" className={cn('text-muted-foreground h-4 border-0 px-1.5 py-0.5 text-xs', 'bg-muted')}>
+          Sending
+        </Badge>
+      ) : message.status === 'failed' && message.isOwn && message.clientMessageId && message.content ? (
+        <Badge variant="outline" className="h-4 border-0 px-1.5 py-0.5 text-xs text-red-500">
+          Failed
+        </Badge>
+      ) : (
+        <Badge
+          variant="outline"
+          className={cn(
+            'h-4 border-0 px-1.5 py-0.5 text-xs',
+            lastMessageStatus === 'seen' ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground',
+          )}
+        >
+          {lastMessageStatus}
+        </Badge>
+      )}
+    </div>
+  );
+
+  const showRetry = message.status === 'failed' && message.isOwn && message.clientMessageId && message.content;
 
   return (
     <>
@@ -144,136 +360,37 @@ const MessageItemComponent = ({ message, index, messages, selectedConvo, lastMes
         )}
 
         {/*message*/}
-        <div className={cn('max-w-x flex flex-col space-y-0 lg:max-w-md', message.isOwn ? 'items-end' : 'items-start')}>
-          {message.imgUrl && !message.content ? (
-            <div className="border-border/50 overflow-hidden rounded-xl border bg-slate-100">
-              <img
-                src={message.imgUrl ?? undefined}
-                alt={message.content ?? 'Image message'}
-                className="max-h-80 w-full cursor-pointer object-contain"
-                loading="lazy"
-                decoding="async"
-                onClick={() => window.open(message.imgUrl ?? undefined, '_blank')}
+        {showRetry ? (
+          <div className="flex items-center gap-3">
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-muted-foreground hover:text-foreground mb-2.5 h-4 w-4 cursor-pointer"
+                    onClick={handleRetry}
+                    aria-label="Retry"
+                  >
+                    <RefreshCw className="size-4.5" />
+                  </Button>
+                }
               />
+              <TooltipContent>Retry</TooltipContent>
+            </Tooltip>
+            <div className={cn('max-w-x flex flex-col space-y-0 lg:max-w-md', 'items-end')}>
+              {messageBubbles}
+              {messageStatusRow}
             </div>
-          ) : null}
-
-          {message.imgUrl && message.content ? (
-            <div className="border-border/50 overflow-hidden rounded-2xl border bg-white dark:border-white/10 dark:bg-slate-950/90">
-              <img
-                src={message.imgUrl ?? undefined}
-                alt={message.content ?? 'Image message'}
-                className="max-h-80 w-full cursor-pointer object-contain"
-                loading="lazy"
-                decoding="async"
-                onClick={() => window.open(message.imgUrl ?? undefined, '_blank')}
-              />
-              <div
-                className={cn(
-                  'rounded-b-2xl border-0 p-3',
-                  message.isOwn ? 'chat-bubble-sent' : 'chat-bubble-received',
-                )}
-              >
-                <p className="text-sm leading-relaxed wrap-break-word">{message.content}</p>
-              </div>
-            </div>
-          ) : null}
-
-          {message.fileUrl && message.content ? (
-            <div className="border-border/50 overflow-hidden rounded-2xl border bg-white dark:border-white/10 dark:bg-slate-950/90">
-              <button
-                type="button"
-                onClick={handleDownloadAttachment}
-                disabled={isDownloading}
-                className="border-border/50 flex w-full items-center gap-3 border-b bg-white p-3 text-left transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-slate-950/80 dark:hover:bg-slate-900/90"
-              >
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-50 shadow-sm dark:bg-slate-900/70">
-                  {FileIconElement}
-                </div>
-
-                <div className="min-w-0 flex-1">
-                  {isDownloading ? (
-                    <div className="flex items-center gap-2 text-sm font-medium text-slate-950 dark:text-white">
-                      <Spin className="size-4" />
-                      <span>Downloading...</span>
-                    </div>
-                  ) : (
-                    <>
-                      <p className="truncate text-sm font-medium text-slate-950 dark:text-white">
-                        {message.fileName ?? 'Attachment'}
-                      </p>
-
-                      <p className="text-muted-foreground text-xs dark:text-slate-400">
-                        {message.fileType ?? 'File'} •{' '}
-                        {message.fileSize ? formatFileSize(message.fileSize) : 'Size unknown'}
-                      </p>
-                    </>
-                  )}
-                </div>
-              </button>
-
-              <div
-                className={cn(
-                  'rounded-b-2xl border-0 p-3',
-                  message.isOwn ? 'chat-bubble-sent' : 'chat-bubble-received',
-                )}
-              >
-                <p className="text-sm leading-relaxed wrap-break-word">{message.content}</p>
-              </div>
-            </div>
-          ) : null}
-
-          {!message.content && message.fileUrl ? (
-            <button
-              type="button"
-              onClick={handleDownloadAttachment}
-              disabled={isDownloading}
-              className="border-border/50 mb-2 flex w-full items-center gap-3 overflow-hidden rounded-2xl border bg-slate-50 p-3 text-left transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-70 dark:border-white/10 dark:bg-slate-950/90 dark:hover:bg-slate-900/90"
-            >
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-white shadow-sm dark:bg-slate-900/80">
-                {FileIconElement}
-              </div>
-
-              <div className="min-w-0 flex-1">
-                {isDownloading ? (
-                  <div className="flex items-center gap-2 text-sm font-medium text-slate-950 dark:text-white">
-                    <Spin className="size-4" />
-                    <span>Downloading...</span>
-                  </div>
-                ) : (
-                  <>
-                    <p className="truncate text-sm font-medium text-slate-950 dark:text-white">
-                      {message.fileName ?? 'Attachment'}
-                    </p>
-                    <p className="text-muted-foreground text-xs dark:text-slate-400">
-                      {message.fileType ?? 'File'} •{' '}
-                      {message.fileSize ? formatFileSize(message.fileSize) : 'Size unknown'}
-                    </p>
-                  </>
-                )}
-              </div>
-            </button>
-          ) : null}
-
-          {message.content && !message.fileUrl && !message.imgUrl ? (
-            <Card className={cn('p-3', message.isOwn ? 'chat-bubble-sent border-0' : 'chat-bubble-received')}>
-              <p className="text-sm leading-relaxed wrap-break-word">{message.content}</p>
-            </Card>
-          ) : null}
-
-          {/*seen delivered*/}
-          {message.isOwn && message._id === selectedConvo.lastMessage?._id && (
-            <Badge
-              variant="outline"
-              className={cn(
-                'h-4 border-0 px-1.5 py-0.5 text-xs',
-                lastMessageStatus === 'seen' ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground',
-              )}
-            >
-              {lastMessageStatus}
-            </Badge>
-          )}
-        </div>
+          </div>
+        ) : (
+          <div
+            className={cn('max-w-x flex flex-col space-y-0 lg:max-w-md', message.isOwn ? 'items-end' : 'items-start')}
+          >
+            {messageBubbles}
+            {messageStatusRow}
+          </div>
+        )}
       </div>
     </>
   );

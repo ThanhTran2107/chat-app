@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/stores/use-auth-store';
+import { useAuthStore } from '@/stores/use-auth.store';
 import { LogOut } from 'lucide-react';
 import { toast } from 'sonner';
 

@@ -1,4 +1,4 @@
-import { useFriendStore } from '@/stores/use-friend-store';
+import { useFriendStore } from '@/stores/use-friend.store';
 
 import { type Dispatch, type SetStateAction, useEffect, useState } from 'react';
 

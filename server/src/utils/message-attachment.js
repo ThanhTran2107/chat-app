@@ -1,5 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
-import { uploadChatAttachmentFromBuffer } from "../middlewares/chatUploadMiddleware.js";
+import { uploadChatAttachmentFromBuffer } from "../middlewares/chat-upload.middleware.js";
 
 const normalizeFileName = (originalName) => {
   if (!originalName) return originalName;

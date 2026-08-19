@@ -18,11 +18,11 @@ import {
   createSessionForUser,
   createSocialUser,
   createEmailVerificationToken,
-} from "../services/authService.js";
+} from "../services/auth.service.js";
 import {
   getGoogleUserInfo,
   getFacebookUserInfo,
-} from "../services/oauthService.js";
+} from "../services/oauth.service.js";
 
 const ACCESS_TOKEN_TTL = "30m";
 const REFRESH_TOKEN_TTL = 14 * 24 * 60 * 60 * 1000; // 14 days

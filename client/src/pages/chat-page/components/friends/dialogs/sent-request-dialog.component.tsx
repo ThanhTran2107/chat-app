@@ -1,4 +1,4 @@
-import { useFriendStore } from '@/stores/use-friend-store.ts';
+import { useFriendStore } from '@/stores/use-friend.store';
 import isEmpty from 'lodash-es/isEmpty';
 import map from 'lodash-es/map';
 

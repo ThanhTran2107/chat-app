@@ -1,4 +1,4 @@
-import { useFriendStore } from '@/stores/use-friend-store';
+import { useFriendStore } from '@/stores/use-friend.store';
 import type { User } from '@/types/user.type';
 import { UserPlus } from 'lucide-react';
 import { toast } from 'sonner';

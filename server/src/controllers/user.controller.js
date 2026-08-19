@@ -11,7 +11,7 @@ import {
   notifyFriendsOfProfileUpdate,
   onlineUsers,
 } from "../sockets/index.js";
-import { uploadImageFromBuffer } from "../middlewares/uploadMiddleware.js";
+import { uploadImageFromBuffer } from "../middlewares/upload.middleware.js";
 
 export const authMe = async (req, res) => {
   try {

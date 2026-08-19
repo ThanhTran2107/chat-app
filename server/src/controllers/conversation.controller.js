@@ -1,7 +1,7 @@
 import { Conversation } from "../models/Conversation.js";
 import { Message } from "../models/Message.js";
 import { io } from "../sockets/index.js";
-import { formatConversationParticipants } from "../utils/messageHelper.js";
+import { formatConversationParticipants } from "../utils/message-helper.js";
 
 export const createConversation = async (req, res) => {
   try {
@@ -63,7 +63,9 @@ export const createConversation = async (req, res) => {
       { path: "lastMessage.senderId", select: "displayName avatarUrl" },
     ]);
 
-    const participants = formatConversationParticipants(conversation.participants);
+    const participants = formatConversationParticipants(
+      conversation.participants,
+    );
 
     const formatted = { ...conversation.toObject(), participants };
 

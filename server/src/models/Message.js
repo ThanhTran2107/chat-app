@@ -32,6 +32,11 @@ const messageSchema = new mongoose.Schema(
     fileSize: {
       type: Number,
     },
+    clientMessageId: {
+      type: String,
+      index: true,
+      sparse: true,
+    },
   },
   { timestamps: true },
 );

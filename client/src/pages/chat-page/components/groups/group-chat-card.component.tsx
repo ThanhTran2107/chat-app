@@ -1,5 +1,5 @@
-import { useAuthStore } from '@/stores/use-auth-store.ts';
-import { useChatStore } from '@/stores/use-chat-store.ts';
+import { useAuthStore } from '@/stores/use-auth.store';
+import { useChatStore } from '@/stores/use-chat.store';
 import { type Conversation } from '@/types/chat.type';
 
 import * as React from 'react';

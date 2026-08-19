@@ -1,5 +1,5 @@
-import { appSessionInitPromise, useAuthStore } from '@/stores/use-auth-store';
-import { useChatStore } from '@/stores/use-chat-store';
+import { appSessionInitPromise, useAuthStore } from '@/stores/use-auth.store';
+import { useChatStore } from '@/stores/use-chat.store';
 
 import { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';

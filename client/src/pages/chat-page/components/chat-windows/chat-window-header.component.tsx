@@ -1,6 +1,6 @@
-import { useAuthStore } from '@/stores/use-auth-store';
-import { useChatStore } from '@/stores/use-chat-store';
-import { useSocketStore } from '@/stores/use-socket-store';
+import { useAuthStore } from '@/stores/use-auth.store';
+import { useChatStore } from '@/stores/use-chat.store';
+import { useSocketStore } from '@/stores/use-socket.store';
 import type { Conversation } from '@/types/chat.type';
 import filter from 'lodash-es/filter';
 import find from 'lodash-es/find';

@@ -1,4 +1,4 @@
-import { useChatStore } from '@/stores/use-chat-store';
+import { useChatStore } from '@/stores/use-chat.store';
 import find from 'lodash-es/find';
 
 import { useEffect, useMemo } from 'react';
@@ -15,6 +15,7 @@ export const ChatWindowLayout = () => {
   const activeConversationId = useChatStore(state => state.activeConversationId);
   const conversations = useChatStore(state => state.conversations);
   const loading = useChatStore(state => state.messageLoading);
+  const messageLoaded = useChatStore(state => state.messageLoaded);
   const messages = useChatStore(state => state.messages);
   const markAsSeen = useChatStore(state => state.markAsSeen);
 
@@ -26,6 +27,8 @@ export const ChatWindowLayout = () => {
     const convMsgs = messages[activeConversationId];
     return convMsgs?.items ?? [];
   }, [activeConversationId, messages]);
+
+  const isInitialLoading = loading && !messageLoaded[activeConversationId ?? ''];
 
   useEffect(() => {
     if (!selectedConvo) return;
@@ -43,7 +46,7 @@ export const ChatWindowLayout = () => {
 
   if (!selectedConvo) return <ChatWelcomeScreen />;
 
-  if (loading && conversationMessages.length === 0) return <ChatWindowSkeleton />;
+  if (isInitialLoading && conversationMessages.length === 0) return <ChatWindowSkeleton />;
 
   return (
     <SidebarInset className="flex h-full min-h-0 flex-1 flex-col overflow-hidden rounded-sm shadow-md">

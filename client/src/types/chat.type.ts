@@ -59,4 +59,7 @@ export interface Message {
   createdAt: string;
   isOwn?: boolean;
   isNew?: boolean;
+  status?: 'sending' | 'failed';
+  clientMessageId?: string;
+  file?: File;
 }

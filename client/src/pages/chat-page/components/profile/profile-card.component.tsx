@@ -1,4 +1,4 @@
-import { useSocketStore } from '@/stores/use-socket-store';
+import { useSocketStore } from '@/stores/use-socket.store';
 import type { User } from '@/types/user.type';
 
 import { Badge } from '@/components/ui/badge';

@@ -1,6 +1,6 @@
-import { useAuthStore } from '@/stores/use-auth-store';
-import { useChatStore } from '@/stores/use-chat-store';
-import type { Conversation } from '@/types/chat.type';
+import { useAuthStore } from '@/stores/use-auth.store';
+import { useChatStore } from '@/stores/use-chat.store';
+import type { Conversation, Message } from '@/types/chat.type';
 import filter from 'lodash-es/filter';
 import includes from 'lodash-es/includes';
 import { ImagePlus, Send, X } from 'lucide-react';
@@ -8,7 +8,6 @@ import { toast } from 'sonner';
 
 import React, { Suspense, useEffect, useRef, useState } from 'react';
 
-import { Spin } from '@/components/antd/spin.component';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -28,11 +27,11 @@ export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation })
   const [value, setValue] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [filePreviewUrl, setFilePreviewUrl] = useState<string | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const user = useAuthStore(state => state.user);
+  const addMessage = useChatStore(state => state.addMessage);
   const sendDirectMessage = useChatStore(state => state.sendDirectMessage);
   const sendGroupMessage = useChatStore(state => state.sendGroupMessage);
 
@@ -41,10 +40,6 @@ export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation })
       if (filePreviewUrl) URL.revokeObjectURL(filePreviewUrl);
     };
   }, [filePreviewUrl]);
-
-  useEffect(() => {
-    if (!isUploading) inputRef.current?.focus();
-  }, [isUploading]);
 
   if (!user) return null;
 
@@ -152,26 +147,50 @@ export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation })
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
+  const generateClientMessageId = () => `temp-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+
   const handleSendMessage = async () => {
     if (!value.trim() && !selectedFile) return;
     if (isConversationUnavailable) return;
 
-    setIsUploading(true);
+    const clientMessageId = generateClientMessageId();
+    const tempMessage: Message = {
+      _id: clientMessageId,
+      conversationId: selectedConvo._id,
+      senderId: user._id,
+      content: value.trim() || null,
+      createdAt: new Date().toISOString(),
+      isOwn: true,
+      status: 'sending',
+      clientMessageId,
+      ...(selectedFile?.type.startsWith('image/') ? { imgUrl: filePreviewUrl ?? undefined } : {}),
+      ...(selectedFile && !selectedFile.type.startsWith('image/')
+        ? {
+            fileName: selectedFile.name,
+            fileType: selectedFile.type,
+            fileSize: selectedFile.size,
+          }
+        : {}),
+      ...(selectedFile ? { file: selectedFile } : {}),
+    };
+
+    addMessage(tempMessage);
+
+    const contentToSend = value.trim();
+    const fileToSend = selectedFile ?? undefined;
+
+    setValue('');
+    handleClearSelectedFile();
 
     try {
       if (selectedConvo.type === CONVERSATION_TYPES.DIRECT) {
-        await sendDirectMessage(otherUser?._id ?? '', value, selectedFile ?? undefined);
+        await sendDirectMessage(otherUser?._id ?? '', contentToSend, fileToSend, clientMessageId);
       } else {
-        await sendGroupMessage(selectedConvo._id, value, selectedFile ?? undefined);
+        await sendGroupMessage(selectedConvo._id, contentToSend, fileToSend, clientMessageId);
       }
-
-      handleClearSelectedFile();
-      setValue('');
     } catch (e) {
       console.error('Send message error:', e);
       toast.error('Failed to send message. Please try again.');
-    } finally {
-      setIsUploading(false);
     }
   };
 
@@ -247,13 +266,7 @@ export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation })
                 {selectedFile.type || 'File'} • {formatFileSize(selectedFile.size)}
               </p>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="hover:bg-primary/10"
-              onClick={handleClearSelectedFile}
-              disabled={isUploading}
-            >
+            <Button variant="ghost" size="icon" className="hover:bg-primary/10" onClick={handleClearSelectedFile}>
               <X className="size-4" />
             </Button>
           </div>
@@ -273,7 +286,6 @@ export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation })
           size="icon"
           className="hover:bg-primary/10 transition-smooth cursor-pointer"
           onClick={() => fileInputRef.current?.click()}
-          disabled={isUploading}
         >
           <ImagePlus className="size-4" />
         </Button>
@@ -286,18 +298,13 @@ export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation })
             onChange={e => setValue(e.target.value)}
             placeholder={isConversationUnavailable ? 'Conversation unavailable' : 'Type a message...'}
             className="border-border/50 focus:border-primary/50 transition-smooth h-9 resize-none bg-white pr-20 dark:bg-slate-900/80 dark:text-white"
-            disabled={isConversationUnavailable || isUploading}
+            disabled={isConversationUnavailable}
           />
-          <div
-            className={
-              'absolute top-1/2 right-2 flex -translate-y-1/2 transform items-center gap-1 ' +
-              (isConversationUnavailable || isUploading ? 'pointer-events-none opacity-50' : '')
-            }
-          >
+          <div className="absolute top-1/2 right-2 flex -translate-y-1/2 transform items-center gap-1">
             <Suspense fallback={emojiPickerFallback}>
               <EmojiPicker
                 onChange={(emoji: string) => {
-                  if (isConversationUnavailable || isUploading) return;
+                  if (isConversationUnavailable) return;
                   setValue(`${value}${emoji}`);
                 }}
               />
@@ -307,10 +314,10 @@ export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation })
 
         <Button
           className="bg-gradient-chat hover:shadow-glow transition-smooth cursor-pointer hover:scale-105"
-          disabled={isConversationUnavailable || (!value.trim() && !selectedFile) || isUploading}
+          disabled={isConversationUnavailable || (!value.trim() && !selectedFile)}
           onClick={handleSendMessage}
         >
-          {isUploading ? <Spin className="size-4 text-white" /> : <Send className="size-4 text-white" />}
+          <Send className="size-4 text-white" />
         </Button>
       </div>
     </div>
