@@ -2,7 +2,7 @@ import { RedirectIfAuthenticated } from '@/routes/redirect-if-authenticated';
 
 import { LoginForm } from '@/pages/login-page/components/login-form.component';
 
-import { ThemeToggleFloat } from '@/components/ui/theme-toggle-float';
+import { ThemeToggleFloat } from '@/components/ui/theme-toggle-float.component';
 
 export const LoginPage = () => {
   return (

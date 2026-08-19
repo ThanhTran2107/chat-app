@@ -1,4 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { LoadingOutlined } from '@ant-design/icons';
 import { Toaster } from 'sonner';
 
 import { Suspense, lazy, useEffect } from 'react';
@@ -8,9 +9,9 @@ import { Spin } from '@/components/antd/spin.component';
 
 import { ProtectedRoute } from './routes/protected-route';
 import { RedirectIfAuthenticated } from './routes/redirect-if-authenticated';
-import { useAuthStore } from './stores/use-auth-store';
-import { useSocketStore } from './stores/use-socket-store';
-import { useThemeStore } from './stores/use-theme-store';
+import { useAuthStore } from './stores/use-auth.store';
+import { useSocketStore } from './stores/use-socket.store';
+import { useThemeStore } from './stores/use-theme.store';
 import { AUTH_SESSION_VALUE, LOCAL_STORAGE_KEYS, ROUTES } from './utils/constants';
 
 const ChatPage = lazy(() => import('./pages/chat-page/chat.page').then(m => ({ default: m.ChatPage })));
@@ -70,7 +71,11 @@ function App() {
         <Suspense
           fallback={
             <div className="flex h-screen items-center justify-center">
-              <Spin size="large" description="Loading..." />
+              <Spin
+                indicator={<LoadingOutlined spin style={{ fontSize: 48 }} />}
+                size="large"
+                description="Loading..."
+              />
             </div>
           }
         >

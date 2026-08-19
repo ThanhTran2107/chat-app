@@ -1,14 +1,14 @@
-import { useAuthStore } from '@/stores/use-auth-store';
-import { useThemeStore } from '@/stores/use-theme-store';
-import { useUserStore } from '@/stores/use-user-store';
+import { useAuthStore } from '@/stores/use-auth.store';
+import { useThemeStore } from '@/stores/use-theme.store';
+import { useUserStore } from '@/stores/use-user.store';
 import { Moon, Sun } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { useState } from 'react';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.component';
+import { Label } from '@/components/ui/label.component';
+import { Switch } from '@/components/ui/switch.component';
 
 import { getApiErrorMessage } from '@/lib/axios';
 

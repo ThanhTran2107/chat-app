@@ -1,4 +1,4 @@
-import { useChatStore } from '@/stores/use-chat-store';
+import { useChatStore } from '@/stores/use-chat.store';
 import filter from 'lodash-es/filter';
 import map from 'lodash-es/map';
 

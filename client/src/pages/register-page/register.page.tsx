@@ -2,7 +2,7 @@ import { RedirectIfAuthenticated } from '@/routes/redirect-if-authenticated';
 
 import { RegisterForm } from '@/pages/register-page/components/register-form.component';
 
-import { ThemeToggleFloat } from '@/components/ui/theme-toggle-float';
+import { ThemeToggleFloat } from '@/components/ui/theme-toggle-float.component';
 
 export const RegisterPage = () => {
   return (

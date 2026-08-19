@@ -1,3 +1,9 @@
+export const buildDirectKey = (userIdA, userIdB) => {
+  const ids = [userIdA, userIdB].map((id) => id.toString()).sort();
+
+  return `${ids[0]}_${ids[1]}`;
+};
+
 const getMessagePreview = (message) => {
   if (message.content) return message.content;
   if (message.imgUrl) return "📷 Image";

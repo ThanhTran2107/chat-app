@@ -2,7 +2,7 @@ import { RedirectIfAuthenticated } from '@/routes/redirect-if-authenticated';
 
 import { ResetPasswordForm } from '@/pages/reset-password-page/components/reset-password-form.component';
 
-import { ThemeToggleFloat } from '@/components/ui/theme-toggle-float';
+import { ThemeToggleFloat } from '@/components/ui/theme-toggle-float.component';
 
 export const ResetPasswordPage = () => {
   return (

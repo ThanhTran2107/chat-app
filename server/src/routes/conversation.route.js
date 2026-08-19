@@ -4,8 +4,8 @@ import {
   getConversations,
   getMessages,
   markAsSeen,
-} from "../controllers/conversationController.js";
-import { checkFriendship } from "../middlewares/friendMiddleware.js";
+} from "../controllers/conversation.controller.js";
+import { checkFriendship } from "../middlewares/friend.middleware.js";
 
 export const conversationRoute = express.Router();
 

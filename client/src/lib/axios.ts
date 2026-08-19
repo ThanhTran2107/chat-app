@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/stores/use-auth-store';
+import { useAuthStore } from '@/stores/use-auth.store';
 import axios, { isAxiosError } from 'axios';
 import includes from 'lodash-es/includes';
 

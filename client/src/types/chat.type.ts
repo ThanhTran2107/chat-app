@@ -59,4 +59,16 @@ export interface Message {
   createdAt: string;
   isOwn?: boolean;
   isNew?: boolean;
+  status?: 'sending' | 'failed';
+  isUploading?: boolean;
+  clientMessageId?: string;
+  clientSequence?: number;
+  clientGroupId?: string | null;
+  file?: File;
+}
+
+export interface SelectedAttachment {
+  id: string;
+  file: File;
+  previewUrl?: string;
 }

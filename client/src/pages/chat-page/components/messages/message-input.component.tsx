@@ -1,18 +1,22 @@
-import { useAuthStore } from '@/stores/use-auth-store';
-import { useChatStore } from '@/stores/use-chat-store';
-import type { Conversation } from '@/types/chat.type';
+import { useAuthStore } from '@/stores/use-auth.store';
+import { useChatStore } from '@/stores/use-chat.store';
+import type { Conversation, Message, SelectedAttachment } from '@/types/chat.type';
 import filter from 'lodash-es/filter';
+import find from 'lodash-es/find';
 import includes from 'lodash-es/includes';
-import { ImagePlus, Send, X } from 'lucide-react';
+import isEmpty from 'lodash-es/isEmpty';
+import map from 'lodash-es/map';
+import some from 'lodash-es/some';
+import { ImagePlus, Send, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 import React, { Suspense, useEffect, useRef, useState } from 'react';
 
-import { Spin } from '@/components/antd/spin.component';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button.component';
+import { Input } from '@/components/ui/input.component';
 
-import { CONVERSATION_TYPES } from '@/utils/constants';
+import { CONVERSATION_TYPES, MAX_ATTACHMENTS_PER_SEND } from '@/utils/constants';
+import { type UploadJob, createUploadQueue } from '@/utils/upload-queue';
 
 import { formatFileSize } from '@/lib/utils';
 
@@ -24,27 +28,47 @@ const emojiPickerFallback = (
   </Button>
 );
 
+const generateId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+
 export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation }) => {
   const [value, setValue] = useState('');
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [filePreviewUrl, setFilePreviewUrl] = useState<string | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<SelectedAttachment[]>([]);
+  const [hoveredAttachmentId, setHoveredAttachmentId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const optimisticBlobUrls = useRef(new Set<string>());
+  const clientSequenceRef = useRef(0);
 
   const user = useAuthStore(state => state.user);
+  const addMessage = useChatStore(state => state.addMessage);
   const sendDirectMessage = useChatStore(state => state.sendDirectMessage);
   const sendGroupMessage = useChatStore(state => state.sendGroupMessage);
+  const setMessageUploading = useChatStore(state => state.setMessageUploading);
 
   useEffect(() => {
+    const urls = optimisticBlobUrls.current;
+
     return () => {
-      if (filePreviewUrl) URL.revokeObjectURL(filePreviewUrl);
-    };
-  }, [filePreviewUrl]);
+      for (const blobUrl of urls) {
+        const messages = useChatStore.getState().messages;
+        let urlInUse = false;
 
-  useEffect(() => {
-    if (!isUploading) inputRef.current?.focus();
-  }, [isUploading]);
+        for (const convoId in messages) {
+          const items = messages[convoId]?.items ?? [];
+
+          if (items.some(m => m.imgUrl === blobUrl)) {
+            urlInUse = true;
+
+            break;
+          }
+        }
+
+        if (!urlInUse) URL.revokeObjectURL(blobUrl);
+      }
+
+      urls.clear();
+    };
+  }, []);
 
   if (!user) return null;
 
@@ -116,62 +140,257 @@ export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation })
   };
 
   const handleSelectFile = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0] ?? null;
+    const files = Array.from(event.target.files ?? []);
+    if (isEmpty(files)) return;
 
-    if (!file) return;
-
-    if (file.size > 20 * 1024 * 1024) {
-      toast.error('File must be 20MB or smaller.');
+    if (selectedFiles.length + files.length > MAX_ATTACHMENTS_PER_SEND) {
+      toast.error(`You can only send up to ${MAX_ATTACHMENTS_PER_SEND} files at a time.`);
       event.target.value = '';
 
       return;
     }
 
-    if (!isAcceptedFileType(file)) {
-      toast.error('File type is not supported.');
-      event.target.value = '';
+    const newAttachments: SelectedAttachment[] = [];
 
-      return;
+    for (const file of files) {
+      if (file.size > 20 * 1024 * 1024) {
+        toast.error('File must be 20MB or smaller.');
+        event.target.value = '';
+
+        return;
+      }
+
+      if (!isAcceptedFileType(file)) {
+        toast.error('File type is not supported.');
+        event.target.value = '';
+
+        return;
+      }
+
+      const existing = find(
+        selectedFiles,
+        item => item.file.name === file.name && item.file.size === file.size && item.file.type === file.type,
+      );
+
+      if (existing) continue;
+
+      const previewUrl = file.type.startsWith('image/') ? URL.createObjectURL(file) : undefined;
+      newAttachments.push({ id: generateId(), file, previewUrl });
     }
 
-    if (filePreviewUrl) {
-      URL.revokeObjectURL(filePreviewUrl);
-      setFilePreviewUrl(null);
-    }
-
-    setSelectedFile(file);
-    if (file.type.startsWith('image/')) setFilePreviewUrl(URL.createObjectURL(file));
-  };
-
-  const handleClearSelectedFile = () => {
-    if (filePreviewUrl) URL.revokeObjectURL(filePreviewUrl);
-
-    setFilePreviewUrl(null);
-    setSelectedFile(null);
+    if (!isEmpty(newAttachments)) setSelectedFiles(prev => [...prev, ...newAttachments]);
 
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
+  const clearSelectionForSend = () => {
+    setSelectedFiles([]);
+    setValue('');
+
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const generateClientMessageId = () => `temp-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+
+  const updateOptimisticMessage = (conversationId: string, clientMessageId: string, message: Message) => {
+    const revokeBlobUrl = (url?: string | null) => {
+      if (typeof url === 'string' && url.startsWith('blob:')) URL.revokeObjectURL(url);
+    };
+
+    useChatStore.setState(state => {
+      const items = state.messages[conversationId]?.items ?? [];
+      const exists = some(items, m => m._id === message._id);
+
+      if (exists) return state;
+
+      const updatedItems = map(items, m => {
+        if (m.clientMessageId !== clientMessageId) return m;
+
+        revokeBlobUrl(m.imgUrl);
+
+        return {
+          ...message,
+          isOwn: true,
+          isNew: true,
+          clientMessageId: m.clientMessageId,
+          status: undefined,
+        };
+      });
+
+      return {
+        messages: {
+          ...state.messages,
+          [conversationId]: {
+            items: updatedItems,
+            hasMore: state.messages[conversationId]?.hasMore ?? true,
+            nextCursor: state.messages[conversationId]?.nextCursor,
+          },
+        },
+      };
+    });
+  };
+
+  const markOptimisticFailed = (conversationId: string, clientMessageId: string) => {
+    useChatStore.setState(state => ({
+      messages: {
+        ...state.messages,
+        [conversationId]: {
+          ...state.messages[conversationId],
+          items: map(state.messages[conversationId]?.items ?? [], m =>
+            m.clientMessageId === clientMessageId ? { ...m, status: 'failed' as const } : m,
+          ),
+        },
+      },
+    }));
+  };
+
   const handleSendMessage = async () => {
-    if (!value.trim() && !selectedFile) return;
+    if (!value.trim() && isEmpty(selectedFiles)) return;
     if (isConversationUnavailable) return;
 
-    setIsUploading(true);
+    const text = value.trim();
+    const attachments = [...selectedFiles];
 
-    try {
-      if (selectedConvo.type === CONVERSATION_TYPES.DIRECT) {
-        await sendDirectMessage(otherUser?._id ?? '', value, selectedFile ?? undefined);
-      } else {
-        await sendGroupMessage(selectedConvo._id, value, selectedFile ?? undefined);
+    clearSelectionForSend();
+
+    const queue = createUploadQueue<unknown>({
+      maxConcurrent: 2,
+      maxAttempts: 3,
+      baseDelay: 500,
+    });
+
+    if (isEmpty(attachments) && text) {
+      const clientMessageId = generateClientMessageId();
+      const clientSequence = clientSequenceRef.current++;
+      const tempMessage: Message = {
+        _id: clientMessageId,
+        conversationId: selectedConvo._id,
+        senderId: user._id,
+        content: text,
+        createdAt: new Date().toISOString(),
+        isOwn: true,
+        status: 'sending',
+        clientMessageId,
+        clientSequence,
+      };
+
+      addMessage(tempMessage);
+
+      const sendJob: UploadJob<unknown> = {
+        key: clientMessageId,
+        run: () => {
+          if (selectedConvo.type === CONVERSATION_TYPES.DIRECT) {
+            return sendDirectMessage(
+              otherUser?._id ?? '',
+              text,
+              undefined,
+              clientMessageId,
+              tempMessage.createdAt,
+              clientSequence,
+              undefined,
+            );
+          }
+
+          return sendGroupMessage(
+            selectedConvo._id,
+            text,
+            undefined,
+            clientMessageId,
+            tempMessage.createdAt,
+            clientSequence,
+            undefined,
+          );
+        },
+        onSuccess: message => {
+          updateOptimisticMessage(selectedConvo._id, clientMessageId, message as Message);
+        },
+        onError: () => {
+          markOptimisticFailed(selectedConvo._id, clientMessageId);
+        },
+        onStart: () => {
+          setMessageUploading(selectedConvo._id, clientMessageId, true);
+        },
+      };
+
+      await queue.drain([sendJob]);
+    } else if (!isEmpty(attachments)) {
+      const clientGroupId = generateClientMessageId();
+      const jobs: UploadJob<unknown>[] = [];
+
+      for (const attachment of attachments) {
+        const clientMessageId = generateClientMessageId();
+        const clientSequence = clientSequenceRef.current++;
+        const tempMessage: Message = {
+          _id: clientMessageId,
+          conversationId: selectedConvo._id,
+          senderId: user._id,
+          content: text && attachments.indexOf(attachment) === 0 ? text : null,
+          createdAt: new Date().toISOString(),
+          isOwn: true,
+          status: 'sending',
+          clientMessageId,
+          clientSequence,
+          clientGroupId,
+          ...(attachment.file.type.startsWith('image/') ? { imgUrl: attachment.previewUrl ?? undefined } : {}),
+          ...(!attachment.file.type.startsWith('image/')
+            ? {
+                fileName: attachment.file.name,
+                fileType: attachment.file.type,
+                fileSize: attachment.file.size,
+              }
+            : {}),
+          file: attachment.file,
+        };
+
+        addMessage(tempMessage);
+
+        if (tempMessage.imgUrl && tempMessage.imgUrl.startsWith('blob:'))
+          optimisticBlobUrls.current.add(tempMessage.imgUrl);
+
+        const contentToSend = tempMessage.content ?? '';
+        const fileToSend = attachment.file;
+
+        jobs.push({
+          key: clientMessageId,
+          run: () => {
+            if (selectedConvo.type === CONVERSATION_TYPES.DIRECT) {
+              return sendDirectMessage(
+                otherUser?._id ?? '',
+                contentToSend,
+                fileToSend,
+                clientMessageId,
+                tempMessage.createdAt,
+                clientSequence,
+                clientGroupId,
+              );
+            }
+
+            return sendGroupMessage(
+              selectedConvo._id,
+              contentToSend,
+              fileToSend,
+              clientMessageId,
+              tempMessage.createdAt,
+              clientSequence,
+              clientGroupId,
+            );
+          },
+          onSuccess: message => {
+            updateOptimisticMessage(selectedConvo._id, clientMessageId, message as Message);
+          },
+          onError: () => {
+            markOptimisticFailed(selectedConvo._id, clientMessageId);
+          },
+          onRetry: (attempt, error) => {
+            console.warn(`Retry ${clientMessageId} attempt ${attempt}:`, error);
+          },
+          onStart: () => {
+            setMessageUploading(selectedConvo._id, clientMessageId, true);
+          },
+        });
       }
 
-      handleClearSelectedFile();
-      setValue('');
-    } catch (e) {
-      console.error('Send message error:', e);
-      toast.error('Failed to send message. Please try again.');
-    } finally {
-      setIsUploading(false);
+      await queue.drain(jobs);
     }
   };
 
@@ -182,11 +401,79 @@ export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation })
     }
   };
 
-  const renderFileInputIcon = () => {
-    if (!selectedFile) return null;
+  const removeSelectedAttachment = (id: string) => {
+    setSelectedFiles(prev => {
+      const target = prev.find(item => item.id === id);
 
-    const type = selectedFile.type.toLowerCase();
-    const name = selectedFile.name.toLowerCase();
+      if (target?.previewUrl && target.previewUrl.startsWith('blob:')) URL.revokeObjectURL(target.previewUrl);
+
+      return prev.filter(item => item.id !== id);
+    });
+  };
+
+  const getAttachmentSummary = (attachments: SelectedAttachment[]) => {
+    const total = attachments.length;
+
+    if (total === 0) return '';
+
+    const totalSize = attachments.reduce((sum, item) => sum + (item.file.size || 0), 0);
+
+    const imageCount = attachments.filter(item => item.file.type.startsWith('image/')).length;
+    const nonImageCount = total - imageCount;
+
+    if (imageCount === total)
+      return `${total === 1 ? '1 image' : `${total} images`} • ${formatFileSize(totalSize)} total`;
+
+    if (nonImageCount === 0)
+      return `${total === 1 ? '1 image' : `${total} images`} • ${formatFileSize(totalSize)} total`;
+
+    if (nonImageCount === total)
+      return `${total === 1 ? '1 file' : `${total} files`} • ${formatFileSize(totalSize)} total`;
+
+    const categoryCounts = new Map<string, { count: number; size: number }>();
+
+    for (const item of attachments) {
+      const category = item.file.type.startsWith('image/')
+        ? 'image'
+        : item.file.type.includes('pdf')
+          ? 'pdf'
+          : item.file.type.includes('word') || item.file.type.includes('document')
+            ? 'doc'
+            : item.file.type.includes('sheet') || item.file.type.includes('excel')
+              ? 'sheet'
+              : item.file.type.includes('presentation') || item.file.type.includes('powerpoint')
+                ? 'slide'
+                : item.file.type.includes('zip') || item.file.type.includes('rar')
+                  ? 'archive'
+                  : item.file.type.includes('video')
+                    ? 'video'
+                    : item.file.type.includes('audio')
+                      ? 'audio'
+                      : 'file';
+
+      const current = categoryCounts.get(category) || { count: 0, size: 0 };
+
+      categoryCounts.set(category, {
+        count: current.count + 1,
+        size: current.size + (item.file.size || 0),
+      });
+    }
+
+    const entries = Array.from(categoryCounts.entries());
+    const parts = entries.map(([category, data]) => {
+      const label = category === 'image' ? (data.count === 1 ? 'image' : 'images') : category;
+
+      return `${data.count} ${label}`;
+    });
+
+    const summary = parts.join(' • ');
+
+    return `${summary} • ${formatFileSize(totalSize)}`;
+  };
+
+  const getFileIcon = (file: File) => {
+    const type = file.type.toLowerCase();
+    const name = file.name.toLowerCase();
     let iconName = 'default';
 
     if (type.includes('pdf') || name.endsWith('.pdf')) iconName = 'pdf';
@@ -225,35 +512,79 @@ export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation })
     );
   };
 
-  const fileIcon = selectedFile?.type.startsWith('image/') ? (
-    <img src={filePreviewUrl ?? undefined} alt={selectedFile?.name} className="h-16 w-16 rounded-md object-cover" />
-  ) : (
-    <div className="flex h-12 w-12 items-center justify-center rounded-md border bg-slate-50 dark:border-white/10 dark:bg-slate-900/70">
-      {renderFileInputIcon()}
-    </div>
-  );
+  const selectedAttachmentPreview = map(selectedFiles, item => {
+    const isHovered = hoveredAttachmentId === item.id;
 
-  return (
-    <div className="space-y-2 px-3 pt-2 pb-3">
-      {selectedFile && (
-        <div className="border-border/50 overflow-hidden rounded-2xl border bg-white dark:border-white/10 dark:bg-slate-950/90">
-          <div className="border-border/5 flex w-full items-center gap-3 border-b bg-white p-3 dark:border-white/10 dark:bg-slate-950/80">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-50 shadow-sm dark:bg-slate-900/80">
-              {fileIcon}
+    if (item.file.type.startsWith('image/')) {
+      return (
+        <div
+          key={item.id}
+          className="relative h-16 w-16"
+          onMouseEnter={() => setHoveredAttachmentId(item.id)}
+          onMouseLeave={() => setHoveredAttachmentId(null)}
+        >
+          <img src={item.previewUrl ?? undefined} alt={item.file.name} className="h-16 w-16 rounded-md object-cover" />
+          {isHovered && (
+            <div className="absolute inset-0 flex items-center justify-center rounded-md bg-black/30">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 cursor-pointer rounded-full bg-black/50 text-white hover:bg-black/70"
+                onClick={() => removeSelectedAttachment(item.id)}
+                aria-label={`Remove ${item.file.name}`}
+              >
+                <Trash2 className="size-3.5" />
+              </Button>
             </div>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">{selectedFile.name}</p>
-              <p className="text-muted-foreground text-xs dark:text-slate-400">
-                {selectedFile.type || 'File'} • {formatFileSize(selectedFile.size)}
-              </p>
-            </div>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <div
+        key={item.id}
+        className="relative flex h-12 w-12 items-center justify-center rounded-md border bg-slate-50 dark:border-white/10 dark:bg-slate-900/70"
+        onMouseEnter={() => setHoveredAttachmentId(item.id)}
+        onMouseLeave={() => setHoveredAttachmentId(null)}
+      >
+        {getFileIcon(item.file)}
+        {isHovered && (
+          <div className="absolute inset-0 flex items-center justify-center rounded-md bg-black/30">
             <Button
               variant="ghost"
               size="icon"
-              className="hover:bg-primary/10"
-              onClick={handleClearSelectedFile}
-              disabled={isUploading}
+              className="h-6 w-6 cursor-pointer rounded-full bg-black/50 text-white hover:bg-black/70"
+              onClick={() => removeSelectedAttachment(item.id)}
+              aria-label={`Remove ${item.file.name}`}
             >
+              <Trash2 className="size-3.5" />
+            </Button>
+          </div>
+        )}
+      </div>
+    );
+  });
+
+  const attachmentSummary = getAttachmentSummary(selectedFiles);
+
+  return (
+    <div className="space-y-2 px-3 pt-2 pb-3">
+      {!isEmpty(selectedFiles) && (
+        <div className="border-border/50 overflow-hidden rounded-2xl border bg-white dark:border-white/10 dark:bg-slate-950/90">
+          <div className="border-border/5 flex w-full items-center gap-3 border-b bg-white p-3 dark:border-white/10 dark:bg-slate-950/80">
+            <div className="flex flex-wrap gap-2">{selectedAttachmentPreview}</div>
+
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
+                {selectedFiles.length === 1 ? selectedFiles[0].file.name : `${selectedFiles.length} files selected`}
+              </p>
+              {attachmentSummary && (
+                <p className="text-muted-foreground text-xs dark:text-slate-400">{attachmentSummary}</p>
+              )}
+            </div>
+
+            <Button variant="ghost" size="icon" className="hover:bg-primary/10" onClick={clearSelectionForSend}>
               <X className="size-4" />
             </Button>
           </div>
@@ -264,16 +595,17 @@ export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation })
         <input
           ref={fileInputRef}
           type="file"
+          multiple
           accept={acceptMimeTypes.join(',')}
           className="hidden"
           onChange={handleSelectFile}
         />
+
         <Button
           variant="ghost"
           size="icon"
           className="hover:bg-primary/10 transition-smooth cursor-pointer"
           onClick={() => fileInputRef.current?.click()}
-          disabled={isUploading}
         >
           <ImagePlus className="size-4" />
         </Button>
@@ -286,18 +618,13 @@ export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation })
             onChange={e => setValue(e.target.value)}
             placeholder={isConversationUnavailable ? 'Conversation unavailable' : 'Type a message...'}
             className="border-border/50 focus:border-primary/50 transition-smooth h-9 resize-none bg-white pr-20 dark:bg-slate-900/80 dark:text-white"
-            disabled={isConversationUnavailable || isUploading}
+            disabled={isConversationUnavailable}
           />
-          <div
-            className={
-              'absolute top-1/2 right-2 flex -translate-y-1/2 transform items-center gap-1 ' +
-              (isConversationUnavailable || isUploading ? 'pointer-events-none opacity-50' : '')
-            }
-          >
+          <div className="absolute top-1/2 right-2 flex -translate-y-1/2 transform items-center gap-1">
             <Suspense fallback={emojiPickerFallback}>
               <EmojiPicker
                 onChange={(emoji: string) => {
-                  if (isConversationUnavailable || isUploading) return;
+                  if (isConversationUnavailable) return;
                   setValue(`${value}${emoji}`);
                 }}
               />
@@ -307,10 +634,10 @@ export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation })
 
         <Button
           className="bg-gradient-chat hover:shadow-glow transition-smooth cursor-pointer hover:scale-105"
-          disabled={isConversationUnavailable || (!value.trim() && !selectedFile) || isUploading}
+          disabled={isConversationUnavailable || (!value.trim() && isEmpty(selectedFiles))}
           onClick={handleSendMessage}
         >
-          {isUploading ? <Spin className="size-4 text-white" /> : <Send className="size-4 text-white" />}
+          <Send className="size-4 text-white" />
         </Button>
       </div>
     </div>

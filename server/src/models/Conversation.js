@@ -64,6 +64,10 @@ const conversationSchema = new mongoose.Schema(
     group: {
       type: [groupSchema],
     },
+    directKey: {
+      type: String,
+      trim: true,
+    },
     lastMessageAt: {
       type: Date,
     },
@@ -87,5 +91,6 @@ const conversationSchema = new mongoose.Schema(
 );
 
 conversationSchema.index({ "participants.userId": 1, lastMessageAt: -1 });
+conversationSchema.index({ directKey: 1 }, { unique: true, sparse: true });
 
 export const Conversation = mongoose.model("Conversation", conversationSchema);

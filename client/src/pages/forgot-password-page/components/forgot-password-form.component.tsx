@@ -1,3 +1,4 @@
+import { LoadingOutlined } from '@ant-design/icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Mail } from 'lucide-react';
 import { toast } from 'sonner';
@@ -8,9 +9,9 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { Spin } from '@/components/antd/spin.component';
 import { AuthIllustration } from '@/components/ui/auth-illustration.component';
-import { Button } from '@/components/ui/button';
-import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button.component';
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field.component';
+import { Input } from '@/components/ui/input.component';
 
 import { APP_NAME, type ForgotPasswordFormValues, ROUTES, forgotPasswordSchema } from '@/utils/constants';
 import { authService } from '@/utils/services/auth.service';
@@ -110,7 +111,9 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
                 disabled={isSubmitting}
               >
                 <div className="flex items-center justify-center gap-2">
-                  {isSubmitting && <Spin className="size-4" />}
+                  {isSubmitting && (
+                    <Spin indicator={<LoadingOutlined spin style={{ fontSize: 24 }} />} className="size-4" />
+                  )}
                   Send reset link
                 </div>
               </Button>

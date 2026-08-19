@@ -1,7 +1,7 @@
 'use client';
 
-import { useAuthStore } from '@/stores/use-auth-store';
-import { useThemeStore } from '@/stores/use-theme-store';
+import { useAuthStore } from '@/stores/use-auth.store.ts';
+import { useThemeStore } from '@/stores/use-theme.store.ts';
 import { Moon, Sun } from 'lucide-react';
 
 import * as React from 'react';
@@ -24,12 +24,12 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from '@/components/ui/sidebar';
-import { Switch } from '@/components/ui/switch';
+} from '@/components/ui/sidebar.component.tsx';
+import { Switch } from '@/components/ui/switch.component.tsx';
 
 import { APP_NAME } from '@/utils/constants';
 
-import { NavUser } from './nav-user.tsx';
+import { NavUser } from './nav-user.component.tsx';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const isDark = useThemeStore(state => state.isDark);

@@ -357,3 +357,39 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Image messages (unlayered on purpose):
+   Ant Design v6 injects `.ant-image { display: inline-block }` at runtime as an
+   UNLAYERED style. Rules inside `@layer components` are lower priority than
+   unlayered styles, so the earlier layered override was silently ignored and the
+   inline-block <div> kept its line-box strut. That strut left a thin gray
+   (wrapper bg) rounded band above/below the <img> inside the rounded wrapper.
+   Declaring these rules unlayered (and with higher specificity) makes the image
+   root a block element, so the wrapper shrinks to the image and the stray band
+   disappears. */
+.ant-image.tetra-image-message {
+  display: block;
+}
+
+.ant-image.tetra-image-message .ant-image-img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 20rem;
+  object-fit: contain;
+}
+
+/* Image grid cell (multi-attachment message): fill the square cell, crop. */
+.ant-image.tetra-image-grid {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ant-image.tetra-image-grid .ant-image-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

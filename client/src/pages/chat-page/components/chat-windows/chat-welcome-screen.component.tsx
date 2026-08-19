@@ -1,4 +1,4 @@
-import { SidebarInset } from '@/components/ui/sidebar';
+import { SidebarInset } from '@/components/ui/sidebar.component';
 
 import { APP_NAME } from '@/utils/constants';
 

@@ -1,11 +1,12 @@
-import { useUserStore } from '@/stores/use-user-store';
+import { useUserStore } from '@/stores/use-user.store';
+import { LoadingOutlined } from '@ant-design/icons';
 import { Camera } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { useRef, useState } from 'react';
 
 import { Spin } from '@/components/antd/spin.component';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button.component';
 
 import { getApiErrorMessage } from '@/lib/axios';
 
@@ -53,7 +54,7 @@ export const AvatarUploader = () => {
     <>
       {loading && (
         <div className="absolute inset-0 z-20 flex items-center justify-center rounded-full bg-black/25">
-          <Spin />
+          <Spin indicator={<LoadingOutlined spin style={{ fontSize: 24 }} />} />
         </div>
       )}
 

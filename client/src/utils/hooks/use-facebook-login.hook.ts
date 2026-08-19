@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/stores/use-auth-store';
+import { useAuthStore } from '@/stores/use-auth.store';
 import { toast } from 'sonner';
 
 import { useEffect, useRef, useState } from 'react';
@@ -32,10 +32,7 @@ export function useFacebookLogin(onSuccess?: () => void) {
   const handleFacebookClick = () => {
     const FB = window.FB;
 
-    if (!FB) {
-      toast.error('Facebook login is not ready yet.');
-      return;
-    }
+    if (!FB) return toast.error('Facebook login is not ready yet.');
 
     clearFacebookRequestTimeout();
     setFacebookLoading(true);

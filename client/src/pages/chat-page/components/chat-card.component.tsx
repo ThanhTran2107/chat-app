@@ -2,7 +2,7 @@ import { MoreHorizontal } from 'lucide-react';
 
 import * as React from 'react';
 
-import { Card } from '@/components/ui/card.tsx';
+import { Card } from '@/components/ui/card.component';
 
 import { cn, formatOnlineTime } from '@/lib/utils.ts';
 

@@ -1,9 +1,9 @@
-import { useFriendStore } from '@/stores/use-friend-store';
+import { useFriendStore } from '@/stores/use-friend.store';
 import isEmpty from 'lodash-es/isEmpty';
 import map from 'lodash-es/map';
 import { toast } from 'sonner';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button.component';
 
 import { getApiErrorMessage } from '@/lib/axios';
 

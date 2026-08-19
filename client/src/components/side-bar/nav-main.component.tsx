@@ -1,7 +1,8 @@
+import isEmpty from 'lodash-es/isEmpty';
 import map from 'lodash-es/map';
 import { ChevronRightIcon } from 'lucide-react';
 
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible.component';
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -12,7 +13,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from '@/components/ui/sidebar';
+} from '@/components/ui/sidebar.component';
 
 export function NavMain({
   items,
@@ -38,7 +39,7 @@ export function NavMain({
               {item.icon}
               <span>{item.title}</span>
             </SidebarMenuButton>
-            {item.items?.length ? (
+            {!isEmpty(item.items) ? (
               <>
                 <CollapsibleTrigger render={<SidebarMenuAction className="aria-expanded:rotate-90" />}>
                   <ChevronRightIcon />

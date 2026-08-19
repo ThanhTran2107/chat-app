@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button.component';
 
 import { ROUTES } from '@/utils/constants';
 import { useFacebookLogin } from '@/utils/hooks/use-facebook-login.hook';

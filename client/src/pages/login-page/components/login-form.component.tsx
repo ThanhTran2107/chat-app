@@ -1,4 +1,5 @@
-import { useAuthStore } from '@/stores/use-auth-store';
+import { useAuthStore } from '@/stores/use-auth.store';
+import { LoadingOutlined } from '@ant-design/icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff, LockKeyhole, Mail } from 'lucide-react';
 import { toast } from 'sonner';
@@ -12,9 +13,9 @@ import { SocialButtons } from '@/pages/login-page/components/social-buttons.comp
 import { Checkbox } from '@/components/antd/checkbox.component';
 import { Spin } from '@/components/antd/spin.component';
 import { AuthIllustration } from '@/components/ui/auth-illustration.component';
-import { Button } from '@/components/ui/button';
-import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button.component';
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field.component';
+import { Input } from '@/components/ui/input.component';
 
 import { APP_NAME, LOCAL_STORAGE_KEYS, type LoginFormValues, ROUTES, loginSchema } from '@/utils/constants';
 
@@ -187,7 +188,9 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                 disabled={isSubmitting}
               >
                 <div className="flex items-center justify-center gap-2">
-                  {isSubmitting && <Spin className="size-4" />}
+                  {isSubmitting && (
+                    <Spin indicator={<LoadingOutlined spin style={{ fontSize: 24 }} />} className="size-4" />
+                  )}
                   Login
                 </div>
               </Button>

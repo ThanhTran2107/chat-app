@@ -1,14 +1,15 @@
-import { useAuthStore } from '@/stores/use-auth-store';
-import { Spin } from 'antd';
+import { useAuthStore } from '@/stores/use-auth.store';
+import { LoadingOutlined } from '@ant-design/icons';
 import { Bell, Shield, ShieldBan } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Spin } from '@/components/antd/spin.component';
+import { Button } from '@/components/ui/button.component';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.component';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog.component';
 
 import { ROUTES } from '@/utils/constants';
 import { authService } from '@/utils/services/auth.service';
@@ -122,7 +123,7 @@ export const PrivacySettings = () => {
             >
               {isDeleting ? (
                 <>
-                  <Spin /> Deleting...
+                  <Spin indicator={<LoadingOutlined spin style={{ fontSize: 24 }} />} /> Deleting...
                 </>
               ) : (
                 'Delete Account'

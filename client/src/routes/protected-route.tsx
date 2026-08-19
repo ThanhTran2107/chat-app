@@ -1,5 +1,7 @@
-import { appSessionInitPromise, useAuthStore } from '@/stores/use-auth-store';
-import { useChatStore } from '@/stores/use-chat-store';
+import { appSessionInitPromise, useAuthStore } from '@/stores/use-auth.store';
+import { useChatStore } from '@/stores/use-chat.store';
+import { LoadingOutlined } from '@ant-design/icons';
+import isEmpty from 'lodash-es/isEmpty';
 
 import { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
@@ -30,7 +32,7 @@ export const ProtectedRoute = () => {
 
         if (!currentUser) await authState.fetchMe();
 
-        if (!chatState.conversations.length && !chatState.convoLoading) await chatState.fetchConversations();
+        if (isEmpty(chatState.conversations) && !chatState.convoLoading) await chatState.fetchConversations();
       } catch (e) {
         console.warn('ProtectedRoute initialization warning:', e);
       } finally {
@@ -48,7 +50,11 @@ export const ProtectedRoute = () => {
   if (loading || starting)
     return (
       <div className="flex h-screen items-center justify-center">
-        <Spin description="Loading the page..." size="large" />
+        <Spin
+          indicator={<LoadingOutlined spin style={{ fontSize: 48 }} />}
+          description="Loading the page..."
+          size="large"
+        />
       </div>
     );
 

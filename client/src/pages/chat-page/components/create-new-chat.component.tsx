@@ -1,10 +1,10 @@
-import { useFriendStore } from '@/stores/use-friend-store';
+import { useFriendStore } from '@/stores/use-friend.store';
 import { MessageCircle } from 'lucide-react';
 
 import { useState } from 'react';
 
-import { Card } from '@/components/ui/card';
-import { Dialog, DialogTrigger } from '@/components/ui/dialog';
+import { Card } from '@/components/ui/card.component';
+import { Dialog, DialogTrigger } from '@/components/ui/dialog.component';
 
 import { FriendListDialog } from './friends/dialogs/friend-list-dialog.component';
 

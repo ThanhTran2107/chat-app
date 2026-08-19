@@ -32,10 +32,26 @@ const messageSchema = new mongoose.Schema(
     fileSize: {
       type: Number,
     },
+    clientMessageId: {
+      type: String,
+      index: true,
+      sparse: true,
+    },
+    clientSequence: {
+      type: Number,
+      index: true,
+      sparse: true,
+    },
+    clientGroupId: {
+      type: String,
+      index: true,
+      sparse: true,
+    },
   },
   { timestamps: true },
 );
 
-messageSchema.index({ conversationId: 1, createdAt: -1 });
+messageSchema.index({ conversationId: 1, createdAt: -1, clientSequence: -1 });
+messageSchema.index({ senderId: 1, clientMessageId: 1 }, { unique: true, sparse: true });
 
 export const Message = mongoose.model("Message", messageSchema);

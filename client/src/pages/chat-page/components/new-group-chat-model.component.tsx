@@ -1,6 +1,7 @@
-import { useChatStore } from '@/stores/use-chat-store';
-import { useFriendStore } from '@/stores/use-friend-store';
+import { useChatStore } from '@/stores/use-chat.store';
+import { useFriendStore } from '@/stores/use-friend.store';
 import { type Friend } from '@/types/user.type';
+import { LoadingOutlined } from '@ant-design/icons';
 import debounce from 'lodash-es/debounce';
 import filter from 'lodash-es/filter';
 import includes from 'lodash-es/includes';
@@ -13,10 +14,17 @@ import { toast } from 'sonner';
 import { useEffect, useRef, useState } from 'react';
 
 import { Spin } from '@/components/antd/spin.component';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button.component';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog.component';
+import { Input } from '@/components/ui/input.component';
+import { Label } from '@/components/ui/label.component';
 
 import { CONVERSATION_TYPES } from '@/utils/constants';
 
@@ -166,7 +174,7 @@ export const NewGroupChatModel = () => {
             </div>
 
             {/* selected users list */}
-            {invitedUsers.length > 0 && <SelectedUserList invitedUsers={invitedUsers} onRemove={handleRemoveFriend} />}
+            {!isEmpty(invitedUsers) && <SelectedUserList invitedUsers={invitedUsers} onRemove={handleRemoveFriend} />}
 
             {/* invite suggestion list */}
             <InviteSuggestionList filteredFriends={filteredFriends} onSelect={handleSelectFriend} />
@@ -180,7 +188,7 @@ export const NewGroupChatModel = () => {
             >
               {loading ? (
                 <>
-                  <Spin />
+                  <Spin indicator={<LoadingOutlined spin style={{ fontSize: 24 }} />} />
                   Creating...
                 </>
               ) : (

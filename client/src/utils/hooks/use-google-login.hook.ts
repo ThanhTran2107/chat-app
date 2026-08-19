@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/stores/use-auth-store';
+import { useAuthStore } from '@/stores/use-auth.store';
 import { toast } from 'sonner';
 
 import { useEffect, useRef, useState } from 'react';
@@ -60,6 +60,7 @@ export function useGoogleLogin(onSuccess?: () => void) {
         if (existingScript) {
           existingScript.addEventListener('load', () => resolve());
           existingScript.addEventListener('error', () => reject(new Error('Google SDK failed to load')));
+
           return;
         }
 
@@ -91,12 +92,14 @@ export function useGoogleLogin(onSuccess?: () => void) {
             }
 
             setGoogleLoading(false);
+
             return;
           }
 
           if (!response.access_token) {
             toast.error('Google login did not return an access token.');
             setGoogleLoading(false);
+
             return;
           }
 
@@ -123,10 +126,7 @@ export function useGoogleLogin(onSuccess?: () => void) {
   }, [logInWithGoogle]);
 
   const handleGoogleClick = () => {
-    if (!googleTokenClient.current) {
-      toast.error('Google login is not ready yet.');
-      return;
-    }
+    if (!googleTokenClient.current) return toast.error('Google login is not ready yet.');
 
     clearGoogleRequestTimeout();
     setGoogleLoading(true);

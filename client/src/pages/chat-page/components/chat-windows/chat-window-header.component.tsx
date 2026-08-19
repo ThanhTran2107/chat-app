@@ -1,13 +1,13 @@
-import { useAuthStore } from '@/stores/use-auth-store';
-import { useChatStore } from '@/stores/use-chat-store';
-import { useSocketStore } from '@/stores/use-socket-store';
+import { useAuthStore } from '@/stores/use-auth.store';
+import { useChatStore } from '@/stores/use-chat.store';
+import { useSocketStore } from '@/stores/use-socket.store';
 import type { Conversation } from '@/types/chat.type';
 import filter from 'lodash-es/filter';
 import find from 'lodash-es/find';
 import isEmpty from 'lodash-es/isEmpty';
 
-import { Separator } from '@/components/ui/separator';
-import { SidebarTrigger } from '@/components/ui/sidebar';
+import { Separator } from '@/components/ui/separator.component';
+import { SidebarTrigger } from '@/components/ui/sidebar.component';
 
 import { CONVERSATION_TYPES, DELETED_ACCOUNT_LABEL, PRESENCE_STATUS } from '@/utils/constants';
 

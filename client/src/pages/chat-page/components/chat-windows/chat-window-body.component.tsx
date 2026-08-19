@@ -1,15 +1,17 @@
-import { useChatStore } from '@/stores/use-chat-store';
+import { useAuthStore } from '@/stores/use-auth.store';
+import { useChatStore } from '@/stores/use-chat.store';
 import { find, isEmpty, map, some } from 'lodash-es';
 
 import { useMemo, useRef } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
 import { Skeleton } from '@/components/antd/skeleton.component';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button.component';
 
 import { CONVERSATION_TYPES } from '@/utils/constants';
 
-import { MessageItem } from '../messages/message-item.component';
+import { MessageGroup } from '../messages/message-group.component';
+import { groupMessages } from '../messages/utils/message-grouping.util';
 import { ChatWelcomeScreen } from './chat-welcome-screen.component';
 import { useChatWindowScroll } from './hooks/use-chat-window-scroll.hook';
 
@@ -35,13 +37,24 @@ export const ChatWindowBody = () => {
     return find(state.conversations, c => c._id === activeId) ?? null;
   });
 
+  const user = useAuthStore(state => state.user);
+
   const lastMessageStatus = selectedConvo && isEmpty(selectedConvo.seenBy ?? []) ? 'delivered' : 'seen';
+
+  const lastOwnMessageId = useMemo(() => {
+    if (!user) return undefined;
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i].senderId === user._id) return messages[i]._id;
+    }
+    return undefined;
+  }, [messages, user]);
 
   const isUnavailableConversation =
     selectedConvo?.type === CONVERSATION_TYPES.DIRECT &&
     some(selectedConvo.participants, participant => !participant._id);
 
   const reversedMessages = useMemo(() => [...messages].reverse(), [messages]);
+  const messageGroups = useMemo(() => groupMessages(reversedMessages), [reversedMessages]);
   const latestMessageId = messages[messages.length - 1]?._id;
 
   const { newMessageCount, scrollToBottom, handleFetchMoreMessages } = useChatWindowScroll({
@@ -102,14 +115,15 @@ export const ChatWindowBody = () => {
           inverse={true}
           style={{ display: 'flex', flexDirection: 'column-reverse', overflow: 'visible' }}
         >
-          {map(reversedMessages, (message, index) => (
-            <div key={message._id} className="text-foreground px-3 py-2 wrap-break-word">
-              <MessageItem
-                message={message}
+          {map(messageGroups, (group, index) => (
+            <div key={group.id} className="text-foreground px-3 py-2 wrap-break-word">
+              <MessageGroup
+                group={group}
                 index={index}
-                messages={reversedMessages}
+                groups={messageGroups}
                 selectedConvo={selectedConvo}
                 lastMessageStatus={lastMessageStatus}
+                lastOwnMessageId={lastOwnMessageId}
               />
             </div>
           ))}

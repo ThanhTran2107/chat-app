@@ -10,7 +10,7 @@ import {
   resetPassword,
   verifyEmail,
   resendVerificationEmail,
-} from "../controllers/authController.js";
+} from "../controllers/auth.controller.js";
 
 export const authRoute = express.Router();
 

@@ -1,7 +1,7 @@
 import { Conversation } from "../models/Conversation.js";
 import { Message } from "../models/Message.js";
 import { io } from "../sockets/index.js";
-import { formatConversationParticipants } from "../utils/messageHelper.js";
+import { formatConversationParticipants } from "../utils/message-helper.js";
 
 export const createConversation = async (req, res) => {
   try {
@@ -63,7 +63,9 @@ export const createConversation = async (req, res) => {
       { path: "lastMessage.senderId", select: "displayName avatarUrl" },
     ]);
 
-    const participants = formatConversationParticipants(conversation.participants);
+    const participants = formatConversationParticipants(
+      conversation.participants,
+    );
 
     const formatted = { ...conversation.toObject(), participants };
 
@@ -125,10 +127,30 @@ export const getMessages = async (req, res) => {
 
     const query = { conversationId };
 
-    if (cursor) query.createdAt = { $lt: new Date(cursor) };
+    if (cursor) {
+      try {
+        const decoded = JSON.parse(Buffer.from(cursor, "base64").toString());
+        const cursorCreatedAt = new Date(decoded.createdAt);
+        const cursorSequence = decoded.clientSequence;
+
+        if (cursorSequence !== undefined && cursorSequence !== null) {
+          query.$or = [
+            { createdAt: { $lt: cursorCreatedAt } },
+            {
+              createdAt: cursorCreatedAt,
+              clientSequence: { $lt: Number(cursorSequence) },
+            },
+          ];
+        } else {
+          query.createdAt = { $lt: cursorCreatedAt };
+        }
+      } catch {
+        query.createdAt = { $lt: new Date(cursor) };
+      }
+    }
 
     let messages = await Message.find(query)
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: -1, clientSequence: -1 })
       .limit(Number(limit) + 1)
       .lean();
 
@@ -137,7 +159,12 @@ export const getMessages = async (req, res) => {
     if (messages.length > Number(limit)) {
       const nextMessage = messages[messages.length - 1];
 
-      nextCursor = nextMessage.createdAt.toISOString();
+      nextCursor = Buffer.from(
+        JSON.stringify({
+          createdAt: nextMessage.createdAt.toISOString(),
+          clientSequence: nextMessage.clientSequence,
+        }),
+      ).toString("base64");
       messages.pop();
     }
 

@@ -1,4 +1,4 @@
-import { Badge } from '../../../components/ui/badge';
+import { Badge } from '../../../components/ui/badge.component.';
 
 export const UnreadCountBadge = ({ unreadCount }: { unreadCount: number }) => {
   return (

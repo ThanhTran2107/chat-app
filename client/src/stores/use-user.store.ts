@@ -3,8 +3,8 @@ import { create } from 'zustand';
 import { UserService } from '@/utils/services/user.service';
 
 import type { UserState } from '../types/store.type';
-import { useAuthStore } from './use-auth-store';
-import { useChatStore } from './use-chat-store';
+import { useAuthStore } from './use-auth.store';
+import { useChatStore } from './use-chat.store';
 
 export const useUserStore = create<UserState>(() => ({
   updatedAvatarUrl: async formData => {

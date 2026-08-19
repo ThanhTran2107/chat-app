@@ -1,4 +1,4 @@
-import { useFriendStore } from '@/stores/use-friend-store';
+import { useFriendStore } from '@/stores/use-friend.store';
 import type { User } from '@/types/user.type';
 import { UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
@@ -9,7 +9,7 @@ import { useForm } from 'react-hook-form';
 import { SearchForm } from '@/pages/chat-page/components/friends/forms/search-form.component';
 import { SendFriendRequestForm } from '@/pages/chat-page/components/friends/forms/send-friend-request-form.component';
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog.component';
 
 import { getApiErrorMessage } from '@/lib/axios';
 

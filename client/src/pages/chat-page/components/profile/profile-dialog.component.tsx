@@ -1,9 +1,9 @@
-import { useAuthStore } from '@/stores/use-auth-store';
+import { useAuthStore } from '@/stores/use-auth.store';
 
 import type { Dispatch, SetStateAction } from 'react';
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog.component';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.component';
 
 import { PersonalInfoForm } from './personal-info-form.component';
 import { PreferencesForm } from './preferences-form.component';

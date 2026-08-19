@@ -1,3 +1,4 @@
+import { LoadingOutlined } from '@ant-design/icons';
 import { Mail } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -6,10 +7,10 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { Spin } from '@/components/antd/spin.component';
 import { AuthIllustration } from '@/components/ui/auth-illustration.component';
-import { Button } from '@/components/ui/button';
-import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { ThemeToggleFloat } from '@/components/ui/theme-toggle-float';
+import { Button } from '@/components/ui/button.component';
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field.component';
+import { Input } from '@/components/ui/input.component';
+import { ThemeToggleFloat } from '@/components/ui/theme-toggle-float.component';
 
 import { APP_NAME } from '@/utils/constants';
 import { ROUTES } from '@/utils/constants';
@@ -110,7 +111,9 @@ export const ResendVerificationPage = () => {
                     disabled={loading || !email}
                   >
                     <div className="flex items-center justify-center gap-2">
-                      {loading && <Spin className="size-4" />}
+                      {loading && (
+                        <Spin indicator={<LoadingOutlined spin style={{ fontSize: 24 }} />} className="size-4" />
+                      )}
                       Resend verification email
                     </div>
                   </Button>

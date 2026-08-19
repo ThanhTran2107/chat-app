@@ -3,7 +3,7 @@ import { Cloud, MessageSquare, Rocket, ShieldCheck, Smartphone, Zap } from 'luci
 
 import { Link } from 'react-router-dom';
 
-import { ThemeToggleFloat } from '@/components/ui/theme-toggle-float';
+import { ThemeToggleFloat } from '@/components/ui/theme-toggle-float.component';
 
 import { APP_NAME } from '@/utils/constants';
 

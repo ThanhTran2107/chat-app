@@ -1,6 +1,6 @@
 'use client';
 
-import { useFriendStore } from '@/stores/use-friend-store';
+import { useFriendStore } from '@/stores/use-friend.store';
 import { type User } from '@/types/user.type';
 import { Bell, ChevronsUpDownIcon, UserIcon } from 'lucide-react';
 
@@ -8,9 +8,9 @@ import { useEffect, useState } from 'react';
 
 import { ProfileDialog } from '@/pages/chat-page/components/profile/profile-dialog.component';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { useSidebar } from '@/components/ui/contexts/sidebar-context';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.component';
+import { Badge } from '@/components/ui/badge.component.';
+import { useSidebar } from '@/components/ui/contexts/sidebar.context';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,8 +19,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+} from '@/components/ui/dropdown-menu.component';
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar.component';
 
 import { FriendRequestDialog } from '../../pages/chat-page/components/friends/dialogs/friend-request-dialog.component';
 import { LogoutButton } from '../../pages/chat-page/components/logout-button.component';

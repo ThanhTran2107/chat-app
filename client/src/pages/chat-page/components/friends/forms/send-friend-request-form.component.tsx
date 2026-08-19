@@ -1,4 +1,5 @@
 import type { User } from '@/types/user.type';
+import { LoadingOutlined } from '@ant-design/icons';
 import TextArea from 'antd/es/input/TextArea';
 import { UserPlus } from 'lucide-react';
 
@@ -8,9 +9,9 @@ import type { IFormValues } from '@/pages/chat-page/components/add-friend-model.
 import { UserAvatar } from '@/pages/chat-page/components/friends/user-avatar.component';
 
 import { Spin } from '@/components/antd/spin.component';
-import { Button } from '@/components/ui/button';
-import { DialogFooter } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button.component';
+import { DialogFooter } from '@/components/ui/dialog.component';
+import { Label } from '@/components/ui/label.component';
 
 interface SendFriendRequestFormProps {
   control: Control<IFormValues>;
@@ -86,7 +87,9 @@ export const SendFriendRequestForm = ({
             className="bg-gradient-chat transition-smooth flex-1 cursor-pointer rounded-full text-white hover:opacity-90"
           >
             {loading ? (
-              <Spin />
+              <>
+                <Spin indicator={<LoadingOutlined spin style={{ fontSize: 24 }} />} /> Sending...
+              </>
             ) : (
               <>
                 <UserPlus className="size-4" /> Add friend

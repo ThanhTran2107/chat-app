@@ -1,4 +1,4 @@
-import { useThemeStore } from '@/stores/use-theme-store';
+import { useThemeStore } from '@/stores/use-theme.store';
 import { Separator as SeparatorPrimitive } from '@base-ui/react/separator';
 
 import { cn } from '@/lib/utils';

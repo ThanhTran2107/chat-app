@@ -1,6 +1,6 @@
-import { useChatStore } from '@/stores/use-chat-store';
-import { useFriendStore } from '@/stores/use-friend-store';
-import { useSocketStore } from '@/stores/use-socket-store';
+import { useChatStore } from '@/stores/use-chat.store';
+import { useFriendStore } from '@/stores/use-friend.store';
+import { useSocketStore } from '@/stores/use-socket.store';
 import type { AuthState } from '@/types/store.type';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';

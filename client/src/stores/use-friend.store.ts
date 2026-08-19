@@ -7,7 +7,7 @@ import { FriendService } from '@/utils/services/friend.service';
 
 import type { FriendState } from '../types/store.type';
 import type { User } from '../types/user.type';
-import { useChatStore } from './use-chat-store';
+import { useChatStore } from './use-chat.store';
 
 let getAllFriendRequestsPromise: Promise<void> | null = null;
 

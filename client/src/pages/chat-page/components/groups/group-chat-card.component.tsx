@@ -1,6 +1,7 @@
-import { useAuthStore } from '@/stores/use-auth-store.ts';
-import { useChatStore } from '@/stores/use-chat-store.ts';
+import { useAuthStore } from '@/stores/use-auth.store';
+import { useChatStore } from '@/stores/use-chat.store';
 import { type Conversation } from '@/types/chat.type';
+import isEmpty from 'lodash-es/isEmpty';
 
 import * as React from 'react';
 
@@ -23,7 +24,7 @@ const GroupChatCardComponent = ({ convo }: { convo: Conversation }) => {
   const handleSelectConversation = async (id: string) => {
     setActiveConversation(id);
 
-    if (!messages[id]?.items?.length) await fetchMessages(id);
+    if (isEmpty(messages[id]?.items)) await fetchMessages(id);
   };
 
   return (

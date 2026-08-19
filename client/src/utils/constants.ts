@@ -99,6 +99,7 @@ export const STATIC_ASSETS = Object.freeze({
 export const DELETED_ACCOUNT_LABEL = 'Deleted account';
 
 export const MESSAGE_PAGE_LIMIT = 50;
+export const MAX_ATTACHMENTS_PER_SEND = 10;
 
 const passwordValidationSchema = z
   .string()

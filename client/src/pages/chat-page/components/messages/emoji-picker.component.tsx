@@ -1,9 +1,9 @@
-import { useThemeStore } from '@/stores/use-theme-store';
+import { useThemeStore } from '@/stores/use-theme.store';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Smile } from 'lucide-react';
 
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover.component';
 
 interface EmojiPickerProps {
   onChange: (value: string) => void;

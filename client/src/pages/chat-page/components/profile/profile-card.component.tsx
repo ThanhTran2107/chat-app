@@ -1,8 +1,8 @@
-import { useSocketStore } from '@/stores/use-socket-store';
+import { useSocketStore } from '@/stores/use-socket.store';
 import type { User } from '@/types/user.type';
 
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge.component.';
+import { Card, CardContent } from '@/components/ui/card.component';
 
 import { PRESENCE_STATUS } from '@/utils/constants';
 

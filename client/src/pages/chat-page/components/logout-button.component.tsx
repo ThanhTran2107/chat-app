@@ -1,10 +1,10 @@
-import { useAuthStore } from '@/stores/use-auth-store';
+import { useAuthStore } from '@/stores/use-auth.store';
 import { LogOut } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { useNavigate } from 'react-router-dom';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button.component';
 
 import { ROUTES } from '@/utils/constants';
 

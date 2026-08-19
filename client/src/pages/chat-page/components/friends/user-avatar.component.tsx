@@ -1,6 +1,6 @@
 import { UserX2 } from 'lucide-react';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.tsx';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.component';
 
 import { APP_NAME, DELETED_ACCOUNT_LABEL } from '@/utils/constants';
 

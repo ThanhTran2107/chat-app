@@ -1,5 +1,5 @@
 import { Message } from "../models/Message.js";
-import { cleanupUploadedAttachment } from "./messageAttachment.js";
+import { cleanupUploadedAttachment } from "./message-attachment.js";
 
 export const createMessageOrCleanupAttachment = async (
   messageData,

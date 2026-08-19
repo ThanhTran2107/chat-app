@@ -1,17 +1,18 @@
-import { useAuthStore } from '@/stores/use-auth-store.ts';
+import { useAuthStore } from '@/stores/use-auth.store.ts';
 import type { Conversation, Message } from '@/types/chat.type.ts';
 import type { SocketState } from '@/types/store.type.ts';
 import type { FriendRequest, User } from '@/types/user.type.ts';
 import { Howl } from 'howler';
 import filter from 'lodash-es/filter';
+import map from 'lodash-es/map';
 import some from 'lodash-es/some';
 import { type Socket, io } from 'socket.io-client';
 import { create } from 'zustand';
 
 import { CONVERSATION_TYPES, PRESENCE_STATUS, SOCKET_EVENTS, STATIC_ASSETS } from '@/utils/constants';
 
-import { useChatStore } from './use-chat-store';
-import { useFriendStore } from './use-friend-store.ts';
+import { useChatStore } from './use-chat.store.ts';
+import { useFriendStore } from './use-friend.store.ts';
 
 const notificationSound = new Howl({
   src: [STATIC_ASSETS.NOTIFICATION_SOUND],
@@ -144,7 +145,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     let isFirstConnect = true;
 
     const joinAllConversations = () => {
-      const conversationIds = useChatStore.getState().conversations.map(c => c._id);
+      const conversationIds = map(useChatStore.getState().conversations, c => c._id);
       conversationIds.forEach(id => socket.emit(SOCKET_EVENTS.JOIN_CONVERSATION, id));
     };
 

@@ -1,6 +1,6 @@
-import { useUserStore } from '@/stores/use-user-store';
+import { useUserStore } from '@/stores/use-user.store';
 import type { User } from '@/types/user.type';
-import { Spin } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
 import map from 'lodash-es/map';
 import { Heart } from 'lucide-react';
 import { toast } from 'sonner';
@@ -8,11 +8,12 @@ import { toast } from 'sonner';
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { Spin } from '@/components/antd/spin.component';
+import { Button } from '@/components/ui/button.component';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.component';
+import { Input } from '@/components/ui/input.component';
+import { Label } from '@/components/ui/label.component';
+import { Textarea } from '@/components/ui/textarea.component';
 
 import { getApiErrorMessage } from '@/lib/axios';
 
@@ -142,7 +143,7 @@ export const PersonalInfoForm = ({ userInfo }: Props) => {
           >
             {loading ? (
               <>
-                <Spin /> Saving...
+                <Spin indicator={<LoadingOutlined spin style={{ fontSize: 24 }} />} /> Saving...
               </>
             ) : (
               'Save Changes'

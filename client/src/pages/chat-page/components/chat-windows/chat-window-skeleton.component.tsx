@@ -1,3 +1,5 @@
+import map from 'lodash-es/map';
+
 import { Skeleton } from '@/components/antd/skeleton.component';
 
 import { cn } from '@/lib/utils';
@@ -39,7 +41,7 @@ const SkeletonBubble = ({ lines, className }: { lines: number; className?: strin
 export const ChatWindowSkeleton = () => {
   return (
     <div className="flex h-full w-full flex-col gap-3 overflow-y-auto p-4">
-      {INITIAL_SKELETON.map((item, index) => {
+      {map(INITIAL_SKELETON, (item, index) => {
         if (item.type === 'time') {
           return (
             <div key={`time-${index}`} className="flex justify-center">

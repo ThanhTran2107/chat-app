@@ -1,4 +1,5 @@
-import { useAuthStore } from '@/stores/use-auth-store';
+import { useAuthStore } from '@/stores/use-auth.store';
+import { LoadingOutlined } from '@ant-design/icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff, LockKeyhole, Mail, UserRound } from 'lucide-react';
 import { toast } from 'sonner';
@@ -9,9 +10,9 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { Spin } from '@/components/antd/spin.component';
 import { AuthIllustration } from '@/components/ui/auth-illustration.component';
-import { Button } from '@/components/ui/button';
-import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button.component';
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field.component';
+import { Input } from '@/components/ui/input.component';
 
 import { APP_NAME, ROUTES, type RegisterFormValues, registerSchema } from '@/utils/constants';
 
@@ -233,7 +234,9 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<'div'
                 disabled={isSubmitting}
               >
                 <div className="flex items-center justify-center gap-2">
-                  {isSubmitting && <Spin className="size-4" />}
+                  {isSubmitting && (
+                    <Spin indicator={<LoadingOutlined spin style={{ fontSize: 24 }} />} className="size-4" />
+                  )}
                   Create account
                 </div>
               </Button>

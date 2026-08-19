@@ -1,9 +1,10 @@
-import { useFriendStore } from '@/stores/use-friend-store';
+import { useFriendStore } from '@/stores/use-friend.store';
+import isEmpty from 'lodash-es/isEmpty';
 
 import { type Dispatch, type SetStateAction, useEffect, useState } from 'react';
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog.component';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.component';
 
 import { ReceivedRequestDialog } from './received-request-dialog.component';
 import { SentRequestDialog } from './sent-request-dialog.component';
@@ -29,10 +30,10 @@ export const FriendRequestDialog = ({ open, setOpen }: FriendRequestDialogProps)
     };
 
     if (!open) return;
-    if (receivedList.length || sentList.length) return;
+    if (!isEmpty(receivedList) || !isEmpty(sentList)) return;
 
     loadRequest();
-  }, [open, tab, getAllFriendRequests, receivedList.length, sentList.length]);
+  }, [open, tab, getAllFriendRequests, receivedList, sentList]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

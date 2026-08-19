@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 
 import { AuthIllustration } from '@/components/ui/auth-illustration.component';
-import { Button } from '@/components/ui/button';
-import { ThemeToggleFloat } from '@/components/ui/theme-toggle-float';
+import { Button } from '@/components/ui/button.component';
+import { ThemeToggleFloat } from '@/components/ui/theme-toggle-float.component';
 
 import { APP_NAME, ROUTES } from '@/utils/constants';
 import { authService } from '@/utils/services/auth.service';

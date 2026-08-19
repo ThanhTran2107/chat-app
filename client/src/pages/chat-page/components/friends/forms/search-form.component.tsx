@@ -1,3 +1,4 @@
+import { LoadingOutlined } from '@ant-design/icons';
 import { Search } from 'lucide-react';
 
 import { type Control, type FieldErrors, type UseFormRegister, useWatch } from 'react-hook-form';
@@ -5,10 +6,10 @@ import { type Control, type FieldErrors, type UseFormRegister, useWatch } from '
 import type { IFormValues } from '@/pages/chat-page/components/add-friend-model.component.tsx';
 
 import { Spin } from '@/components/antd/spin.component';
-import { Button } from '@/components/ui/button';
-import { DialogFooter } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button.component';
+import { DialogFooter } from '@/components/ui/dialog.component';
+import { Input } from '@/components/ui/input.component';
+import { Label } from '@/components/ui/label.component';
 
 interface SearchFormProps {
   register: UseFormRegister<IFormValues>;
@@ -62,7 +63,9 @@ export const SearchForm = ({
           className="bg-gradient-chat transition-smooth flex-1 cursor-pointer rounded-full text-white hover:opacity-90"
         >
           {loading ? (
-            <Spin />
+            <>
+              <Spin indicator={<LoadingOutlined spin style={{ fontSize: 24 }} />} /> Searching...
+            </>
           ) : (
             <>
               <Search className="size-4" />

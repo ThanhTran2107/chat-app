@@ -1,5 +1,5 @@
-import { useChatStore } from '@/stores/use-chat-store';
-import { useFriendStore } from '@/stores/use-friend-store';
+import { useChatStore } from '@/stores/use-chat.store';
+import { useFriendStore } from '@/stores/use-friend.store';
 import filter from 'lodash-es/filter';
 import includes from 'lodash-es/includes';
 import isEmpty from 'lodash-es/isEmpty';
@@ -10,8 +10,8 @@ import { useState } from 'react';
 
 import { UserAvatar } from '@/pages/chat-page/components/friends/user-avatar.component';
 
-import { DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
+import { DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog.component';
+import { Input } from '@/components/ui/input.component';
 
 import { CONVERSATION_TYPES } from '@/utils/constants';
 

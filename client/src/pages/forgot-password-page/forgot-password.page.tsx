@@ -2,7 +2,7 @@ import { RedirectIfAuthenticated } from '@/routes/redirect-if-authenticated';
 
 import { ForgotPasswordForm } from '@/pages/forgot-password-page/components/forgot-password-form.component';
 
-import { ThemeToggleFloat } from '@/components/ui/theme-toggle-float';
+import { ThemeToggleFloat } from '@/components/ui/theme-toggle-float.component';
 
 export const ForgotPasswordPage = () => {
   return (

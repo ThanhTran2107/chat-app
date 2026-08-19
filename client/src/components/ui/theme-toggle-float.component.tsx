@@ -1,4 +1,4 @@
-import { useThemeStore } from '@/stores/use-theme-store';
+import { useThemeStore } from '@/stores/use-theme.store';
 import { Moon, Sun } from 'lucide-react';
 
 export function ThemeToggleFloat() {

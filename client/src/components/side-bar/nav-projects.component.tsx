@@ -3,7 +3,7 @@
 import map from 'lodash-es/map';
 import { FolderIcon, MoreHorizontalIcon, ShareIcon, Trash2Icon } from 'lucide-react';
 
-import { useSidebar } from '@/components/ui/contexts/sidebar-context';
+import { useSidebar } from '@/components/ui/contexts/sidebar.context';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,7 +18,7 @@ import {
   SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
-} from '@/components/ui/sidebar';
+} from '@/components/ui/sidebar.component';
 
 export function NavProjects({
   projects,
