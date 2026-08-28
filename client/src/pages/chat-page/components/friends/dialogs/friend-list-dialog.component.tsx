@@ -6,7 +6,7 @@ import isEmpty from 'lodash-es/isEmpty';
 import map from 'lodash-es/map';
 import { Users } from 'lucide-react';
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { UserAvatar } from '@/pages/chat-page/components/friends/user-avatar.component';
 
@@ -20,10 +20,13 @@ export const FriendListDialog = ({ onClose }: { onClose?: () => void }) => {
   const createConversation = useChatStore(state => state.createConversation);
   const [search, setSearch] = useState('');
 
-  const handleAddConversation = async (friendId: string) => {
-    await createConversation(CONVERSATION_TYPES.DIRECT, [friendId], '');
-    onClose?.();
-  };
+  const handleAddConversation = useCallback(
+    async (friendId: string) => {
+      await createConversation(CONVERSATION_TYPES.DIRECT, [friendId], '');
+      onClose?.();
+    },
+    [createConversation, onClose],
+  );
 
   const filteredFriends = filter(friends, friend => {
     const query = search.trim().toLowerCase();

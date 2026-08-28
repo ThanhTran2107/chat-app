@@ -27,11 +27,11 @@ import type { MessageGroupData } from './utils/message-grouping.util';
 
 interface MessageGroupComponentProps {
   group: MessageGroupData;
-  index: number;
-  groups: MessageGroupData[];
   selectedConvo: Conversation;
   lastMessageStatus: 'delivered' | 'seen';
   lastOwnMessageId?: string;
+  isShowTime: boolean;
+  isGroupBreak: boolean;
 }
 
 const renderFileIcon = (fileType?: string | null, fileName?: string | null) => {
@@ -117,21 +117,14 @@ const ImageCell = ({
 
 export const MessageGroupComponent = ({
   group,
-  index,
-  groups,
   selectedConvo,
   lastMessageStatus,
   lastOwnMessageId,
+  isShowTime,
+  isGroupBreak,
 }: MessageGroupComponentProps) => {
   const messages = group.messages;
   const primary = group.primary;
-
-  const prevGroup = index + 1 < groups.length ? groups[index + 1] : undefined;
-  const isShowTime =
-    index === 0 ||
-    new Date(primary.createdAt).getTime() - new Date(prevGroup?.primary.createdAt || 0).getTime() > 300000;
-
-  const isGroupBreak = isShowTime || primary.senderId !== prevGroup?.primary.senderId;
 
   const participant = find(
     selectedConvo.participants,

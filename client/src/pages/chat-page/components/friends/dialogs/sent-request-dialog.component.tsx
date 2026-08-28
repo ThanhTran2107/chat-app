@@ -4,6 +4,8 @@ import map from 'lodash-es/map';
 
 import { FriendRequestItem } from './friend-request-item.component';
 
+const WAITING_ACTIONS = <p className="text-muted-foreground text-sm">Waiting for response...</p>;
+
 export const SentRequestDialog = () => {
   const sentList = useFriendStore(state => state.sentList);
 
@@ -13,12 +15,7 @@ export const SentRequestDialog = () => {
   return (
     <div className="mt-4 space-y-3">
       {map(sentList, request => (
-        <FriendRequestItem
-          key={request._id}
-          requestInfo={request}
-          actions={<p className="text-muted-foreground text-sm">Waiting for response...</p>}
-          type="sent"
-        />
+        <FriendRequestItem key={request._id} requestInfo={request} actions={WAITING_ACTIONS} type="sent" />
       ))}
     </div>
   );

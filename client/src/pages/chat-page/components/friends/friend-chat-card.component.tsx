@@ -4,6 +4,7 @@ import { useSocketStore } from '@/stores/use-socket.store';
 import { type Conversation } from '@/types/chat.type';
 import find from 'lodash-es/find';
 
+import { useCallback, useMemo } from 'react';
 import * as React from 'react';
 
 import { DELETED_ACCOUNT_LABEL, PRESENCE_STATUS } from '@/utils/constants';
@@ -19,14 +20,21 @@ const FriendChatCardComponent = ({ convo }: { convo: Conversation }) => {
   const user = useAuthStore(state => state.user);
   const activeConversationId = useChatStore(state => state.activeConversationId);
   const setActiveConversation = useChatStore(state => state.setActiveConversation);
-  const messages = useChatStore(state => state.messages);
   const fetchMessages = useChatStore(state => state.fetchMessages);
   const friendPresence = useSocketStore(state => state.friendPresence);
   const onlineUsers = useSocketStore(state => state.onlineUsers);
 
-  if (!user) return null;
+  const handleSelectConversation = useCallback(
+    async (id: string) => {
+      setActiveConversation(id);
 
-  const otherUser = find(convo.participants, participant => participant._id !== user._id);
+      const currentMessages = useChatStore.getState().messages;
+      if (!currentMessages[id]) await fetchMessages(id);
+    },
+    [setActiveConversation, fetchMessages],
+  );
+
+  const otherUser = find(convo.participants, participant => participant._id !== user?._id);
   const isDeleted = !otherUser?._id;
   const otherUserName = otherUser?.displayName ?? DELETED_ACCOUNT_LABEL;
   const isOnline =
@@ -36,14 +44,35 @@ const FriendChatCardComponent = ({ convo }: { convo: Conversation }) => {
         otherUser?.showOnlineStatus !== false &&
         onlineUsers.has(otherUser?._id ?? '')));
 
-  const unreadCount = convo.unreadCounts[user._id];
+  const unreadCount = user ? convo.unreadCounts[user._id] : 0;
   const lastMessage = convo.lastMessage?.content ?? '';
 
-  const handleSelectConversation = async (id: string) => {
-    setActiveConversation(id);
+  const leftSection = useMemo(
+    () => (
+      <>
+        <UserAvatar
+          type="sidebar"
+          name={otherUserName}
+          avatarUrl={otherUser?.avatarUrl ?? undefined}
+          className={isDeleted ? 'bg-slate-400' : undefined}
+        />
+        <StatusBadge status={isOnline ? PRESENCE_STATUS.ONLINE : PRESENCE_STATUS.OFFLINE} />
+        {unreadCount > 0 && <UnreadCountBadge unreadCount={unreadCount} />}
+      </>
+    ),
+    [otherUserName, otherUser?.avatarUrl, isDeleted, isOnline, unreadCount],
+  );
 
-    if (!messages[id]) await fetchMessages(id);
-  };
+  const subtitle = useMemo(
+    () => (
+      <p className={cn('truncate text-sm', unreadCount > 0 ? 'text-foreground font-medium' : 'text-muted-foreground')}>
+        {lastMessage}
+      </p>
+    ),
+    [unreadCount, lastMessage],
+  );
+
+  if (!user) return null;
 
   return (
     <ChatCard
@@ -52,25 +81,8 @@ const FriendChatCardComponent = ({ convo }: { convo: Conversation }) => {
       timeStamp={convo.lastMessage?.createdAt ? new Date(convo.lastMessage.createdAt) : undefined}
       isActive={activeConversationId === convo._id}
       unreadCount={unreadCount}
-      leftSection={
-        <>
-          <UserAvatar
-            type="sidebar"
-            name={otherUserName}
-            avatarUrl={otherUser?.avatarUrl ?? undefined}
-            className={isDeleted ? 'bg-slate-400' : undefined}
-          />
-          <StatusBadge status={isOnline ? PRESENCE_STATUS.ONLINE : PRESENCE_STATUS.OFFLINE} />
-          {unreadCount > 0 && <UnreadCountBadge unreadCount={unreadCount} />}
-        </>
-      }
-      subtitle={
-        <p
-          className={cn('truncate text-sm', unreadCount > 0 ? 'text-foreground font-medium' : 'text-muted-foreground')}
-        >
-          {lastMessage}
-        </p>
-      }
+      leftSection={leftSection}
+      subtitle={subtitle}
       onSelect={handleSelectConversation}
     />
   );

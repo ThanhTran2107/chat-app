@@ -1,8 +1,14 @@
+import * as React from 'react';
+
 import { PRESENCE_STATUS } from '@/utils/constants';
 
 import { cn } from '@/lib/utils.ts';
 
-export const StatusBadge = ({ status }: { status: typeof PRESENCE_STATUS.ONLINE | typeof PRESENCE_STATUS.OFFLINE }) => {
+const StatusBadgeComponent = ({
+  status,
+}: {
+  status: typeof PRESENCE_STATUS.ONLINE | typeof PRESENCE_STATUS.OFFLINE;
+}) => {
   return (
     <div
       className={cn(
@@ -12,3 +18,6 @@ export const StatusBadge = ({ status }: { status: typeof PRESENCE_STATUS.ONLINE 
     ></div>
   );
 };
+
+export const StatusBadge = React.memo(StatusBadgeComponent);
+StatusBadge.displayName = 'StatusBadge';

@@ -1,7 +1,7 @@
 import { useFriendStore } from '@/stores/use-friend.store';
 import { MessageCircle } from 'lucide-react';
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { Card } from '@/components/ui/card.component';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog.component';
@@ -12,11 +12,14 @@ export const CreateNewChat = () => {
   const getFriendList = useFriendStore(state => state.getFriendList);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const handleDialogOpenChange = async (open: boolean) => {
-    setIsDialogOpen(open);
+  const handleDialogOpenChange = useCallback(
+    async (open: boolean) => {
+      setIsDialogOpen(open);
 
-    if (open) await getFriendList();
-  };
+      if (open) await getFriendList();
+    },
+    [getFriendList],
+  );
 
   return (
     <div className="flex gap-2">

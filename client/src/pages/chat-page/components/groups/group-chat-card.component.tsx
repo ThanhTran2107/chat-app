@@ -3,6 +3,7 @@ import { useChatStore } from '@/stores/use-chat.store';
 import { type Conversation } from '@/types/chat.type';
 import isEmpty from 'lodash-es/isEmpty';
 
+import { useCallback, useMemo } from 'react';
 import * as React from 'react';
 
 import { ChatCard } from '../chat-card.component';
@@ -13,19 +14,37 @@ const GroupChatCardComponent = ({ convo }: { convo: Conversation }) => {
   const user = useAuthStore(state => state.user);
   const activeConversationId = useChatStore(state => state.activeConversationId);
   const setActiveConversation = useChatStore(state => state.setActiveConversation);
-  const messages = useChatStore(state => state.messages);
   const fetchMessages = useChatStore(state => state.fetchMessages);
 
-  if (!user) return null;
+  const handleSelectConversation = useCallback(
+    async (id: string) => {
+      setActiveConversation(id);
+
+      const currentMessages = useChatStore.getState().messages;
+      if (isEmpty(currentMessages[id]?.items)) await fetchMessages(id);
+    },
+    [setActiveConversation, fetchMessages],
+  );
 
   const unreadCount = convo.unreadCounts[user._id];
   const groupName = Array.isArray(convo.group) ? convo.group[0]?.name : convo.group?.name;
 
-  const handleSelectConversation = async (id: string) => {
-    setActiveConversation(id);
+  const leftSection = useMemo(
+    () => (
+      <>
+        {unreadCount > 0 && <UnreadCountBadge unreadCount={unreadCount} />}
+        <GroupChatAvatar participants={convo.participants} type="chat" />
+      </>
+    ),
+    [unreadCount, convo.participants],
+  );
 
-    if (isEmpty(messages[id]?.items)) await fetchMessages(id);
-  };
+  const subtitle = useMemo(
+    () => <p className="text-muted-foreground truncate text-sm">{convo.participants.length} members</p>,
+    [convo.participants.length],
+  );
+
+  if (!user) return null;
 
   return (
     <ChatCard
@@ -34,13 +53,8 @@ const GroupChatCardComponent = ({ convo }: { convo: Conversation }) => {
       unreadCount={unreadCount}
       timeStamp={convo.lastMessage?.createdAt ? new Date(convo.lastMessage.createdAt) : undefined}
       isActive={activeConversationId === convo._id}
-      leftSection={
-        <>
-          {unreadCount > 0 && <UnreadCountBadge unreadCount={unreadCount} />}
-          <GroupChatAvatar participants={convo.participants} type="chat" />
-        </>
-      }
-      subtitle={<p className="text-muted-foreground truncate text-sm">{convo.participants.length} members</p>}
+      leftSection={leftSection}
+      subtitle={subtitle}
       onSelect={handleSelectConversation}
     />
   );

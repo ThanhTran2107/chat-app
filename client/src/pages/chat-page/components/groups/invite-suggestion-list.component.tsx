@@ -2,6 +2,8 @@ import type { Friend } from '@/types/user.type';
 import isEmpty from 'lodash-es/isEmpty';
 import map from 'lodash-es/map';
 
+import * as React from 'react';
+
 import { UserAvatar } from '../friends/user-avatar.component';
 
 interface InviteSuggestionListProps {
@@ -9,7 +11,7 @@ interface InviteSuggestionListProps {
   onSelect: (friend: Friend) => void;
 }
 
-export const InviteSuggestionList = ({ filteredFriends, onSelect }: InviteSuggestionListProps) => {
+const InviteSuggestionListComponent = ({ filteredFriends, onSelect }: InviteSuggestionListProps) => {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
@@ -42,3 +44,6 @@ export const InviteSuggestionList = ({ filteredFriends, onSelect }: InviteSugges
     </div>
   );
 };
+
+export const InviteSuggestionList = React.memo(InviteSuggestionListComponent);
+InviteSuggestionList.displayName = 'InviteSuggestionList';

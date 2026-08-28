@@ -3,6 +3,8 @@ import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Smile } from 'lucide-react';
 
+import * as React from 'react';
+
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover.component';
 
 interface EmojiPickerProps {
@@ -34,5 +36,6 @@ const EmojiPickerComponent = ({ onChange }: EmojiPickerProps) => {
   );
 };
 
-export const EmojiPicker = EmojiPickerComponent;
+export const EmojiPicker = React.memo(EmojiPickerComponent);
+EmojiPicker.displayName = 'EmojiPicker';
 export default EmojiPicker;

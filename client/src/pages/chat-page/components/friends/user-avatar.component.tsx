@@ -1,5 +1,7 @@
 import { UserX2 } from 'lucide-react';
 
+import * as React from 'react';
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.component';
 
 import { APP_NAME, DELETED_ACCOUNT_LABEL } from '@/utils/constants';
@@ -13,7 +15,7 @@ interface IUserAvatarProps {
   className?: string;
 }
 
-export const UserAvatar = ({ type, name, avatarUrl, className }: IUserAvatarProps) => {
+const UserAvatarComponent = ({ type, name, avatarUrl, className }: IUserAvatarProps) => {
   const isDeleted = name === DELETED_ACCOUNT_LABEL;
   const bgColor = isDeleted ? 'bg-slate-600' : !avatarUrl ? 'bg-blue-500' : '';
 
@@ -35,3 +37,6 @@ export const UserAvatar = ({ type, name, avatarUrl, className }: IUserAvatarProp
     </Avatar>
   );
 };
+
+export const UserAvatar = React.memo(UserAvatarComponent);
+UserAvatar.displayName = 'UserAvatar';

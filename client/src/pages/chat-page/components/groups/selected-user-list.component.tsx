@@ -2,6 +2,8 @@ import type { Friend } from '@/types/user.type';
 import map from 'lodash-es/map';
 import { X } from 'lucide-react';
 
+import * as React from 'react';
+
 import { UserAvatar } from '../friends/user-avatar.component';
 
 interface SelectedUserListProps {
@@ -9,7 +11,7 @@ interface SelectedUserListProps {
   onRemove: (user: Friend) => void;
 }
 
-export const SelectedUserList = ({ invitedUsers, onRemove }: SelectedUserListProps) => {
+const SelectedUserListComponent = ({ invitedUsers, onRemove }: SelectedUserListProps) => {
   return (
     <div className="border-border/50 bg-muted/20 rounded-xl border p-3">
       <div className="flex flex-wrap gap-2">
@@ -25,3 +27,6 @@ export const SelectedUserList = ({ invitedUsers, onRemove }: SelectedUserListPro
     </div>
   );
 };
+
+export const SelectedUserList = React.memo(SelectedUserListComponent);
+SelectedUserList.displayName = 'SelectedUserList';

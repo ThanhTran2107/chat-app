@@ -57,6 +57,24 @@ export const ChatWindowBody = () => {
   const messageGroups = useMemo(() => groupMessages(reversedMessages), [reversedMessages]);
   const latestMessageId = messages[messages.length - 1]?._id;
 
+  const groupVisibility = useMemo(() => {
+    const visibility: Record<string, boolean> = {};
+    const breaks: Record<string, boolean> = {};
+
+    for (let i = 0; i < messageGroups.length; i++) {
+      const current = messageGroups[i];
+      const next = messageGroups[i + 1];
+      const isTimeBreak =
+        i === 0 ||
+        new Date(current.primary.createdAt).getTime() - new Date(next?.primary.createdAt || 0).getTime() > 300000;
+
+      visibility[current.id] = isTimeBreak;
+      breaks[current.id] = isTimeBreak || current.primary.senderId !== next?.primary.senderId;
+    }
+
+    return { visibility, breaks };
+  }, [messageGroups]);
+
   const { newMessageCount, scrollToBottom, handleFetchMoreMessages } = useChatWindowScroll({
     containerRef,
     activeConversationId,
@@ -115,15 +133,15 @@ export const ChatWindowBody = () => {
           inverse={true}
           style={{ display: 'flex', flexDirection: 'column-reverse', overflow: 'visible' }}
         >
-          {map(messageGroups, (group, index) => (
+          {map(messageGroups, group => (
             <div key={group.id} className="text-foreground px-3 py-2 wrap-break-word">
               <MessageGroup
                 group={group}
-                index={index}
-                groups={messageGroups}
                 selectedConvo={selectedConvo}
                 lastMessageStatus={lastMessageStatus}
                 lastOwnMessageId={lastOwnMessageId}
+                isShowTime={groupVisibility.visibility[group.id] ?? false}
+                isGroupBreak={groupVisibility.breaks[group.id] ?? false}
               />
             </div>
           ))}

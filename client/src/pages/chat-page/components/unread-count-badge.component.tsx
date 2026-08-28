@@ -1,6 +1,8 @@
+import * as React from 'react';
+
 import { Badge } from '../../../components/ui/badge.component.';
 
-export const UnreadCountBadge = ({ unreadCount }: { unreadCount: number }) => {
+const UnreadCountBadgeComponent = ({ unreadCount }: { unreadCount: number }) => {
   return (
     <div className="pulse-ring absolute -top-1 -right-1 z-20">
       <Badge
@@ -12,3 +14,6 @@ export const UnreadCountBadge = ({ unreadCount }: { unreadCount: number }) => {
     </div>
   );
 };
+
+export const UnreadCountBadge = React.memo(UnreadCountBadgeComponent);
+UnreadCountBadge.displayName = 'UnreadCountBadge';

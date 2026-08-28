@@ -11,7 +11,7 @@ import some from 'lodash-es/some';
 import { UserPlus, Users } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Spin } from '@/components/antd/spin.component';
 import { Button } from '@/components/ui/button.component';
@@ -47,56 +47,63 @@ export const NewGroupChatModel = () => {
   const friends = useFriendStore(state => state.friends);
   const getFriendList = useFriendStore(state => state.getFriendList);
 
-  const handleGetFriends = () => {
+  const handleGetFriends = useCallback(() => {
     debouncedGetFriendsRef.current?.();
     isOpeningRef.current = true;
-  };
+  }, []);
 
-  const handleSelectFriend = (friend: Friend) => {
-    setInvitedUsers([...invitedUsers, friend]);
+  const handleSelectFriend = useCallback((friend: Friend) => {
+    setInvitedUsers(prev => [...prev, friend]);
     setSearch('');
-  };
+  }, []);
 
-  const handleRemoveFriend = (friend: Friend) => setInvitedUsers(filter(invitedUsers, user => user._id !== friend._id));
+  const handleRemoveFriend = useCallback((friend: Friend) => {
+    setInvitedUsers(prev => filter(prev, user => user._id !== friend._id));
+  }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    try {
-      e.preventDefault();
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      try {
+        e.preventDefault();
 
-      if (isEmpty(invitedUsers)) return toast.warning('Please invite at least one friend to create a group chat.');
+        if (isEmpty(invitedUsers)) return toast.warning('Please invite at least one friend to create a group chat.');
 
-      await createConversation(
-        CONVERSATION_TYPES.GROUP,
-        map(invitedUsers, user => user._id),
-        groupName,
-      );
+        await createConversation(
+          CONVERSATION_TYPES.GROUP,
+          map(invitedUsers, user => user._id),
+          groupName,
+        );
 
-      setGroupName('');
-      setSearch('');
-      setInvitedUsers([]);
-      setIsOpen(false);
-      isOpeningRef.current = false;
-    } catch (e) {
-      console.error('Error creating group conversation:', e);
-      toast.error(getApiErrorMessage(e, 'Failed to create group conversation. Please try again.'));
-    }
-  };
-
-  const filteredFriends = filter(
-    friends,
-    friend =>
-      includes(friend.displayName.toLowerCase(), search.toLowerCase()) &&
-      !some(invitedUsers, user => user._id === friend._id),
+        setGroupName('');
+        setSearch('');
+        setInvitedUsers([]);
+        setIsOpen(false);
+        isOpeningRef.current = false;
+      } catch (e) {
+        console.error('Error creating group conversation:', e);
+        toast.error(getApiErrorMessage(e, 'Failed to create group conversation. Please try again.'));
+      }
+    },
+    [invitedUsers, createConversation, groupName],
   );
 
-  const handleOpenChange = (open: boolean) => {
+  const filteredFriends = useMemo(() => {
+    return filter(
+      friends,
+      friend =>
+        includes(friend.displayName.toLowerCase(), search.toLowerCase()) &&
+        !some(invitedUsers, user => user._id === friend._id),
+    );
+  }, [friends, search, invitedUsers]);
+
+  const handleOpenChange = useCallback((open: boolean) => {
     if (!open) {
       isOpeningRef.current = false;
       debouncedGetFriendsRef.current?.cancel?.();
     }
 
     setIsOpen(open);
-  };
+  }, []);
 
   useEffect(() => {
     debouncedGetFriendsRef.current = debounce(async () => {

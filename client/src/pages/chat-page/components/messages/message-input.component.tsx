@@ -10,7 +10,7 @@ import some from 'lodash-es/some';
 import { ImagePlus, Send, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
 
-import React, { Suspense, useEffect, useRef, useState } from 'react';
+import React, { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/button.component';
 import { Input } from '@/components/ui/input.component';
@@ -45,6 +45,22 @@ export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation })
   const sendGroupMessage = useChatStore(state => state.sendGroupMessage);
   const setMessageUploading = useChatStore(state => state.setMessageUploading);
 
+  const otherUser =
+    selectedConvo.type === CONVERSATION_TYPES.DIRECT
+      ? filter(selectedConvo.participants, participant => participant._id !== user?._id)[0]
+      : undefined;
+
+  const isConversationUnavailable = selectedConvo.type === CONVERSATION_TYPES.DIRECT && !otherUser?._id;
+
+  const handleEmojiSelect = useCallback(
+    (emoji: string) => {
+      if (isConversationUnavailable) return;
+
+      setValue(prev => `${prev}${emoji}`);
+    },
+    [isConversationUnavailable],
+  );
+
   useEffect(() => {
     const urls = optimisticBlobUrls.current;
 
@@ -71,13 +87,6 @@ export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation })
   }, []);
 
   if (!user) return null;
-
-  const otherUser =
-    selectedConvo.type === CONVERSATION_TYPES.DIRECT
-      ? filter(selectedConvo.participants, participant => participant._id !== user._id)[0]
-      : undefined;
-
-  const isConversationUnavailable = selectedConvo.type === CONVERSATION_TYPES.DIRECT && !otherUser?._id;
 
   const acceptMimeTypes = [
     'image/jpeg',
@@ -622,12 +631,7 @@ export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation })
           />
           <div className="absolute top-1/2 right-2 flex -translate-y-1/2 transform items-center gap-1">
             <Suspense fallback={emojiPickerFallback}>
-              <EmojiPicker
-                onChange={(emoji: string) => {
-                  if (isConversationUnavailable) return;
-                  setValue(`${value}${emoji}`);
-                }}
-              />
+              <EmojiPicker onChange={handleEmojiSelect} />
             </Suspense>
           </div>
         </div>
