@@ -238,29 +238,26 @@ export const forgotPassword = async (req, res) => {
 
     const user = await User.findOne({ email: normalizeEmail(email) });
 
-    if (!user) return res.status(404).json({ message: "Email does not exist" });
+    if (user) {
+      const provider = user.authProvider || "local";
 
-    const provider = user.authProvider || "local";
-    if (provider !== "local")
-      return res.status(400).json({
-        message:
-          "This account is linked to social login. Please sign in with Google or Facebook, or set a local password first.",
-      });
+      if (provider === "local") {
+        const resetToken = crypto.randomBytes(32).toString("hex");
+        const resetTokenHash = hashToken(resetToken);
+        const resetTokenExpiry = new Date(Date.now() + RESET_TOKEN_TTL);
 
-    const resetToken = crypto.randomBytes(32).toString("hex");
-    const resetTokenHash = hashToken(resetToken);
-    const resetTokenExpiry = new Date(Date.now() + RESET_TOKEN_TTL);
+        user.passwordResetToken = resetTokenHash;
+        user.passwordResetExpires = resetTokenExpiry;
+        await user.save();
 
-    user.passwordResetToken = resetTokenHash;
-    user.passwordResetExpires = resetTokenExpiry;
-    await user.save();
+        const resetUrl = buildPasswordResetUrl(resetToken);
 
-    const resetUrl = buildPasswordResetUrl(resetToken);
-
-    await sendPasswordResetEmail({
-      to: user.email,
-      url: resetUrl,
-    });
+        await sendPasswordResetEmail({
+          to: user.email,
+          url: resetUrl,
+        });
+      }
+    }
 
     return res
       .status(200)

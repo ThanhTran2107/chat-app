@@ -5,6 +5,7 @@ import { socketMiddleware } from "../middlewares/socket.middleware.js";
 import { getUserConversationsForSocketIo } from "../controllers/conversation.controller.js";
 import { Friend } from "../models/Friend.js";
 import { User } from "../models/User.js";
+import { Conversation } from "../models/Conversation.js";
 
 export const app = express();
 
@@ -144,9 +145,29 @@ io.on("connection", async (socket) => {
     user.showOnlineStatus !== false ? "online" : "offline",
   );
 
-  socket.on("join-conversation", (conversationId) =>
-    socket.join(conversationId),
-  );
+  socket.on("join-conversation", async (conversationId) => {
+    try {
+      const conversation = await Conversation.findById(conversationId).lean();
+
+      if (!conversation) return;
+
+      const userId = socket.user._id.toString();
+      const isParticipant = (conversation.participants || []).some((p) => {
+        const participantId = p?.userId;
+        if (!participantId) return false;
+
+        return typeof participantId === "string"
+          ? participantId === userId
+          : participantId._id?.toString() === userId;
+      });
+
+      if (!isParticipant) return;
+
+      socket.join(conversationId);
+    } catch (e) {
+      console.error("Join conversation error:", e);
+    }
+  });
 
   socket.join(user._id.toString());
 

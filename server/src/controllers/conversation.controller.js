@@ -195,13 +195,8 @@ export const getUserConversationsForSocketIo = async (userId) => {
 
 export const markAsSeen = async (req, res) => {
   try {
-    const { conversationId } = req.params;
     const userId = req.user._id.toString();
-
-    const conversation = await Conversation.findById(conversationId).lean();
-
-    if (!conversation)
-      return res.status(404).json({ message: "Conversation not found" });
+    const conversation = req.conversation;
 
     const last = conversation.lastMessage;
 
@@ -216,7 +211,7 @@ export const markAsSeen = async (req, res) => {
         .json({ message: "Sender no need to mark as seen" });
 
     const updated = await Conversation.findByIdAndUpdate(
-      conversationId,
+      conversation._id,
       {
         $addToSet: { seenBy: userId },
         $set: { [`unreadCounts.${userId}`]: 0 },
@@ -255,7 +250,7 @@ export const markAsSeen = async (req, res) => {
       },
     };
 
-    io.to(conversationId).emit("read-message", payload);
+    io.to(conversation._id.toString()).emit("read-message", payload);
 
     participantIds.forEach((participantId) => {
       io.to(participantId).emit("read-message", payload);

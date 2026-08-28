@@ -10,15 +10,21 @@ import {
   sendGroupMessage,
   downloadMessageAttachment,
 } from "../controllers/message.controller.js";
+import {
+  validateSendDirectMessage,
+  validateSendGroupMessage,
+  validateMessageParam,
+} from "../validators/message.validator.js";
 
 export const messageRoute = express.Router();
 
-messageRoute.get("/download/:messageId", downloadMessageAttachment);
+messageRoute.get("/download/:messageId", validateMessageParam, downloadMessageAttachment);
 
 messageRoute.post(
   "/direct",
   uploadRateLimiter,
   uploadChatAttachmentSingle,
+  validateSendDirectMessage,
   checkFriendship,
   sendDirectMessage,
 );
@@ -27,6 +33,7 @@ messageRoute.post(
   "/group",
   uploadRateLimiter,
   uploadChatAttachmentSingle,
+  validateSendGroupMessage,
   checkGroupMemberShip,
   sendGroupMessage,
 );

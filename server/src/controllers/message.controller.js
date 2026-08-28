@@ -37,6 +37,29 @@ export const sendDirectMessage = async (req, res) => {
 
     if (conversationId) {
       conversation = await Conversation.findById(conversationId);
+
+      if (!conversation)
+        return res.status(404).json({ message: "Conversation not found" });
+
+      if (conversation.type !== "direct")
+        return res.status(400).json({ message: "Invalid conversation type" });
+
+      const senderId = req.user._id.toString();
+      const participants = conversation.participants || [];
+
+      const senderParticipant = participants.find(
+        (p) => p?.userId?.toString() === senderId,
+      );
+
+      if (!senderParticipant)
+        return res.status(403).json({ message: "You are not a participant of this conversation" });
+
+      const recipientParticipant = participants.find(
+        (p) => p?.userId?.toString() === recipientId,
+      );
+
+      if (!recipientParticipant)
+        return res.status(403).json({ message: "Recipient is not a participant of this conversation" });
     } else {
       const directKey = buildDirectKey(senderId, recipientId);
 
