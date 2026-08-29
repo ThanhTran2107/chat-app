@@ -308,6 +308,17 @@
     }
   }
 
+  /* Respect reduced motion for continuous landing-page animations */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-float,
+    .animate-pulse-glow,
+    .animate-fade-up,
+    .animate-fade-in,
+    .typing-dot {
+      animation: none !important;
+    }
+  }
+
   .dark .ant-skeleton-title,
   .dark .ant-skeleton-paragraph > li,
   .dark .ant-skeleton-input,
