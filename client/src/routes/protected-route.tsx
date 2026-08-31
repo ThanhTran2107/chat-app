@@ -29,19 +29,21 @@ export const ProtectedRoute = () => {
         const chatState = useChatStore.getState();
 
         if (appSessionInitPromise) await appSessionInitPromise;
-        if (mounted) setProgress(33);
+        setProgress(33);
 
         if (!currentAccessToken) return;
 
         if (!currentUser) await authState.fetchMe();
-        if (mounted) setProgress(67);
+        setProgress(67);
 
         if (isEmpty(chatState.conversations) && !chatState.convoLoading) await chatState.fetchConversations();
       } catch (e) {
         console.warn('ProtectedRoute initialization warning:', e);
       } finally {
-        if (mounted) setProgress(100);
-        if (mounted) setStarting(false);
+        if (mounted) {
+          setProgress(100);
+          setStarting(false);
+        }
       }
     };
 
@@ -52,7 +54,7 @@ export const ProtectedRoute = () => {
     };
   }, [accessToken]);
 
-  if (loading || starting) return <LoadingSpinner progress={progress} />;
+  if (loading || starting) return <LoadingSpinner description="Securing your connection..." progress={progress} />;
 
   if (!accessToken) return <Navigate to={ROUTES.LOGIN} replace />;
 

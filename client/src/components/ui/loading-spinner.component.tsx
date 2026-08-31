@@ -7,7 +7,7 @@ export interface LoadingSpinnerProps {
 }
 
 export function LoadingSpinner({
-  description = 'Securing your connection...',
+  description = 'Wait a moment for loading !',
   className,
   progress,
 }: LoadingSpinnerProps) {

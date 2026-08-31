@@ -13,7 +13,7 @@ export const authRateLimiter = rateLimit({
 
 export const refreshRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 20,
+  max: 100,
   message: {
     message: "Too many refresh attempts. Please try again later.",
     code: "REFRESH_RATE_LIMIT_EXCEEDED",

@@ -1,35 +1,34 @@
-import { useAuthStore } from '@/stores/use-auth.store';
+import { LoadingOutlined } from '@ant-design/icons';
 import { LogOut } from 'lucide-react';
-import { toast } from 'sonner';
 
-import { useNavigate } from 'react-router-dom';
-
+import { Spin } from '@/components/antd/spin.component';
 import { Button } from '@/components/ui/button.component';
 
-import { ROUTES } from '@/utils/constants';
+interface LogoutButtonProps {
+  loading?: boolean;
+  onClick?: () => void;
+  onPointerDown?: () => void;
+}
 
-import { getApiErrorMessage } from '@/lib/axios';
-
-export const LogoutButton = () => {
-  const logOut = useAuthStore(state => state.logOut);
-  const navigate = useNavigate();
-
-  // Handle the logout process when the button is clicked
-  const handleLogOut = async () => {
-    try {
-      await logOut();
-
-      toast.success('Logout successful!');
-      navigate(ROUTES.LOGIN, { replace: true });
-    } catch (e) {
-      console.error('Logout error:', e);
-      toast.error(getApiErrorMessage(e, 'Logout failed. Please try again.'));
-    }
+export const LogoutButton = ({ loading = false, onClick, onPointerDown }: LogoutButtonProps) => {
+  const handleClick = () => {
+    if (onClick) onClick();
   };
 
   return (
-    <Button className="flex w-full cursor-pointer justify-start" variant="completeGhost" onClick={handleLogOut}>
-      <LogOut className="text-destructive -ml-2" /> Log out
+    <Button
+      className="flex w-full cursor-pointer justify-start"
+      variant="completeGhost"
+      onClick={handleClick}
+      onPointerDown={onPointerDown}
+      disabled={loading}
+    >
+      {loading ? (
+        <Spin indicator={<LoadingOutlined spin className="text-destructive!" />} />
+      ) : (
+        <LogOut className="text-destructive -ml-2" />
+      )}
+      {loading ? 'Logging out...' : 'Log out'}
     </Button>
   );
 };

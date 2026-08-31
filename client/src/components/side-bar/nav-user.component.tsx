@@ -1,10 +1,13 @@
 'use client';
 
+import { useAuthStore } from '@/stores/use-auth.store';
 import { useFriendStore } from '@/stores/use-friend.store';
 import { type User } from '@/types/user.type';
 import { Bell, ChevronsUpDownIcon, UserIcon } from 'lucide-react';
+import { toast } from 'sonner';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { ProfileDialog } from '@/pages/chat-page/components/profile/profile-dialog.component';
 
@@ -22,16 +25,53 @@ import {
 } from '@/components/ui/dropdown-menu.component';
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar.component';
 
+import { ROUTES } from '@/utils/constants';
+
+import { getApiErrorMessage } from '@/lib/axios';
+
 import { FriendRequestDialog } from '../../pages/chat-page/components/friends/dialogs/friend-request-dialog.component';
 import { LogoutButton } from '../../pages/chat-page/components/logout-button.component';
 
 export function NavUser({ user }: { user: User }) {
   const [friendRequestOpen, setFriendRequestOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const isLoggingOutRef = useRef(false);
 
   const { isMobile } = useSidebar();
   const receivedCount = useFriendStore(state => state.receivedList.length);
   const getAllFriendRequests = useFriendStore(state => state.getAllFriendRequests);
+  const logOut = useAuthStore(state => state.logOut);
+  const navigate = useNavigate();
+
+  const handleOpenChange = (open: boolean) => {
+    if (isLoggingOutRef.current) return;
+
+    setDropdownOpen(open);
+  };
+
+  const setLoggingOut = (value: boolean) => {
+    setIsLoggingOut(value);
+    isLoggingOutRef.current = value;
+  };
+
+  const handleLogOut = async () => {
+    setLoggingOut(true);
+
+    try {
+      await logOut();
+
+      toast.success('Logout successful!');
+      navigate(ROUTES.LOGIN, { replace: true });
+    } catch (e) {
+      console.error('Logout error:', e);
+      toast.error(getApiErrorMessage(e, 'Logout failed. Please try again.'));
+    } finally {
+      setLoggingOut(false);
+      setDropdownOpen(false);
+    }
+  };
 
   useEffect(() => {
     getAllFriendRequests();
@@ -41,7 +81,7 @@ export function NavUser({ user }: { user: User }) {
     <>
       <SidebarMenu>
         <SidebarMenuItem>
-          <DropdownMenu>
+          <DropdownMenu open={dropdownOpen} onOpenChange={handleOpenChange}>
             <DropdownMenuTrigger
               render={<SidebarMenuButton size="lg" className="aria-expanded:bg-muted cursor-pointer" />}
             >
@@ -115,8 +155,14 @@ export function NavUser({ user }: { user: User }) {
 
               <DropdownMenuSeparator />
 
-              <DropdownMenuItem className="cursor-pointer" variant="destructive">
-                <LogoutButton />
+              <DropdownMenuItem
+                className="cursor-pointer"
+                variant="destructive"
+                onPointerDown={() => {
+                  isLoggingOutRef.current = true;
+                }}
+              >
+                <LogoutButton loading={isLoggingOut} onClick={handleLogOut} />
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

@@ -67,7 +67,7 @@ function App() {
     <>
       <Toaster richColors />
       <BrowserRouter>
-        <Suspense fallback={<LoadingSpinner description="Wait a moment for loading !" />}>
+        <Suspense fallback={<LoadingSpinner />}>
           <Routes>
             <Route
               path="/"
