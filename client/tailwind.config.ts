@@ -138,6 +138,35 @@ export default {
             opacity: '0.7',
           },
         },
+        'gradient-shift': {
+          '0%, 100%': {
+            backgroundPosition: '0% 50%',
+          },
+          '50%': {
+            backgroundPosition: '100% 50%',
+          },
+        },
+        'pulse-subtle': {
+          '0%, 100%': {
+            opacity: '1',
+            transform: 'scale(1)',
+          },
+          '50%': {
+            opacity: '0.8',
+            transform: 'scale(1.05)',
+          },
+        },
+        'progress-bar': {
+          '0%': {
+            width: '0%',
+          },
+          '50%': {
+            width: '100%',
+          },
+          '100%': {
+            width: '0%',
+          },
+        },
       },
       transitionDuration: {
         600: '600ms',
@@ -149,6 +178,9 @@ export default {
         'fade-in': 'fade-in 0.6s ease-out forwards',
         'float': 'float 7s ease-in-out infinite',
         'pulse-glow': 'pulse-glow 3s ease-in-out infinite',
+        'gradient-shift': 'gradient-shift 20s ease-in-out infinite',
+        'pulse-subtle': 'pulse-subtle 2s ease-in-out infinite',
+        'progress-bar': 'progress-bar 3s ease-in-out infinite',
       },
     },
   },

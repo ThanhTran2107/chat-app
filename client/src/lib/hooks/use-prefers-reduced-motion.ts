@@ -1,0 +1,23 @@
+import { useSyncExternalStore } from 'react';
+
+function getSnapshot(): boolean {
+  if (typeof window === 'undefined') return false;
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+function getServerSnapshot(): boolean {
+  return false;
+}
+
+export function usePrefersReducedMotion(): boolean {
+  return useSyncExternalStore(
+    (callback: () => void) => {
+      if (typeof window === 'undefined') return () => {};
+      const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+      mediaQuery.addEventListener('change', callback);
+      return () => mediaQuery.removeEventListener('change', callback);
+    },
+    getSnapshot,
+    getServerSnapshot,
+  );
+}

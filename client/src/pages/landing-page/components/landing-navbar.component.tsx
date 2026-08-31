@@ -1,3 +1,4 @@
+import map from 'lodash-es/map';
 import { Menu } from 'lucide-react';
 
 import { Link, useLocation } from 'react-router-dom';
@@ -48,7 +49,7 @@ export function LandingNavbar() {
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
-          {navLinks.map(link => (
+          {map(navLinks, link => (
             <NavLink key={link.href} label={link.label} href={link.href} />
           ))}
         </nav>
@@ -61,12 +62,12 @@ export function LandingNavbar() {
           <Sheet>
             <SheetTrigger
               aria-label="Open menu"
-              className="inline-flex items-center justify-center rounded-xl border border-slate-200/70 bg-white/80 p-2.5 text-slate-950 shadow-sm md:hidden dark:border-white/10 dark:bg-slate-950/80"
+              className="inline-flex items-center justify-center rounded-xl border border-slate-200/70 bg-white/80 p-2.5 text-slate-950 shadow-sm md:hidden dark:border-white/10 dark:bg-slate-950/80 dark:text-slate-300"
             >
               <Menu className="h-5 w-5" />
             </SheetTrigger>
             <SheetContent side="right" className="bg-background flex w-64 flex-col gap-6 p-6 pt-16">
-              {navLinks.map(link => (
+              {map(navLinks, link => (
                 <NavLink key={link.href} label={link.label} href={link.href} />
               ))}
               <PrimaryButton to="/login" className="mt-2 justify-center">

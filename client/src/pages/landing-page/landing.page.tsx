@@ -1,9 +1,10 @@
+import { Suspense, lazy } from 'react';
+
 import { ThemeToggleFloat } from '@/components/ui/theme-toggle-float.component';
 
 import { HeroSection } from './components/hero-section.component';
 import { LandingFooter } from './components/landing-footer.component';
 import { LandingNavbar } from './components/landing-navbar.component';
-import { lazy, Suspense } from 'react';
 import { ProductShowcase } from './components/product-showcase.component';
 
 const LazyBenefitsSection = lazy(() =>

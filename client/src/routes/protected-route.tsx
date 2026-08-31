@@ -1,17 +1,17 @@
 import { appSessionInitPromise, useAuthStore } from '@/stores/use-auth.store';
 import { useChatStore } from '@/stores/use-chat.store';
-import { LoadingOutlined } from '@ant-design/icons';
 import isEmpty from 'lodash-es/isEmpty';
 
 import { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 
-import { Spin } from '@/components/antd/spin.component';
+import { LoadingSpinner } from '@/components/ui/loading-spinner.component';
 
 import { ROUTES } from '@/utils/constants';
 
 export const ProtectedRoute = () => {
   const [starting, setStarting] = useState(true);
+  const [progress, setProgress] = useState(0);
 
   const accessToken = useAuthStore(state => state.accessToken);
   const loading = useAuthStore(state => state.loading);
@@ -20,6 +20,8 @@ export const ProtectedRoute = () => {
     let mounted = true;
 
     const initializeAuth = async () => {
+      setProgress(0);
+
       try {
         const authState = useAuthStore.getState();
         const currentAccessToken = authState.accessToken;
@@ -27,15 +29,18 @@ export const ProtectedRoute = () => {
         const chatState = useChatStore.getState();
 
         if (appSessionInitPromise) await appSessionInitPromise;
+        if (mounted) setProgress(33);
 
         if (!currentAccessToken) return;
 
         if (!currentUser) await authState.fetchMe();
+        if (mounted) setProgress(67);
 
         if (isEmpty(chatState.conversations) && !chatState.convoLoading) await chatState.fetchConversations();
       } catch (e) {
         console.warn('ProtectedRoute initialization warning:', e);
       } finally {
+        if (mounted) setProgress(100);
         if (mounted) setStarting(false);
       }
     };
@@ -47,16 +52,7 @@ export const ProtectedRoute = () => {
     };
   }, [accessToken]);
 
-  if (loading || starting)
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <Spin
-          indicator={<LoadingOutlined spin style={{ fontSize: 48 }} />}
-          description="Loading the page..."
-          size="large"
-        />
-      </div>
-    );
+  if (loading || starting) return <LoadingSpinner progress={progress} />;
 
   if (!accessToken) return <Navigate to={ROUTES.LOGIN} replace />;
 

@@ -1,11 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { LoadingOutlined } from '@ant-design/icons';
 import { Toaster } from 'sonner';
 
 import { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
-import { Spin } from '@/components/antd/spin.component';
+import { LoadingSpinner } from '@/components/ui/loading-spinner.component';
 
 import { ProtectedRoute } from './routes/protected-route';
 import { RedirectIfAuthenticated } from './routes/redirect-if-authenticated';
@@ -68,17 +67,7 @@ function App() {
     <>
       <Toaster richColors />
       <BrowserRouter>
-        <Suspense
-          fallback={
-            <div className="flex h-screen items-center justify-center">
-              <Spin
-                indicator={<LoadingOutlined spin style={{ fontSize: 48 }} />}
-                size="large"
-                description="Loading..."
-              />
-            </div>
-          }
-        >
+        <Suspense fallback={<LoadingSpinner description="Wait a moment for loading !" />}>
           <Routes>
             <Route
               path="/"

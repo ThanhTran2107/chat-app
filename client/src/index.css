@@ -5,6 +5,12 @@
 @custom-variant dark (&:is(.dark *));
 @config '../tailwind.config.ts';
 
+@keyframes tetra-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @layer base {
   :root {
     /* Base colors - soft pastels */
@@ -310,10 +316,14 @@
 
   /* Respect reduced motion for continuous landing-page animations */
   @media (prefers-reduced-motion: reduce) {
+    .animate-spin,
     .animate-float,
     .animate-pulse-glow,
     .animate-fade-up,
     .animate-fade-in,
+    .animate-pulse-subtle,
+    .animate-progress-bar,
+    .animate-gradient-shift,
     .typing-dot {
       animation: none !important;
     }

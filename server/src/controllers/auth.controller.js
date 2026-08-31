@@ -113,7 +113,7 @@ export const logIn = async (req, res) => {
     const passwordCorrect = await bcrypt.compare(password, user.hashedPassword);
 
     if (!passwordCorrect)
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "Password incorrect" });
 
     const accessToken = await createSessionForUser(user, res);
 
