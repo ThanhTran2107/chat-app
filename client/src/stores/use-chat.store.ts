@@ -22,6 +22,7 @@ import {
 } from './utils/chat-store.util';
 
 let fetchConversationsPromise: Promise<void> | null = null;
+const inflightMessageFetches = new Map<string, AbortController>();
 
 const { CHAT_STORAGE } = LOCAL_STORAGE_KEYS;
 
@@ -46,7 +47,7 @@ export const useChatStore = create<ChatState>()(
       messages: {},
       activeConversationId: null,
       convoLoading: false, // convo loading
-      messageLoading: false, // message loading
+      messageLoading: {}, // per-conversation message loading
       messageLoaded: {}, // tracks whether messages for a conversation have been initially loaded
       loading: false,
 
@@ -57,7 +58,7 @@ export const useChatStore = create<ChatState>()(
           messages: {},
           activeConversationId: null,
           convoLoading: false,
-          messageLoading: false,
+          messageLoading: {},
           messageLoaded: {},
         }),
       fetchConversations: async () => {
@@ -92,13 +93,25 @@ export const useChatStore = create<ChatState>()(
 
         if (nextCursor === null) return;
 
-        set({ messageLoading: true });
+        // Abort any previous in-flight request for the same conversation
+        const existing = inflightMessageFetches.get(convoId);
+        if (existing) existing.abort();
+
+        const controller = new AbortController();
+        inflightMessageFetches.set(convoId, controller);
+
+        set(state => ({
+          messageLoading: { ...state.messageLoading, [convoId]: true },
+        }));
 
         try {
           const { messages: fetched, cursor } = await ChatService.fetchMessages(
             convoId,
             nextCursor === '' ? undefined : nextCursor,
+            controller.signal,
           );
+
+          if (controller.signal.aborted) return;
 
           const processed = map(fetched, message => attachOwnership(message, user?._id));
 
@@ -112,12 +125,18 @@ export const useChatStore = create<ChatState>()(
                 [convoId]: { items: merged, hasMore: !!cursor, nextCursor: cursor ?? null },
               },
               messageLoaded: { ...state.messageLoaded, [convoId]: true },
+              messageLoading: { ...state.messageLoading, [convoId]: false },
             };
           });
         } catch (e) {
+          if (controller.signal.aborted) return;
+
           console.error('Fetch messages error:', e);
+          set(state => ({
+            messageLoading: { ...state.messageLoading, [convoId]: false },
+          }));
         } finally {
-          set({ messageLoading: false });
+          if (inflightMessageFetches.get(convoId) === controller) inflightMessageFetches.delete(convoId);
         }
       },
       sendDirectMessage: async (

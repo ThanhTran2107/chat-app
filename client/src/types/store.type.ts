@@ -44,7 +44,7 @@ export interface ChatState {
   messages: Record<string, { items: Message[]; hasMore: boolean; nextCursor?: string | null }>; // Mapping of conversationId to its messages
   activeConversationId: string | null; // The ID of the currently active conversation, null if none is active
   convoLoading: boolean; // Indicates if conversations are currently being loaded
-  messageLoading: boolean; // Indicates if messages are currently being loaded
+  messageLoading: Record<string, boolean>; // Per-conversation message loading state keyed by conversationId
   messageLoaded: Record<string, boolean>; // Tracks whether messages for a conversation have been initially loaded
   loading: boolean; // General loading state for chat-related operations
   reset: () => void; // Function to reset the chat state to its initial values

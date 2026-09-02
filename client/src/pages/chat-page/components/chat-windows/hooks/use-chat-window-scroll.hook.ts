@@ -1,3 +1,4 @@
+import { useChatStore } from '@/stores/use-chat.store';
 import type { Message } from '@/types/chat.type';
 
 import { type RefObject, useEffect, useLayoutEffect, useRef, useState } from 'react';
@@ -39,10 +40,6 @@ export const useChatWindowScroll = ({
   const manualTriggeredRef = useRef(false);
 
   useEffect(() => {
-    manualTriggeredRef.current = false;
-  }, [messages.length]);
-
-  useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
@@ -54,6 +51,9 @@ export const useChatWindowScroll = ({
         pendingNewMessagesRef.current = 0;
         setNewMessageCount(0);
       }
+
+      // Allow re-triggering fetch-more once the user scrolls away from the top boundary
+      if (container.scrollTop > 100) manualTriggeredRef.current = false;
     };
 
     container.addEventListener('scroll', handleScroll, { passive: true });
@@ -159,7 +159,9 @@ export const useChatWindowScroll = ({
       scrollRestoreRef.current = null;
       fetchInProgressRef.current = false;
       manualTriggeredRef.current = false;
+
       setNewMessageCount(0);
+      setIsLoadingMore(false);
     }
 
     prevActiveConversationIdRef.current = activeConversationId;
@@ -234,6 +236,8 @@ export const useChatWindowScroll = ({
     if (!activeConversationId) return;
 
     if (fetchInProgressRef.current) return;
+
+    if (useChatStore.getState().messages[activeConversationId]?.nextCursor === null) return;
 
     fetchInProgressRef.current = true;
 

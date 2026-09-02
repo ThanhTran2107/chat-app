@@ -15,7 +15,7 @@ import { MessageInput } from '../components/messages/message-input.component';
 export const ChatWindowLayout = () => {
   const activeConversationId = useChatStore(state => state.activeConversationId);
   const conversations = useChatStore(state => state.conversations);
-  const loading = useChatStore(state => state.messageLoading);
+  const messageLoadingMap = useChatStore(state => state.messageLoading);
   const messageLoaded = useChatStore(state => state.messageLoaded);
   const messages = useChatStore(state => state.messages);
   const markAsSeen = useChatStore(state => state.markAsSeen);
@@ -29,7 +29,8 @@ export const ChatWindowLayout = () => {
     return convMsgs?.items ?? [];
   }, [activeConversationId, messages]);
 
-  const isInitialLoading = loading && !messageLoaded[activeConversationId ?? ''];
+  const isInitialLoading =
+    !!activeConversationId && messageLoadingMap[activeConversationId] === true && !messageLoaded[activeConversationId];
 
   useEffect(() => {
     if (!selectedConvo) return;
