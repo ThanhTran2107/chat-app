@@ -4,7 +4,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 import find from 'lodash-es/find';
 import map from 'lodash-es/map';
 import some from 'lodash-es/some';
-import { RefreshCw } from 'lucide-react';
+import { AlertTriangle, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 
 import * as React from 'react';
@@ -81,6 +81,7 @@ const ImageCell = ({
   rootClassName,
   preview,
   isSending,
+  isFailed,
   wrapperClassName,
 }: {
   src?: string;
@@ -88,6 +89,7 @@ const ImageCell = ({
   rootClassName?: string;
   preview: { src: string } | false;
   isSending: boolean;
+  isFailed?: boolean;
   wrapperClassName?: string;
 }) => {
   const [loaded, setLoaded] = React.useState(false);
@@ -101,7 +103,7 @@ const ImageCell = ({
         preview={preview}
         onLoad={() => setLoaded(true)}
       />
-      {!loaded && !isSending && (
+      {!loaded && !isSending && !isFailed && (
         <div className="absolute inset-0 flex items-center justify-center bg-slate-100 dark:bg-slate-900/60">
           <Skeleton.Image active />
         </div>
@@ -109,6 +111,11 @@ const ImageCell = ({
       {isSending && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/20 dark:bg-black/40">
           <Spin indicator={<LoadingOutlined spin style={{ fontSize: 24 }} />} />
+        </div>
+      )}
+      {isFailed && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/50 dark:bg-black/70">
+          <AlertTriangle className="size-6 text-red-400" />
         </div>
       )}
     </div>
@@ -247,6 +254,7 @@ export const MessageGroupComponent = ({
     if (images.length === 1) {
       const img = images[0];
       const isSending = img.status === 'sending';
+      const isFailed = img.status === 'failed';
 
       return (
         <div className="w-full overflow-hidden">
@@ -254,8 +262,9 @@ export const MessageGroupComponent = ({
             src={img.imgUrl ?? undefined}
             alt={text ?? 'Image message'}
             rootClassName="tetra-image-message"
-            preview={img.imgUrl && !isSending ? { src: img.imgUrl } : false}
+            preview={img.imgUrl && !isSending && !isFailed ? { src: img.imgUrl } : false}
             isSending={isSending}
+            isFailed={isFailed}
           />
         </div>
       );
@@ -267,6 +276,7 @@ export const MessageGroupComponent = ({
       <div className={cn('grid gap-0.5', cols === 2 ? 'grid-cols-2' : 'grid-cols-3')}>
         {map(images, img => {
           const isSending = img.status === 'sending';
+          const isFailed = img.status === 'failed';
 
           return (
             <ImageCell
@@ -274,8 +284,9 @@ export const MessageGroupComponent = ({
               src={img.imgUrl ?? undefined}
               alt={text ?? 'Image message'}
               rootClassName="tetra-image-grid"
-              preview={img.imgUrl && !isSending ? { src: img.imgUrl } : false}
+              preview={img.imgUrl && !isSending && !isFailed ? { src: img.imgUrl } : false}
               isSending={isSending}
+              isFailed={isFailed}
               wrapperClassName="aspect-square overflow-hidden bg-slate-100 dark:bg-slate-900/60"
             />
           );
@@ -290,13 +301,14 @@ export const MessageGroupComponent = ({
         const key = file.clientMessageId ?? file._id;
         const isDownloading = !!downloadingIds[key];
         const isSending = file.status === 'sending';
+        const isFailed = file.status === 'failed';
 
         return (
           <button
             key={file._id}
             type="button"
             onClick={() => handleDownloadAttachment(file)}
-            disabled={isDownloading || isSending}
+            disabled={isDownloading || isSending || isFailed}
             className="border-border/50 relative flex w-full items-center gap-3 border-t bg-white p-3 text-left transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-slate-950/80 dark:hover:bg-slate-900/90"
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-50 shadow-sm dark:bg-slate-900/70">
@@ -325,6 +337,12 @@ export const MessageGroupComponent = ({
             {isSending && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/20 dark:bg-black/40">
                 <Spin indicator={<LoadingOutlined spin style={{ fontSize: 24 }} />} />
+              </div>
+            )}
+
+            {isFailed && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/50 dark:bg-black/70">
+                <AlertTriangle className="size-6 text-red-400" />
               </div>
             )}
           </button>
