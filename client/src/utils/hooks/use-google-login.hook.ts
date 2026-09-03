@@ -128,6 +128,9 @@ export function useGoogleLogin(onSuccess?: () => void) {
   const handleGoogleClick = () => {
     if (!googleTokenClient.current) return toast.error('Google login is not ready yet.');
 
+    // Start fetching the ChatPage chunk now, in parallel with the OAuth flow below
+    void import('@/pages/chat-page/chat.page');
+
     clearGoogleRequestTimeout();
     setGoogleLoading(true);
     googleRequestTimeout.current = window.setTimeout(() => {

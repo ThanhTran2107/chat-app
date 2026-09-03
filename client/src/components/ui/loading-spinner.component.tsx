@@ -4,12 +4,14 @@ export interface LoadingSpinnerProps {
   description?: string;
   className?: string;
   progress?: number;
+  onProgressComplete?: () => void;
 }
 
 export function LoadingSpinner({
   description = 'Wait a moment for loading !',
   className,
   progress,
+  onProgressComplete,
 }: LoadingSpinnerProps) {
   const hasProgress = progress !== undefined;
 
@@ -56,8 +58,12 @@ export function LoadingSpinner({
         {hasProgress && (
           <div className="bg-muted/30 w-48 overflow-hidden rounded-full">
             <div
-              className="from-primary to-primary-glow h-1 bg-linear-to-r transition-all duration-300"
+              className="from-primary to-primary-glow h-1 bg-linear-to-r transition-all duration-150"
               style={{ width: `${progress}%` }}
+              // Fire once the width transition actually finishes instead of guessing a delay
+              onTransitionEnd={event => {
+                if (event.propertyName === 'width' && progress === 100) onProgressComplete?.();
+              }}
             />
           </div>
         )}

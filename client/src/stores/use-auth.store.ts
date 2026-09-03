@@ -14,6 +14,8 @@ let fetchMePromise: Promise<void> | null = null;
 let refreshTokenPromise: Promise<void> | null = null;
 export let appSessionInitPromise: Promise<void> | null = null;
 
+export const setAppSessionInitPromise = (promise: Promise<void> | null) => (appSessionInitPromise = promise);
+
 const { AUTH_STORAGE, CHAT_STORAGE, AUTH_SESSION } = LOCAL_STORAGE_KEYS;
 
 // Zustand store for managing authentication state and actions
@@ -161,9 +163,7 @@ export const useAuthStore = create<AuthState>()(
               localStorage.setItem(AUTH_SESSION, AUTH_SESSION_VALUE);
               setAccessToken(accessToken);
 
-              if (!user) await fetchMe();
-
-              await useChatStore.getState().fetchConversations();
+              await Promise.all([user ? Promise.resolve() : fetchMe(), useChatStore.getState().fetchConversations()]);
             } catch (e) {
               console.warn('Refresh token failed:', e);
               get().clearState();

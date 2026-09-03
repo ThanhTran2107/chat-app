@@ -11,6 +11,11 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  // Pre-bundle heavy ChatPage deps at dev server startup instead of discovering them
+  // on first navigation to /chat, which otherwise forces a mid-session re-optimize + reload
+  optimizeDeps: {
+    include: ['antd', '@emoji-mart/react', 'emoji-mart', 'socket.io-client', 'howler', 'framer-motion'],
+  },
   server: {
     proxy: {
       '/tetra': {

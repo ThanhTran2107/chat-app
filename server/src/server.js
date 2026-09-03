@@ -33,6 +33,9 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET, // Click 'View API Keys' above to copy your API secret
 });
 
+// Lightweight endpoint for uptime pingers (e.g. UptimeRobot/cron-job.org) to keep free-tier hosting awake
+app.get("/health", (_, res) => res.status(200).json({ status: "ok" }));
+
 // Swagger setup
 const swaggerDocument = JSON.parse(
   fs.readFileSync("./src/swagger.json", "utf-8"),

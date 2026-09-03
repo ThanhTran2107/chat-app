@@ -8,28 +8,28 @@ import { LoadingSpinner } from '@/components/ui/loading-spinner.component';
 
 import { ProtectedRoute } from './routes/protected-route';
 import { RedirectIfAuthenticated } from './routes/redirect-if-authenticated';
-import { useAuthStore } from './stores/use-auth.store';
+import { setAppSessionInitPromise, useAuthStore } from './stores/use-auth.store';
 import { useSocketStore } from './stores/use-socket.store';
 import { useThemeStore } from './stores/use-theme.store';
 import { AUTH_SESSION_VALUE, LOCAL_STORAGE_KEYS, ROUTES } from './utils/constants';
 
-const ChatPage = lazy(() => import('./pages/chat-page/chat.page').then(m => ({ default: m.ChatPage })));
+const ChatPage = lazy(() => import('@/pages/chat-page/chat.page').then(m => ({ default: m.ChatPage })));
 const ForgotPasswordPage = lazy(() =>
-  import('./pages/forgot-password-page/forgot-password.page').then(m => ({ default: m.ForgotPasswordPage })),
+  import('@/pages/forgot-password-page/forgot-password.page').then(m => ({ default: m.ForgotPasswordPage })),
 );
-const LandingPage = lazy(() => import('./pages/landing-page/landing.page').then(m => ({ default: m.LandingPage })));
-const LoginPage = lazy(() => import('./pages/login-page/login.page').then(m => ({ default: m.LoginPage })));
-const RegisterPage = lazy(() => import('./pages/register-page/register.page').then(m => ({ default: m.RegisterPage })));
+const LandingPage = lazy(() => import('@/pages/landing-page/landing.page').then(m => ({ default: m.LandingPage })));
+const LoginPage = lazy(() => import('@/pages/login-page/login.page').then(m => ({ default: m.LoginPage })));
+const RegisterPage = lazy(() => import('@/pages/register-page/register.page').then(m => ({ default: m.RegisterPage })));
 const ResendVerificationPage = lazy(() =>
-  import('./pages/resend-verification-page/resend-verification.page').then(m => ({
+  import('@/pages/resend-verification-page/resend-verification.page').then(m => ({
     default: m.ResendVerificationPage,
   })),
 );
 const ResetPasswordPage = lazy(() =>
-  import('./pages/reset-password-page/reset-password.page').then(m => ({ default: m.ResetPasswordPage })),
+  import('@/pages/reset-password-page/reset-password.page').then(m => ({ default: m.ResetPasswordPage })),
 );
 const VerifyEmailPage = lazy(() =>
-  import('./pages/verify-email-page/verify-email.page').then(m => ({ default: m.VerifyEmailPage })),
+  import('@/pages/verify-email-page/verify-email.page').then(m => ({ default: m.VerifyEmailPage })),
 );
 
 function App() {
@@ -50,7 +50,7 @@ function App() {
 
       if (hasSession) {
         const { refreshToken } = useAuthStore.getState();
-        refreshToken();
+        setAppSessionInitPromise(refreshToken());
       }
     };
 

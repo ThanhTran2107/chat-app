@@ -50,6 +50,10 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
     try {
       const { email, password, rememberMe } = data;
 
+      // Start fetching the ChatPage chunk now, in parallel with the login request below,
+      // instead of only after login resolves - overlaps chunk load with real network time
+      void import('@/pages/chat-page/chat.page');
+
       if (rememberMe) {
         localStorage.setItem(REMEMBERED_EMAIL, email);
       } else {

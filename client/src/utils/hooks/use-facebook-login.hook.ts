@@ -34,6 +34,9 @@ export function useFacebookLogin(onSuccess?: () => void) {
 
     if (!FB) return toast.error('Facebook login is not ready yet.');
 
+    // Start fetching the ChatPage chunk now, in parallel with the OAuth flow below
+    void import('@/pages/chat-page/chat.page');
+
     clearFacebookRequestTimeout();
     setFacebookLoading(true);
     facebookRequestTimeout.current = window.setTimeout(() => {

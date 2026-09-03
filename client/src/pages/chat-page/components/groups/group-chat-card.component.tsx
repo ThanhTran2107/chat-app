@@ -26,7 +26,7 @@ const GroupChatCardComponent = ({ convo }: { convo: Conversation }) => {
     [setActiveConversation, fetchMessages],
   );
 
-  const unreadCount = convo.unreadCounts[user._id];
+  const unreadCount = user ? convo.unreadCounts[user._id] : 0;
   const groupName = Array.isArray(convo.group) ? convo.group[0]?.name : convo.group?.name;
 
   const leftSection = useMemo(
