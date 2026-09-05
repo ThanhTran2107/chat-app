@@ -40,7 +40,7 @@ const SkeletonBubble = ({ lines, className }: { lines: number; className?: strin
 
 export const ChatWindowSkeleton = () => {
   return (
-    <div className="flex h-full w-full flex-col gap-3 overflow-y-auto p-4">
+    <div className="scrollbar-hidden flex h-full w-full flex-col gap-3 overflow-y-auto p-4">
       {map(INITIAL_SKELETON, (item, index) => {
         if (item.type === 'time') {
           return (

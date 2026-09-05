@@ -170,15 +170,15 @@ export const useChatStore = create<ChatState>()(
 
               if (exists) return state;
 
-              const updatedItems = map(items, m => {
-                if (m.clientMessageId !== clientMessageId) return m;
+              const updatedItems = map(items, msg => {
+                if (msg.clientMessageId !== clientMessageId) return msg;
 
-                revokeBlobUrl(m.imgUrl);
+                revokeBlobUrl(msg.imgUrl);
 
                 return {
                   ...attachOwnership(message, useAuthStore.getState().user?._id),
                   isNew: true,
-                  clientMessageId: m.clientMessageId,
+                  clientMessageId: msg.clientMessageId,
                 };
               });
 
@@ -374,23 +374,23 @@ export const useChatStore = create<ChatState>()(
             }
 
             const sendingCandidates = filter(
-              map(items, (m, index) => ({ m, index })),
-              ({ m }) =>
-                m.status === 'sending' &&
-                m.senderId === message.senderId &&
-                m.content === message.content &&
-                (!m.createdAt ||
-                  Math.abs(new Date(m.createdAt).getTime() - new Date(message.createdAt).getTime()) < 10000),
+              map(items, (msg, index) => ({ msg, index })),
+              ({ msg }) =>
+                msg.status === 'sending' &&
+                msg.senderId === message.senderId &&
+                msg.content === message.content &&
+                (!msg.createdAt ||
+                  Math.abs(new Date(msg.createdAt).getTime() - new Date(message.createdAt).getTime()) < 10000),
             );
 
             if (!isEmpty(sendingCandidates)) {
               const incomingTime = new Date(message.createdAt).getTime();
 
-              const closest = sendingCandidates.reduce((best, { m, index }) => {
-                const currentDiff = Math.abs(new Date(m.createdAt).getTime() - incomingTime);
-                const bestDiff = Math.abs(new Date(best.m.createdAt).getTime() - incomingTime);
+              const closest = sendingCandidates.reduce((best, { msg, index }) => {
+                const currentDiff = Math.abs(new Date(msg.createdAt).getTime() - incomingTime);
+                const bestDiff = Math.abs(new Date(best.msg.createdAt).getTime() - incomingTime);
 
-                return currentDiff < bestDiff ? { m, index } : best;
+                return currentDiff < bestDiff ? { msg, index } : best;
               }, sendingCandidates[0]);
 
               const updatedItems = [...items];
@@ -542,7 +542,7 @@ export const useChatStore = create<ChatState>()(
 
         const existingMessage = find(
           get().messages[conversationId]?.items ?? [],
-          m => m.clientMessageId === clientMessageId,
+          msg => msg.clientMessageId === clientMessageId,
         );
 
         try {
@@ -577,15 +577,15 @@ export const useChatStore = create<ChatState>()(
 
             if (exists) return state;
 
-            const updatedItems = map(items, m => {
-              if (m.clientMessageId !== clientMessageId) return m;
+            const updatedItems = map(items, msg => {
+              if (msg.clientMessageId !== clientMessageId) return msg;
 
-              revokeBlobUrl(m.imgUrl);
+              revokeBlobUrl(msg.imgUrl);
 
               return {
                 ...attachOwnership(message, user?._id),
                 isNew: true,
-                clientMessageId: m.clientMessageId,
+                clientMessageId: msg.clientMessageId,
               };
             });
 
@@ -614,8 +614,10 @@ export const useChatStore = create<ChatState>()(
               messages: {
                 ...state.messages,
                 [conversationId]: {
-                  items: map(items, m =>
-                    m.clientMessageId === clientMessageId ? { ...m, status: 'failed' as const, isUploading: false } : m,
+                  items: map(items, msg =>
+                    msg.clientMessageId === clientMessageId
+                      ? { ...msg, status: 'failed' as const, isUploading: false }
+                      : msg,
                   ),
                   hasMore: state.messages[conversationId]?.hasMore ?? true,
                   nextCursor: state.messages[conversationId]?.nextCursor,
@@ -633,8 +635,8 @@ export const useChatStore = create<ChatState>()(
             ...state.messages,
             [conversationId]: {
               ...state.messages[conversationId],
-              items: map(state.messages[conversationId]?.items ?? [], m =>
-                m.clientMessageId === clientMessageId ? { ...m, isUploading } : m,
+              items: map(state.messages[conversationId]?.items ?? [], msg =>
+                msg.clientMessageId === clientMessageId ? { ...msg, isUploading } : msg,
               ),
             },
           },

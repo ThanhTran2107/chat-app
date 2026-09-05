@@ -1,3 +1,4 @@
+import map from 'lodash-es/map';
 import { Image, MessageSquare, Users, UsersRound } from 'lucide-react';
 
 import { FeatureCard } from './feature-card.component';
@@ -39,7 +40,7 @@ export function UseCasesSection() {
         </Reveal>
 
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {useCases.map((useCase, i) => (
+          {map(useCases, (useCase, i) => (
             <Reveal key={useCase.title} delay={i * 100}>
               <FeatureCard icon={useCase.icon} title={useCase.title} description={useCase.description} />
             </Reveal>

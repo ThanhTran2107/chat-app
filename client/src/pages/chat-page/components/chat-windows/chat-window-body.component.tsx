@@ -34,7 +34,7 @@ export const ChatWindowBody = () => {
 
   const selectedConvo = useChatStore(state => {
     const activeId = state.activeConversationId;
-    return find(state.conversations, c => c._id === activeId) ?? null;
+    return find(state.conversations, convo => convo._id === activeId) ?? null;
   });
 
   const user = useAuthStore(state => state.user);

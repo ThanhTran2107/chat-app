@@ -48,7 +48,14 @@ export const ChatWindowLayout = () => {
 
   if (!selectedConvo) return <ChatWelcomeScreen />;
 
-  if (isInitialLoading && isEmpty(conversationMessages)) return <ChatWindowSkeleton />;
+  if (isInitialLoading && isEmpty(conversationMessages))
+    return (
+      <SidebarInset className="flex h-full min-h-0 flex-1 flex-col overflow-hidden rounded-sm shadow-md">
+        <div className="bg-primary-foreground min-h-0 flex-1 overflow-hidden">
+          <ChatWindowSkeleton />
+        </div>
+      </SidebarInset>
+    );
 
   return (
     <SidebarInset className="flex h-full min-h-0 flex-1 flex-col overflow-hidden rounded-sm shadow-md">

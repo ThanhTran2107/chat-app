@@ -1,3 +1,4 @@
+import map from 'lodash-es/map';
 import { Laptop, Smartphone, Tablet } from 'lucide-react';
 
 import { APP_NAME } from '@/utils/constants';
@@ -35,7 +36,7 @@ export function PlatformSection() {
         </Reveal>
 
         <div className="mt-12 flex flex-col items-center justify-center gap-8 sm:gap-10 lg:flex-row lg:gap-12">
-          {devices.map((device, i) => (
+          {map(devices, (device, i) => (
             <Reveal key={device.name} delay={i * 150}>
               <div className="flex flex-col items-center gap-3">
                 <device.Frame />

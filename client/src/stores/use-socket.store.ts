@@ -145,7 +145,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     let isFirstConnect = true;
 
     const joinAllConversations = () => {
-      const conversationIds = map(useChatStore.getState().conversations, c => c._id);
+      const conversationIds = map(useChatStore.getState().conversations, convo => convo._id);
       conversationIds.forEach(id => socket.emit(SOCKET_EVENTS.JOIN_CONVERSATION, id));
     };
 

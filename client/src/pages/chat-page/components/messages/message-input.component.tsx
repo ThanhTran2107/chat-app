@@ -208,20 +208,20 @@ export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation })
 
     useChatStore.setState(state => {
       const items = state.messages[conversationId]?.items ?? [];
-      const exists = some(items, m => m._id === message._id);
+      const exists = some(items, msg => msg._id === message._id);
 
       if (exists) return state;
 
-      const updatedItems = map(items, m => {
-        if (m.clientMessageId !== clientMessageId) return m;
+      const updatedItems = map(items, msg => {
+        if (msg.clientMessageId !== clientMessageId) return msg;
 
-        revokeBlobUrl(m.imgUrl);
+        revokeBlobUrl(msg.imgUrl);
 
         return {
           ...message,
           isOwn: true,
           isNew: true,
-          clientMessageId: m.clientMessageId,
+          clientMessageId: msg.clientMessageId,
           status: undefined,
         };
       });
@@ -412,11 +412,11 @@ export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation })
 
   const removeSelectedAttachment = (id: string) => {
     setSelectedFiles(prev => {
-      const target = prev.find(item => item.id === id);
+      const target = find(prev, item => item.id === id);
 
       if (target?.previewUrl && target.previewUrl.startsWith('blob:')) URL.revokeObjectURL(target.previewUrl);
 
-      return prev.filter(item => item.id !== id);
+      return filter(prev, item => item.id !== id);
     });
   };
 
@@ -427,7 +427,7 @@ export const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation })
 
     const totalSize = attachments.reduce((sum, item) => sum + (item.file.size || 0), 0);
 
-    const imageCount = attachments.filter(item => item.file.type.startsWith('image/')).length;
+    const imageCount = filter(attachments, item => item.file.type.startsWith('image/')).length;
     const nonImageCount = total - imageCount;
 
     if (imageCount === total)

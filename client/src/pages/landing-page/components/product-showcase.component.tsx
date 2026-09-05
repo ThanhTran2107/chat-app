@@ -1,3 +1,4 @@
+import map from 'lodash-es/map';
 import { Check, CheckCheck, Image, Paperclip, Search, Send, Smile, UsersRound } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -115,30 +116,30 @@ function ConversationSidebar() {
       </div>
 
       <div className="beautiful-scrollbar flex-1 space-y-0.5 overflow-y-auto py-2">
-        {conversations.map(c => (
+        {map(conversations, convo => (
           <div
-            key={c.id}
+            key={convo.id}
             className="flex items-center gap-3 px-4 py-3 text-sm hover:bg-slate-800/60 dark:hover:bg-white/5"
           >
             <div
               className={cn(
                 'relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold',
-                c.role === 'group' ? 'bg-violet-500/20 text-violet-300' : 'bg-slate-500 text-white',
+                convo.role === 'group' ? 'bg-violet-500/20 text-violet-300' : 'bg-slate-500 text-white',
               )}
             >
-              {c.avatar}
-              {c.role === 'online' && <StatusDot />}
+              {convo.avatar}
+              {convo.role === 'online' && <StatusDot />}
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between">
-                <p className="font-semibold text-slate-100">{c.name}</p>
-                <span className="text-xs text-slate-400">{c.time}</span>
+                <p className="font-semibold text-slate-100">{convo.name}</p>
+                <span className="text-xs text-slate-400">{convo.time}</span>
               </div>
-              <p className="truncate text-sm text-slate-400">{c.last}</p>
+              <p className="truncate text-sm text-slate-400">{convo.last}</p>
             </div>
-            {c.unread > 0 && (
+            {convo.unread > 0 && (
               <span className="flex h-5 w-5 items-center justify-center rounded-full bg-violet-500 text-xs font-semibold text-white">
-                {c.unread}
+                {convo.unread}
               </span>
             )}
           </div>
@@ -185,7 +186,7 @@ const chatMessages = [
 function ChatBody() {
   return (
     <div className="beautiful-scrollbar flex-1 space-y-4 overflow-y-auto px-5 py-5">
-      {chatMessages.map((msg, i) => (
+      {map(chatMessages, (msg, i) => (
         <ChatMessage key={i} msg={msg} />
       ))}
     </div>
