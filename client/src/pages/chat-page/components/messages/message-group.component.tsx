@@ -138,18 +138,18 @@ export const MessageGroupComponent = ({
     (participant: Participant) => participant._id?.toString() === primary.senderId.toString(),
   );
 
-  const images = messages.filter(m => m.imgUrl);
-  const files = messages.filter(m => m.fileUrl || (m.fileName && !m.imgUrl));
-  const text = messages.find(m => m.content)?.content ?? null;
+  const images = messages.filter(msg => msg.imgUrl);
+  const files = messages.filter(msg => msg.fileUrl || (msg.fileName && !msg.imgUrl));
+  const text = messages.find(msg => msg.content)?.content ?? null;
 
   const isOwn = !!primary.isOwn;
 
   const [downloadingIds, setDownloadingIds] = React.useState<Record<string, boolean>>({});
   const retryMessage = useChatStore(state => state.retryMessage);
 
-  const groupStatus: 'sending' | 'failed' | undefined = messages.find(m => m.status === 'failed')
+  const groupStatus: 'sending' | 'failed' | undefined = find(messages, msg => msg.status === 'failed')
     ? 'failed'
-    : messages.find(m => m.status === 'sending')
+    : find(messages, msg => msg.status === 'sending')
       ? 'sending'
       : undefined;
 
@@ -189,7 +189,7 @@ export const MessageGroupComponent = ({
   };
 
   const handleRetry = async () => {
-    const failed = messages.find(m => m.status === 'failed');
+    const failed = find(messages, msg => msg.status === 'failed');
 
     if (!failed?.clientMessageId) return;
 
@@ -200,7 +200,9 @@ export const MessageGroupComponent = ({
 
     try {
       if (type === CONVERSATION_TYPES.DIRECT) {
-        const otherParticipant = selectedConvo.participants.find(p => p._id && p._id !== primary.senderId);
+        const otherParticipant = selectedConvo.participants.find(
+          participant => participant._id && participant._id !== primary.senderId,
+        );
         const recipientId = otherParticipant?._id ?? '';
 
         await retryMessage(
@@ -220,7 +222,8 @@ export const MessageGroupComponent = ({
     }
   };
 
-  const showRetry = groupStatus === 'failed' && isOwn && !!messages.find(m => m.status === 'failed')?.clientMessageId;
+  const showRetry =
+    groupStatus === 'failed' && isOwn && !!find(messages, msg => msg.status === 'failed')?.clientMessageId;
 
   const messageStatusRow = showStatus && (
     <div className="mt-1.5 flex items-center gap-1">

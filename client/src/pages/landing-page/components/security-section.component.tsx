@@ -1,3 +1,4 @@
+import map from 'lodash-es/map';
 import { Cookie, FileText, Key, Lock, MailCheck, Shield, ShieldCheck } from 'lucide-react';
 
 import { Reveal, Section, SectionHeader } from './landing-section.component';
@@ -58,7 +59,7 @@ export function SecuritySection() {
         </Reveal>
 
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {securityItems.map((item, i) => (
+          {map(securityItems, (item, i) => (
             <Reveal
               key={item.title}
               delay={i * 80}

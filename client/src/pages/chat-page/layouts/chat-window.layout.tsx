@@ -1,15 +1,13 @@
 import { useChatStore } from '@/stores/use-chat.store';
 import find from 'lodash-es/find';
-import isEmpty from 'lodash-es/isEmpty';
 
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 
 import { SidebarInset } from '@/components/ui/sidebar.component';
 
 import { ChatWelcomeScreen } from '../components/chat-windows/chat-welcome-screen.component';
 import { ChatWindowBody } from '../components/chat-windows/chat-window-body.component';
 import { ChatWindowHeader } from '../components/chat-windows/chat-window-header.component';
-import { ChatWindowSkeleton } from '../components/chat-windows/chat-window-skeleton.component';
 import { MessageInput } from '../components/messages/message-input.component';
 
 export const ChatWindowLayout = () => {
@@ -17,17 +15,9 @@ export const ChatWindowLayout = () => {
   const conversations = useChatStore(state => state.conversations);
   const messageLoadingMap = useChatStore(state => state.messageLoading);
   const messageLoaded = useChatStore(state => state.messageLoaded);
-  const messages = useChatStore(state => state.messages);
   const markAsSeen = useChatStore(state => state.markAsSeen);
 
   const selectedConvo = find(conversations, convo => convo._id === activeConversationId) ?? null;
-
-  const conversationMessages = useMemo(() => {
-    if (!activeConversationId) return [];
-
-    const convMsgs = messages[activeConversationId];
-    return convMsgs?.items ?? [];
-  }, [activeConversationId, messages]);
 
   const isInitialLoading =
     !!activeConversationId && messageLoadingMap[activeConversationId] === true && !messageLoaded[activeConversationId];
@@ -48,8 +38,6 @@ export const ChatWindowLayout = () => {
 
   if (!selectedConvo) return <ChatWelcomeScreen />;
 
-  if (isInitialLoading && isEmpty(conversationMessages)) return <ChatWindowSkeleton />;
-
   return (
     <SidebarInset className="flex h-full min-h-0 flex-1 flex-col overflow-hidden rounded-sm shadow-md">
       {/*Header */}
@@ -57,7 +45,7 @@ export const ChatWindowLayout = () => {
 
       {/*Body */}
       <div className="bg-primary-foreground min-h-0 flex-1 overflow-hidden">
-        <ChatWindowBody />
+        <ChatWindowBody isMessageLoading={isInitialLoading} />
       </div>
 
       {/*Footer */}

@@ -42,26 +42,26 @@ export const updateConversationAfterCreateMessage = (
 };
 
 export const formatConversationParticipants = (participants) =>
-  (participants || []).map((p) => ({
-    _id: p.userId?._id,
-    displayName: p.userId?.displayName,
-    avatarUrl: p.userId?.avatarUrl ?? null,
-    showOnlineStatus: p.userId?.showOnlineStatus,
-    joinedAt: p.joinedAt,
+  (participants || []).map((participant) => ({
+    _id: participant.userId?._id,
+    displayName: participant.userId?.displayName,
+    avatarUrl: participant.userId?.avatarUrl ?? null,
+    showOnlineStatus: participant.userId?.showOnlineStatus,
+    joinedAt: participant.joinedAt,
   }));
 
 const formatConversationForSocket = (conversation) => ({
   _id: conversation._id,
   type: conversation.type,
-  participants: (conversation.participants || []).map((p) => {
-    const userId = p?.userId?._id?.toString?.() ?? p?.userId?.toString?.();
+  participants: (conversation.participants || []).map((participant) => {
+    const userId = participant?.userId?._id?.toString?.() ?? participant?.userId?.toString?.();
 
     return {
       _id: userId,
-      displayName: p?.userId?.displayName,
-      avatarUrl: p?.userId?.avatarUrl ?? null,
-      showOnlineStatus: p?.userId?.showOnlineStatus,
-      joinedAt: p?.joinedAt,
+      displayName: participant?.userId?.displayName,
+      avatarUrl: participant?.userId?.avatarUrl ?? null,
+      showOnlineStatus: participant?.userId?.showOnlineStatus,
+      joinedAt: participant?.joinedAt,
     };
   }),
   lastMessage: conversation.lastMessage,
@@ -73,11 +73,11 @@ export const emitNewMessage = ({ io, conversation, message }) => {
   const recipients = Array.from(
     new Set(
       (conversation.participants || [])
-        .map((p) => {
-          if (!p?.userId) return null;
-          if (typeof p.userId === "string") return p.userId;
-          if (p.userId?._id) return p.userId._id.toString();
-          return p.userId.toString();
+        .map((participant) => {
+          if (!participant?.userId) return null;
+          if (typeof participant.userId === "string") return participant.userId;
+          if (participant.userId?._id) return participant.userId._id.toString();
+          return participant.userId.toString();
         })
         .filter(Boolean),
     ),

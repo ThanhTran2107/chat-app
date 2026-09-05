@@ -40,15 +40,14 @@ const SkeletonBubble = ({ lines, className }: { lines: number; className?: strin
 
 export const ChatWindowSkeleton = () => {
   return (
-    <div className="flex h-full w-full flex-col gap-3 overflow-y-auto p-4">
+    <div className="flex flex-1 flex-col gap-3">
       {map(INITIAL_SKELETON, (item, index) => {
-        if (item.type === 'time') {
+        if (item.type === 'time')
           return (
             <div key={`time-${index}`} className="flex justify-center">
               <Skeleton active className="bg-muted! h-3 w-20 rounded-md" />
             </div>
           );
-        }
 
         const { side, lines, hasAvatar } = item.data;
 

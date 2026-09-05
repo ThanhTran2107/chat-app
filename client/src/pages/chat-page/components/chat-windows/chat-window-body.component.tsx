@@ -1,5 +1,6 @@
 import { useAuthStore } from '@/stores/use-auth.store';
 import { useChatStore } from '@/stores/use-chat.store';
+import type { Message } from '@/types/chat.type';
 import { find, isEmpty, map, some } from 'lodash-es';
 
 import { useMemo, useRef } from 'react';
@@ -13,16 +14,19 @@ import { CONVERSATION_TYPES } from '@/utils/constants';
 import { MessageGroup } from '../messages/message-group.component';
 import { groupMessages } from '../messages/utils/message-grouping.util';
 import { ChatWelcomeScreen } from './chat-welcome-screen.component';
+import { ChatWindowSkeleton } from './chat-window-skeleton.component';
 import { useChatWindowScroll } from './hooks/use-chat-window-scroll.hook';
 
-export const ChatWindowBody = () => {
+const EMPTY_MESSAGES: Message[] = [];
+
+export const ChatWindowBody = ({ isMessageLoading }: { isMessageLoading?: boolean }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const activeConversationId = useChatStore(state => state.activeConversationId);
 
   const messages = useChatStore(state => {
     const convMsgs = state.messages[state.activeConversationId ?? ''];
-    return convMsgs?.items ?? [];
+    return convMsgs?.items ?? EMPTY_MESSAGES;
   });
 
   const hasMore = useChatStore(state => {
@@ -34,7 +38,7 @@ export const ChatWindowBody = () => {
 
   const selectedConvo = useChatStore(state => {
     const activeId = state.activeConversationId;
-    return find(state.conversations, c => c._id === activeId) ?? null;
+    return find(state.conversations, convo => convo._id === activeId) ?? null;
   });
 
   const user = useAuthStore(state => state.user);
@@ -98,54 +102,56 @@ export const ChatWindowBody = () => {
       </div>
     );
 
-  if (isEmpty(messages))
-    return (
-      <div className="text-muted-foreground flex h-full items-center justify-center">Start a conversation now!</div>
-    );
-
   return (
     <div className="bg-primary-foreground relative flex h-full min-h-0 flex-1 flex-col p-4">
       <div
         id="scrollableDiv"
         ref={containerRef}
-        className="beautiful-scrollbar scrollbar-hidden min-h-0 flex-1 flex-col-reverse gap-3 overflow-x-hidden overflow-y-auto pb-5"
+        className={`beautiful-scrollbar scrollbar-hidden flex min-h-0 flex-1 flex-col-reverse gap-3 overflow-x-hidden ${isMessageLoading ? 'overflow-y-hidden' : 'overflow-y-auto'} pb-5`}
+        aria-busy={isMessageLoading ? true : undefined}
       >
-        <InfiniteScroll
-          dataLength={messages.length}
-          next={handleFetchMoreMessages}
-          hasMore={hasMore}
-          loader={
-            <div className="flex flex-col gap-3 py-2">
-              <div className="flex items-start gap-2">
-                <Skeleton.Avatar active size={32} />
-                <Skeleton active className="bg-muted! h-14 w-full max-w-xs rounded-2xl lg:max-w-md" />
+        {isMessageLoading ? (
+          <ChatWindowSkeleton />
+        ) : isEmpty(messages) ? (
+          <div className="text-muted-foreground flex h-full items-center justify-center">Start a conversation now!</div>
+        ) : (
+          <InfiniteScroll
+            dataLength={messages.length}
+            next={handleFetchMoreMessages}
+            hasMore={hasMore}
+            loader={
+              <div className="flex flex-col gap-3 py-2">
+                <div className="flex items-start gap-2">
+                  <Skeleton.Avatar active size={32} />
+                  <Skeleton active className="bg-muted! h-14 w-full max-w-xs rounded-2xl lg:max-w-md" />
+                </div>
+                <div className="flex items-start justify-end gap-2">
+                  <Skeleton active className="bg-muted! lg:maxw-md h-12 w-full max-w-xs rounded-2xl" />
+                </div>
+                <div className="flex items-start gap-2">
+                  <div className="size-8" />
+                  <Skeleton active className="bg-muted! lg:maxw-md h-12 w-full max-w-xs rounded-2xl" />
+                </div>
               </div>
-              <div className="flex items-start justify-end gap-2">
-                <Skeleton active className="bg-muted! h-12 w-full max-w-xs rounded-2xl lg:max-w-md" />
+            }
+            scrollableTarget="scrollableDiv"
+            inverse={true}
+            style={{ display: 'flex', flexDirection: 'column-reverse', overflow: 'visible' }}
+          >
+            {map(messageGroups, group => (
+              <div key={group.id} className="text-foreground px-3 py-2 wrap-break-word">
+                <MessageGroup
+                  group={group}
+                  selectedConvo={selectedConvo}
+                  lastMessageStatus={lastMessageStatus}
+                  lastOwnMessageId={lastOwnMessageId}
+                  isShowTime={groupVisibility.visibility[group.id] ?? false}
+                  isGroupBreak={groupVisibility.breaks[group.id] ?? false}
+                />
               </div>
-              <div className="flex items-start gap-2">
-                <div className="size-8" />
-                <Skeleton active className="bg-muted! h-12 w-full max-w-xs rounded-2xl lg:max-w-md" />
-              </div>
-            </div>
-          }
-          scrollableTarget="scrollableDiv"
-          inverse={true}
-          style={{ display: 'flex', flexDirection: 'column-reverse', overflow: 'visible' }}
-        >
-          {map(messageGroups, group => (
-            <div key={group.id} className="text-foreground px-3 py-2 wrap-break-word">
-              <MessageGroup
-                group={group}
-                selectedConvo={selectedConvo}
-                lastMessageStatus={lastMessageStatus}
-                lastOwnMessageId={lastOwnMessageId}
-                isShowTime={groupVisibility.visibility[group.id] ?? false}
-                isGroupBreak={groupVisibility.breaks[group.id] ?? false}
-              />
-            </div>
-          ))}
-        </InfiniteScroll>
+            ))}
+          </InfiniteScroll>
+        )}
       </div>
       {newMessageCount > 0 && (
         <div className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2">
