@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/stores/use-auth.store';
 import { useChatStore } from '@/stores/use-chat.store';
 import type { Message } from '@/types/chat.type';
 
@@ -20,6 +21,7 @@ export const useChatWindowScroll = ({
   fetchMessages,
   latestMessageId,
 }: UseChatWindowScrollParams) => {
+  const userId = useAuthStore(state => state.user?._id);
   const isNearBottomRef = useRef(true);
   const pendingNewMessagesRef = useRef(0);
   const prevLastMessageIdRef = useRef<string | undefined>(undefined);
@@ -170,16 +172,18 @@ export const useChatWindowScroll = ({
   useEffect(() => {
     const currentLastId = messages[messages.length - 1]?._id;
     const prevLastId = prevLastMessageIdRef.current;
+    const newMessage = messages[messages.length - 1];
 
     if (currentLastId !== prevLastId && prevLastId !== undefined) {
-      if (!isNearBottomRef.current) {
+      // Only count messages from other users (not own messages)
+      if (!isNearBottomRef.current && newMessage && !newMessage.isOwn) {
         pendingNewMessagesRef.current += 1;
         setNewMessageCount(pendingNewMessagesRef.current);
       }
     }
 
     prevLastMessageIdRef.current = currentLastId;
-  }, [messages]);
+  }, [messages, userId]);
 
   useLayoutEffect(() => {
     const container = containerRef.current;
@@ -192,6 +196,10 @@ export const useChatWindowScroll = ({
     const wasNearBottom = isNearBottomRef.current;
     const isOlderMessagesLoaded = messages.length > prevMessagesLength && latestMessageId === prevLatestMessageId;
 
+    // Get the latest message to determine if it's own message (sender) or from other user (receiver)
+    const newMessage = messages[messages.length - 1];
+    const isOwnMessage = newMessage && newMessage.isOwn;
+
     if (scrollRestorePending) {
       const { oldScrollTop, oldScrollHeight, oldMessagesLength } = scrollRestoreRef.current!;
       const delta = container.scrollHeight - oldScrollHeight;
@@ -201,6 +209,7 @@ export const useChatWindowScroll = ({
         if (delta > 0) container.scrollTop = oldScrollTop + delta;
 
         scrollRestoreRef.current = null;
+
         return;
       }
 
@@ -215,9 +224,19 @@ export const useChatWindowScroll = ({
       return;
     }
 
-    if (wasNearBottom && !isOlderMessagesLoaded) container.scrollTop = container.scrollHeight;
-
-    isNearBottomRef.current = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+    // LOGIC MỚI: Phân biệt sender vs receiver cho auto-scroll
+    if (isOwnMessage) {
+      // SENDER: Luôn auto-scroll đến tin nhắn mới của mình
+      container.scrollTop = container.scrollHeight;
+      isNearBottomRef.current = true;
+    } else if (wasNearBottom && !isOlderMessagesLoaded) {
+      // RECEIVER: Chỉ auto-scroll nếu đang ở gần dưới cùng
+      container.scrollTop = container.scrollHeight;
+      isNearBottomRef.current = true;
+    } else {
+      // Cập nhật trạng thái near-bottom dựa trên vị trí hiện tại
+      isNearBottomRef.current = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+    }
 
     prevMessagesLengthRef.current = messages.length;
     prevLatestMessageIdRef.current = latestMessageId;
